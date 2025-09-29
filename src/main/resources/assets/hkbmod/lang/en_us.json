@@ -1,0 +1,13 @@
+{
+  "itemGroup.hkbmod": "Example Mod Tab",
+  "block.hkbmod.example_block": "Example Block",
+  "item.hkbmod.example_item": "Example Item",
+
+  "hkbmod.configuration.title": "HKB-Mod Configs",
+  "hkbmod.configuration.section.hkbmod.common.toml": "HKB-Mod Configs",
+  "hkbmod.configuration.section.hkbmod.common.toml.title": "HKB-Mod Configs",
+  "hkbmod.configuration.items": "Item List",
+  "hkbmod.configuration.logDirtBlock": "Log Dirt Block",
+  "hkbmod.configuration.magicNumberIntroduction": "Magic Number Text",
+  "hkbmod.configuration.magicNumber": "Magic Number"
+}
