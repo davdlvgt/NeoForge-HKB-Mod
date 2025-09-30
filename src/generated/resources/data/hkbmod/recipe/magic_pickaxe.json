@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "D": "minecraft:diamond",
+    "E": "minecraft:ender_eye",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "DED",
+    " S ",
+    " S "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hkbmod:magic_pickaxe"
+  }
+}

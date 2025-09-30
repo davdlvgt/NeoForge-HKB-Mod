@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.\\gradlew.bat build:*)",
+      "Bash(./gradlew:*)",
+      "WebSearch",
+      "Bash(.gradlew.bat runData)",
+      "Bash(gradlew.bat runData:*)",
+      "Bash(.gradlew.bat build)",
+      "Bash(gradlew.bat build:*)",
+      "WebFetch(domain:docs.neoforged.net)",
+      "Bash(cmd /c gradlew.bat:*)",
+      "Bash(cmd /c:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
