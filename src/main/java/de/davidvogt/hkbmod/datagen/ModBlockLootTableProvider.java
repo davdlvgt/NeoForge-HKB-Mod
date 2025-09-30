@@ -1,6 +1,6 @@
 package de.davidvogt.hkbmod.datagen;
 
-import de.davidvogt.hkbmod.registry.ModBlocks;
+import de.davidvogt.hkbmod.block.ModBlocks;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;

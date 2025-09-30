@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.datagen;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.item.ModItems;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.data.PackOutput;
@@ -33,7 +34,8 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModItems.MAGIC_PICKAXE.get(), "Magic Pickaxe");
 
         // Blocks
-
+        add(ModBlocks.TEST_BLOCK.get(), "Test Block");
+        add(ModBlocks.CUSTOM_TEST_BLOCK.get(), "Custom Test Block");
 
         // Tooltips (optional)
     }

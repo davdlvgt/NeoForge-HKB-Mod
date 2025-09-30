@@ -1,5 +1,6 @@
 package de.davidvogt.hkbmod.datagen;
 
+import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.item.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -73,6 +74,22 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('S', Items.STICK)
                 .unlockedBy("has_diamond", has(Items.ENDER_EYE))
                 .save(this.output);
+
+
+        // BLOCK RECIPES
+        shaped(RecipeCategory.MISC, ModBlocks.TEST_BLOCK.get())
+                .pattern("DDD")
+                .pattern("DDD")
+                .pattern("DDD")
+                .define('D', Items.DIAMOND_BLOCK)
+                .unlockedBy("has_diamond", has(Items.DIAMOND)).save(output);
+
+        shaped(RecipeCategory.MISC, ModBlocks.CUSTOM_TEST_BLOCK.get())
+                .pattern("EEE")
+                .pattern("EEE")
+                .pattern("EEE")
+                .define('E', Items.EMERALD_BLOCK)
+                .unlockedBy("has_diamond", has(Items.EMERALD)).save(output);
     }
 
     public static class Generator extends RecipeProvider.Runner {

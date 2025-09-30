@@ -1,26 +1,25 @@
 package de.davidvogt.hkbmod;
 
+import com.mojang.logging.LogUtils;
+import de.davidvogt.hkbmod.block.ModBlocks;
+import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.network.NetworkHandler;
 import de.davidvogt.hkbmod.registry.ModCreativeTabs;
-import de.davidvogt.hkbmod.item.ModItems;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
-
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(HKBMod.MODID)
@@ -44,6 +43,7 @@ public class HKBMod {
 
         // Register all our mod's deferred registers
         ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
@@ -70,11 +70,15 @@ public class HKBMod {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModItems.EMERALD_AXE.get());
             event.accept(ModItems.EMERALD_PICKAXE.get());
-            event.accept(ModItems.EMERALD_SWORD.get());
             event.accept(ModItems.EMERALD_SHOVEL.get());
             event.accept(ModItems.EMERALD_HOE.get());
 
             event.accept(ModItems.MAGIC_PICKAXE.get());
+        } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+            event.accept(ModItems.EMERALD_SWORD.get());
+        } else if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModBlocks.TEST_BLOCK.get());
+            event.accept(ModBlocks.CUSTOM_TEST_BLOCK.get());
         }
     }
 

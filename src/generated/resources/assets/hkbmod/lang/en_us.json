@@ -1,13 +1,11 @@
 {
+  "block.hkbmod.custom_test_block": "Custom Test Block",
+  "block.hkbmod.test_block": "Test Block",
   "item.hkbmod.emerald_axe": "Emerald Axe",
   "item.hkbmod.emerald_hoe": "Emerald Hoe",
   "item.hkbmod.emerald_pickaxe": "Emerald Pickaxe",
   "item.hkbmod.emerald_shovel": "Emerald Shovel",
   "item.hkbmod.emerald_sword": "Emerald Sword",
   "item.hkbmod.magic_pickaxe": "Magic Pickaxe",
-  "itemGroup.hkbmod": "HKB Mod",
-
-  "tooltip.hkbmod.magic_pickaxe_shift_down": "This item can mine 3x3 blocks at once.",
-    "tooltip.hkbmod.magic_pickaxe": "Press SHIFT for more information."
-
+  "itemGroup.hkbmod": "HKB Mod"
 }
