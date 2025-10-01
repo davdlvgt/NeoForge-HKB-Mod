@@ -2,11 +2,13 @@ package de.davidvogt.hkbmod.block;
 
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.block.custom.CustomTestBlock;
+import de.davidvogt.hkbmod.block.custom.TestLampBlock;
 import de.davidvogt.hkbmod.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -30,6 +32,10 @@ public class ModBlocks {
     // CUSTOM BLOCKS
     public static final DeferredBlock<Block> CUSTOM_TEST_BLOCK = registerBlock("custom_test_block",
             (properties) -> new CustomTestBlock(properties.strength(2f).noLootTable()));
+
+    public static final DeferredBlock<Block> TEST_LAMP = registerBlock("test_lamp",
+            (properties) -> new TestLampBlock(properties.strength(2f).requiresCorrectToolForDrops()
+                    .lightLevel(state -> state.getValue(TestLampBlock.CLICKED) ? 15 : 0)));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> function) {
         DeferredBlock<T> toReturn = BLOCKS.registerBlock(name, function);
