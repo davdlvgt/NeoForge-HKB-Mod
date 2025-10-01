@@ -1,6 +1,7 @@
 {
   "block.hkbmod.custom_test_block": "Custom Test Block",
   "block.hkbmod.test_block": "Test Block",
+  "block.hkbmod.test_lamp": "Test Lamp",
   "item.hkbmod.emerald_axe": "Emerald Axe",
   "item.hkbmod.emerald_hoe": "Emerald Hoe",
   "item.hkbmod.emerald_pickaxe": "Emerald Pickaxe",

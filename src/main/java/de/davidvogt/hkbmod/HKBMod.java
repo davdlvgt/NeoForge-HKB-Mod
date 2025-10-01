@@ -79,6 +79,7 @@ public class HKBMod {
         } else if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModBlocks.TEST_BLOCK.get());
             event.accept(ModBlocks.CUSTOM_TEST_BLOCK.get());
+            event.accept(ModBlocks.TEST_LAMP.get());
         }
     }
 

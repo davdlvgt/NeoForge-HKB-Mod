@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "hkbmod:block/test_lamp"
+  }
+}
