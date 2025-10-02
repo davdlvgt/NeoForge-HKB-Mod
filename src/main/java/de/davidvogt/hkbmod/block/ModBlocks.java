@@ -2,6 +2,7 @@ package de.davidvogt.hkbmod.block;
 
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.block.custom.CustomTestBlock;
+import de.davidvogt.hkbmod.block.custom.ResearchTableBlock;
 import de.davidvogt.hkbmod.block.custom.TestLampBlock;
 import de.davidvogt.hkbmod.item.ModItems;
 import net.minecraft.world.item.BlockItem;
@@ -36,6 +37,10 @@ public class ModBlocks {
     public static final DeferredBlock<Block> TEST_LAMP = registerBlock("test_lamp",
             (properties) -> new TestLampBlock(properties.strength(2f).requiresCorrectToolForDrops()
                     .lightLevel(state -> state.getValue(TestLampBlock.CLICKED) ? 15 : 0)));
+
+    public static final DeferredBlock<Block> RESEARCH_TABLE = registerBlock("research_table",
+            (properties) -> new ResearchTableBlock(properties.noOcclusion()));
+
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> function) {
         DeferredBlock<T> toReturn = BLOCKS.registerBlock(name, function);

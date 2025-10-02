@@ -90,6 +90,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .pattern("EEE")
                 .define('E', Items.EMERALD_BLOCK)
                 .unlockedBy("has_diamond", has(Items.EMERALD)).save(output);
+
+        shaped(RecipeCategory.MISC, ModBlocks.RESEARCH_TABLE.get())
+                .pattern("BBB")
+                .pattern("LPL")
+                .pattern("L L")
+                .define('B', Items.BOOK)
+                .define('L', Items.OAK_LOG)
+                .define('P', Items.PAPER)
+                .unlockedBy("has_book", has(Items.BOOK)).save(output);
     }
 
     public static class Generator extends RecipeProvider.Runner {
