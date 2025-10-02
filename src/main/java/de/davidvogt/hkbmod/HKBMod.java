@@ -1,10 +1,18 @@
 package de.davidvogt.hkbmod;
 
 import com.mojang.logging.LogUtils;
+import de.davidvogt.hkbmod.attachment.ModAttachments;
 import de.davidvogt.hkbmod.block.ModBlocks;
+import de.davidvogt.hkbmod.block.entity.ModBlockEntities;
 import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.network.NetworkHandler;
+import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
 import de.davidvogt.hkbmod.registry.ModCreativeTabs;
+import de.davidvogt.hkbmod.research.PlayerResearchData;
+import de.davidvogt.hkbmod.research.ResearchManager;
+import de.davidvogt.hkbmod.screen.ModMenuTypes;
+import de.davidvogt.hkbmod.screen.cutsom.ResearchTableScreen;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Blocks;
@@ -16,8 +24,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
 
@@ -38,13 +48,19 @@ public class HKBMod {
         // Register the creative tab content event on the mod event bus
         modEventBus.addListener(this::addCreative);
 
+        // Register network packets
+        modEventBus.addListener(NetworkHandler::register);
+
         // Register ourselves for server and other game events we are interested in.
         NeoForge.EVENT_BUS.register(this);
 
         // Register all our mod's deferred registers
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
+        ModAttachments.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -80,6 +96,8 @@ public class HKBMod {
             event.accept(ModBlocks.TEST_BLOCK.get());
             event.accept(ModBlocks.CUSTOM_TEST_BLOCK.get());
             event.accept(ModBlocks.TEST_LAMP.get());
+        } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            event.accept(ModBlocks.RESEARCH_TABLE.get());
         }
     }
 
@@ -88,10 +106,34 @@ public class HKBMod {
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         LOGGER.info("HELLO from server starting");
+
+        // Load research data from JSON files
+        ResearchManager.loadResearches(event.getServer().getResourceManager());
     }
+
+    @SubscribeEvent
+    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            // Sync player research data when they log in
+            PlayerResearchData researchData = serverPlayer.getData(ModAttachments.PLAYER_RESEARCH);
+            serverPlayer.connection.send(new SyncPlayerResearchPacket(researchData.getCompletedLevels()));
+            LOGGER.info("Synced research data for player {} - {} classes completed",
+                serverPlayer.getName().getString(), researchData.getCompletedLevels().size());
+        }
+    }
+
 
     @EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
     public static class ClientModEvents {
 
+/*        @SubscribeEvent
+        public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(ModBlockEntities.RESEARCH_TABLE_BE.get(), ResearchTableBlockEntityRenderer::new);
+        }*/
+
+        @SubscribeEvent
+        public static void registerScreens(RegisterMenuScreensEvent event) {
+            event.register(ModMenuTypes.RESEARCH_TABLE_MENU.get(), ResearchTableScreen::new);
+        }
     }
 }

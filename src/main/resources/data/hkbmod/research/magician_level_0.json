@@ -1,0 +1,20 @@
+{
+  "class": "magician",
+  "level": 0,
+  "displayName": "Level 0: Fundamental",
+  "description": "Begin your magical studies",
+  "requirements": [
+    {
+      "item": "minecraft:book",
+      "count": 3
+    },
+    {
+      "item": "minecraft:lapis_lazuli",
+      "count": 16
+    }
+  ],
+  "unlocks": [
+    "Basic Spell Book",
+    "Mana Regeneration"
+  ]
+}

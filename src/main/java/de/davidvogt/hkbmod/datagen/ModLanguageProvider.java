@@ -37,6 +37,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModBlocks.TEST_BLOCK.get(), "Test Block");
         add(ModBlocks.CUSTOM_TEST_BLOCK.get(), "Custom Test Block");
         add(ModBlocks.TEST_LAMP.get(), "Test Lamp");
+        add(ModBlocks.RESEARCH_TABLE.get(), "Research Table");
 
         // Tooltips (optional)
     }
