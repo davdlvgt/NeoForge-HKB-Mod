@@ -21,37 +21,39 @@ public class ResearchManager {
     public static void loadResearches(ResourceManager resourceManager) {
         RESEARCHES.clear();
 
-        // Define research files to load
-        String[] researchFiles = {
-            "knight_level_0", "knight_level_1", "knight_level_2", "knight_level_3", "knight_level_4", "knight_level_5",
-            "archer_level_0", "archer_level_1", "archer_level_2", "archer_level_3", "archer_level_4", "archer_level_5",
-            "cavalier_level_0", "cavalier_level_1", "cavalier_level_2", "cavalier_level_3", "cavalier_level_4", "cavalier_level_5",
-            "magician_level_0", "magician_level_1", "magician_level_2", "magician_level_3", "magician_level_4", "magician_level_5"
-        };
+        // Automatically discover all research JSON files in data/hkbmod/research/
+        // The structure is: data/hkbmod/research/<classname>/<filename>.json
+        // or flat: data/hkbmod/research/<filename>.json
 
-        // Load each research file from resources
-        for (String fileName : researchFiles) {
-            ResourceLocation location = ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "research/" + fileName + ".json");
+        Map<ResourceLocation, net.minecraft.server.packs.resources.Resource> allResources =
+            resourceManager.listResources("research", location -> location.getPath().endsWith(".json"));
+
+        for (Map.Entry<ResourceLocation, net.minecraft.server.packs.resources.Resource> entry : allResources.entrySet()) {
+            ResourceLocation location = entry.getKey();
+
+            // Only process files from our mod
+            if (!location.getNamespace().equals(HKBMod.MODID)) {
+                continue;
+            }
 
             try {
-                var resource = resourceManager.getResource(location);
-                if (resource.isPresent()) {
-                    try (InputStream inputStream = resource.get().open();
-                         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                try (InputStream inputStream = entry.getValue().open();
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
-                        StringBuilder jsonBuilder = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            jsonBuilder.append(line);
-                        }
-
-                        loadFromJsonString(fileName, jsonBuilder.toString());
+                    StringBuilder jsonBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        jsonBuilder.append(line);
                     }
-                } else {
-                    HKBMod.LOGGER.warn("Research file not found: {}", location);
+
+                    // Extract filename for logging (without .json extension)
+                    String path = location.getPath();
+                    String fileName = path.substring(path.lastIndexOf('/') + 1, path.length() - 5);
+
+                    loadFromJsonString(fileName, jsonBuilder.toString());
                 }
             } catch (Exception e) {
-                HKBMod.LOGGER.error("Failed to load research file: {}", fileName, e);
+                HKBMod.LOGGER.error("Failed to load research file: {}", location, e);
             }
         }
 
