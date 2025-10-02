@@ -1,0 +1,29 @@
+name: Restrict branch creation
+
+on:
+  create:
+    branches:
+      - 'feature/*'
+      - 'fix/*'
+      - 'bugfix/*'
+      - 'hotfix/*'
+      - 'experiment/*'
+      - 'chore/*'
+      - 'docs/*'
+      - 'test/*'
+      - 'cicd/*'
+
+jobs:
+  check-branch-origin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prüfe Branch Ursprung
+        run: |
+          NEW_BRANCH="${{ github.ref_name }}"
+          BASE_BRANCH=$(git rev-parse --abbrev-ref ${{ github.sha }}@{u} || echo "unknown")
+          echo "Branch: $NEW_BRANCH, Base: $BASE_BRANCH"
+
+          if [[ "$BASE_BRANCH" != "dev" ]]; then
+            echo "❌ Feature-/Fix-Branch darf nur von dev erstellt werden!"
+            exit 1
+          fi
