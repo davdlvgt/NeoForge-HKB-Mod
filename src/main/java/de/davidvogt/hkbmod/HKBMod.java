@@ -7,11 +7,11 @@ import de.davidvogt.hkbmod.block.entity.ModBlockEntities;
 import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.network.NetworkHandler;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
+import de.davidvogt.hkbmod.network.SyncResearchDataPacket;
 import de.davidvogt.hkbmod.registry.ModCreativeTabs;
 import de.davidvogt.hkbmod.research.PlayerResearchData;
 import de.davidvogt.hkbmod.research.ResearchManager;
 import de.davidvogt.hkbmod.screen.ModMenuTypes;
-import de.davidvogt.hkbmod.screen.cutsom.ResearchTableScreen;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -24,7 +24,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -114,6 +113,9 @@ public class HKBMod {
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            // Sync research definitions to client
+            serverPlayer.connection.send(SyncResearchDataPacket.create());
+
             // Sync player research data when they log in
             PlayerResearchData researchData = serverPlayer.getData(ModAttachments.PLAYER_RESEARCH);
             serverPlayer.connection.send(new SyncPlayerResearchPacket(researchData.getCompletedLevels()));
@@ -123,17 +125,4 @@ public class HKBMod {
     }
 
 
-    @EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
-    public static class ClientModEvents {
-
-/*        @SubscribeEvent
-        public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
-            event.registerBlockEntityRenderer(ModBlockEntities.RESEARCH_TABLE_BE.get(), ResearchTableBlockEntityRenderer::new);
-        }*/
-
-        @SubscribeEvent
-        public static void registerScreens(RegisterMenuScreensEvent event) {
-            event.register(ModMenuTypes.RESEARCH_TABLE_MENU.get(), ResearchTableScreen::new);
-        }
-    }
 }

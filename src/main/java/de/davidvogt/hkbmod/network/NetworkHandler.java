@@ -30,10 +30,22 @@ public class NetworkHandler {
             SetSelectedLevelPacket::handle
         );
 
+        registrar.playToServer(
+            SetDigSizePacket.TYPE,
+            SetDigSizePacket.STREAM_CODEC,
+            SetDigSizePacket::handle
+        );
+
         registrar.playToClient(
             SyncPlayerResearchPacket.TYPE,
             SyncPlayerResearchPacket.STREAM_CODEC,
             SyncPlayerResearchPacket::handle
+        );
+
+        registrar.playToClient(
+            SyncResearchDataPacket.TYPE,
+            SyncResearchDataPacket.STREAM_CODEC,
+            SyncResearchDataPacket::handle
         );
 
         HKBMod.LOGGER.info("Registered network packets");

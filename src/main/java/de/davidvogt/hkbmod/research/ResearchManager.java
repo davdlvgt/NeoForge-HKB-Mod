@@ -23,11 +23,10 @@ public class ResearchManager {
 
         // Define research files to load
         String[] researchFiles = {
-            "knight_level_0",
-            "knight_level_1",
-            "archer_level_0",
-            "cavalier_level_0",
-            "magician_level_0"
+            "knight_level_0", "knight_level_1", "knight_level_2", "knight_level_3", "knight_level_4", "knight_level_5",
+            "archer_level_0", "archer_level_1", "archer_level_2", "archer_level_3", "archer_level_4", "archer_level_5",
+            "cavalier_level_0", "cavalier_level_1", "cavalier_level_2", "cavalier_level_3", "cavalier_level_4", "cavalier_level_5",
+            "magician_level_0", "magician_level_1", "magician_level_2", "magician_level_3", "magician_level_4", "magician_level_5"
         };
 
         // Load each research file from resources
@@ -97,5 +96,13 @@ public class ResearchManager {
 
     public static boolean isLoaded() {
         return !RESEARCHES.isEmpty();
+    }
+
+    public static void addResearch(Research research) {
+        RESEARCHES.computeIfAbsent(research.classType(), k -> new ArrayList<>()).add(research);
+    }
+
+    public static void clearResearches() {
+        RESEARCHES.clear();
     }
 }

@@ -17,7 +17,10 @@
       "Bash(./gradlew.bat build:*)",
       "Bash(find:*)",
       "Bash(.gradlew.bat compileJava)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(.gradlew.bat clean)",
+      "Bash(.\\gradlew.bat runServer:*)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []
