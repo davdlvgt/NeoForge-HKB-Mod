@@ -1,0 +1,20 @@
+{
+  "class": "archer",
+  "level": 0,
+  "displayName": "Level 0: Fundamental",
+  "description": "Begin your path as an Archer",
+  "requirements": [
+    {
+      "item": "minecraft:bow",
+      "count": 1
+    },
+    {
+      "item": "minecraft:arrow",
+      "count": 32
+    }
+  ],
+  "unlocks": [
+    "Leather Armor Set",
+    "Basic Archery Skills"
+  ]
+}

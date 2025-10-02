@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "hkbmod:block/custom_test_block_down",
+    "east": "hkbmod:block/custom_test_block_east",
+    "north": "hkbmod:block/custom_test_block_north",
+    "particle": "hkbmod:block/custom_test_block_particle",
+    "south": "hkbmod:block/custom_test_block_south",
+    "up": "hkbmod:block/custom_test_block_up",
+    "west": "hkbmod:block/custom_test_block_west"
+  }
+}

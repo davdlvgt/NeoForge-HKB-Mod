@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "hkbmod:block/test_block"
+    }
+  }
+}

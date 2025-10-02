@@ -1,0 +1,20 @@
+{
+  "class": "cavalier",
+  "level": 3,
+  "displayName": "Level 3: Expert",
+  "description": "Become an expert cavalier",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 4
+    },
+    {
+      "item": "minecraft:enchanted_golden_apple",
+      "count": 2
+    }
+  ],
+  "unlocks": [
+    "Unstoppable Mount",
+    "Lance Mastery"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "class": "archer",
+  "level": 3,
+  "displayName": "Level 3: Expert",
+  "description": "Become an expert archer",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 3
+    },
+    {
+      "item": "minecraft:crossbow",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Crossbow Mastery",
+    "Piercing Shot"
+  ]
+}
