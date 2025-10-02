@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "minecraft:book",
+    "L": "minecraft:oak_log",
+    "P": "minecraft:paper"
+  },
+  "pattern": [
+    "BBB",
+    "LPL",
+    "L L"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hkbmod:research_table"
+  }
+}

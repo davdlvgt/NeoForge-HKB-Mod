@@ -1,0 +1,13 @@
+{
+  "block.hkbmod.custom_test_block": "Custom Test Block",
+  "block.hkbmod.research_table": "Research Table",
+  "block.hkbmod.test_block": "Test Block",
+  "block.hkbmod.test_lamp": "Test Lamp",
+  "item.hkbmod.emerald_axe": "Emerald Axe",
+  "item.hkbmod.emerald_hoe": "Emerald Hoe",
+  "item.hkbmod.emerald_pickaxe": "Emerald Pickaxe",
+  "item.hkbmod.emerald_shovel": "Emerald Shovel",
+  "item.hkbmod.emerald_sword": "Emerald Sword",
+  "item.hkbmod.magic_pickaxe": "Magic Pickaxe",
+  "itemGroup.hkbmod": "HKB Mod"
+}

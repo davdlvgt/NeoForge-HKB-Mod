@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.\\gradlew.bat build:*)",
+      "Bash(./gradlew:*)",
+      "WebSearch",
+      "Bash(.gradlew.bat runData)",
+      "Bash(gradlew.bat runData:*)",
+      "Bash(.gradlew.bat build)",
+      "Bash(gradlew.bat build:*)",
+      "WebFetch(domain:docs.neoforged.net)",
+      "Bash(cmd /c gradlew.bat:*)",
+      "Bash(cmd /c:*)",
+      "Bash(cat:*)",
+      "Bash(./gradlew.bat compileJava:*)",
+      "Bash(./gradlew.bat runClient:*)",
+      "Bash(./gradlew.bat build:*)",
+      "Bash(find:*)",
+      "Bash(.gradlew.bat compileJava)",
+      "Bash(dir:*)",
+      "Bash(.gradlew.bat clean)",
+      "Bash(.\\gradlew.bat runServer:*)",
+      "Bash(timeout:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
