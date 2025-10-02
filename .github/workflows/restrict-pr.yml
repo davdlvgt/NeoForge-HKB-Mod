@@ -1,0 +1,42 @@
+name: Restrict PRs
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  check-branch-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch rules
+        run: |
+          BASE="${{ github.event.pull_request.base.ref }}"
+          HEAD="${{ github.event.pull_request.head.ref }}"
+
+          echo "🚦 PR geöffnet: $HEAD -> $BASE"
+
+          # Regeln für master
+          if [[ "$BASE" == "master" ]]; then
+            if [[ "$HEAD" != "release" ]]; then
+              echo "❌ Fehler: Nur release darf in master gemerged werden!"
+              exit 1
+            fi
+          fi
+
+          # Regeln für release
+          if [[ "$BASE" == "release" ]]; then
+            if [[ "$HEAD" != "master" && "$HEAD" != "dev" ]]; then
+              echo "❌ Fehler: Nur master oder dev dürfen in release gemerged werden!"
+              exit 1
+            fi
+          fi
+
+          # Regeln für dev
+          if [[ "$BASE" == "dev" ]]; then
+            if [[ "$HEAD" != "release" && ! "$HEAD" =~ ^(feature/|fix/|hotfix/) ]]; then
+              echo "❌ Fehler: Nur release oder feature/*, fix/*, hotfix/* dürfen in dev gemerged werden!"
+              exit 1
+            fi
+          fi
+
+          echo "✅ Regeln eingehalten: Merge erlaubt."
