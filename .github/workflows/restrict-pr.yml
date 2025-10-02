@@ -33,8 +33,8 @@ jobs:
 
           # Regeln für dev
           if [[ "$BASE" == "dev" ]]; then
-            if [[ "$HEAD" != "release" && ! "$HEAD" =~ ^(feature/|fix/|hotfix/|bugfix/|experiment/|chore/|docs/|test/) ]]; then
-              echo "❌ Fehler: Nur release oder feature/*, fix/*, hotfix/* dürfen in dev gemerged werden!"
+            if [[ "$HEAD" != "release" && ! "$HEAD" =~ ^(feature/|fix/|hotfix/|bugfix/|experiment/|chore/|docs/|test/|cicd/) ]]; then
+              echo "❌ Fehler: Nur release oder feature/*, fix/*, hotfix/*, bugfix/*, experiment/*, chore/*, docs/*, test/*, cicd/* dürfen in dev gemerged werden!"
               exit 1
             fi
           fi
