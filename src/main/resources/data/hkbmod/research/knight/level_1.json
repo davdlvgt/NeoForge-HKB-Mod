@@ -16,5 +16,9 @@
   "unlocks": [
     "Diamond Sword Upgrade",
     "Shield Mastery"
-  ]
+  ],
+  "advancement": {
+    "title": "Knight: Man-at-Arms",
+    "description": "Advance your Knight training"
+  }
 }

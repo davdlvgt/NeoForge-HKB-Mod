@@ -73,7 +73,8 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
                             data.displayName(),
                             requirements,
                             data.unlocks(),
-                            data.description()
+                            data.description(),
+                            null
                     );
                     ResearchManager.addResearch(research);
                     totalResearches++;

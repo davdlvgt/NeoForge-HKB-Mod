@@ -16,5 +16,9 @@
   "unlocks": [
     "Legendary Knight Status",
     "Divine Protection"
-  ]
+  ],
+    "advancement": {
+        "title": "Knight: Legendary",
+        "description": "Become a legendary knight"
+    }
 }

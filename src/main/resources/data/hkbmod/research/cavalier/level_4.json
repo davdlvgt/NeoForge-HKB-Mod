@@ -16,5 +16,9 @@
   "unlocks": [
     "Ultimate Cavalry",
     "Mounted Champion"
-  ]
+  ],
+    "advancement": {
+        "title": "Cavalier: Master",
+        "description": "Achieve cavalry mastery"
+    }
 }

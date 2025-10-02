@@ -1,20 +1,24 @@
 {
   "class": "knight",
   "level": 2,
-  "displayName": "Level 2: Advanced",
+  "displayName": "Level 2: Veteran",
   "description": "Master advanced combat techniques",
   "requirements": [
     {
-      "item": "minecraft:diamond",
-      "count": 8
+      "item": "minecraft:diamond_chestplate",
+      "count": 1
     },
     {
-      "item": "minecraft:netherite_scrap",
-      "count": 2
+      "item": "minecraft:golden_apple",
+      "count": 3
     }
   ],
   "unlocks": [
-    "Enhanced Combat Abilities",
-    "Heavy Armor Training"
-  ]
+    "Diamond Armor Mastery",
+    "Advanced Combat Techniques"
+  ],
+  "advancement": {
+    "title": "Knight: Veteran",
+    "description": "Master advanced combat techniques"
+  }
 }

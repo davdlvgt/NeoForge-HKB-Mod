@@ -16,5 +16,9 @@
   "unlocks": [
     "Legendary Archer Status",
     "Arrow of Destiny"
-  ]
+  ],
+    "advancement": {
+        "title": "Archer: Legendary",
+        "description": "Become a legendary archer"
+    }
 }

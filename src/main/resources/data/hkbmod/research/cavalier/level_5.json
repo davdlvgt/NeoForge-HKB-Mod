@@ -16,5 +16,9 @@
   "unlocks": [
     "Legendary Cavalier Status",
     "Divine Steed"
-  ]
+  ],
+    "advancement": {
+        "title": "Cavalier: Legendary",
+        "description": "Become a legendary cavalier"
+    }
 }

@@ -16,5 +16,9 @@
   "unlocks": [
     "Unstoppable Mount",
     "Lance Mastery"
-  ]
+  ],
+    "advancement": {
+        "title": "Cavalier: Expert",
+        "description": "Become an expert cavalier"
+    }
 }

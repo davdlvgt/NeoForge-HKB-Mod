@@ -1,0 +1,22 @@
+{
+  "parent": "hkbmod:archer/level_4",
+  "display": {
+    "icon": {
+      "id": "minecraft:golden_apple"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.archer.level_5.title"
+    },
+    "description": {
+      "translate": "advancements.hkbmod.archer.level_5.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "research_completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

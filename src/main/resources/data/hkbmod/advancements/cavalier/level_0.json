@@ -1,0 +1,22 @@
+{
+  "parent": "hkbmod:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:saddle"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.cavalier.level_0.title"
+    },
+    "description": {
+      "translate": "advancements.hkbmod.cavalier.level_0.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "research_completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

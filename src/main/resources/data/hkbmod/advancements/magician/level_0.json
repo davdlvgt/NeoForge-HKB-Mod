@@ -1,0 +1,22 @@
+{
+  "parent": "hkbmod:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:enchanted_book"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.magician.level_0.title"
+    },
+    "description": {
+      "translate": "advancements.hkbmod.magician.level_0.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "research_completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

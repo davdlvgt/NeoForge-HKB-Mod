@@ -16,5 +16,9 @@
   "unlocks": [
     "Spectral Vision",
     "Rapid Fire"
-  ]
+  ],
+    "advancement": {
+        "title": "Archer: Advanced",
+        "description": "Master advanced archery techniques"
+    }
 }

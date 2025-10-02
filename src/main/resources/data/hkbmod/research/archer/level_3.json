@@ -16,5 +16,9 @@
   "unlocks": [
     "Crossbow Mastery",
     "Piercing Shot"
-  ]
+  ],
+    "advancement": {
+        "title": "Archer: Expert",
+        "description": "Become an expert archer"
+    }
 }

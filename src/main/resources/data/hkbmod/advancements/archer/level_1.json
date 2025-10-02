@@ -1,0 +1,22 @@
+{
+  "parent": "hkbmod:archer/level_0",
+  "display": {
+    "icon": {
+      "id": "minecraft:crossbow"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.archer.level_1.title"
+    },
+    "description": {
+      "translate": "advancements.hkbmod.archer.level_1.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "research_completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

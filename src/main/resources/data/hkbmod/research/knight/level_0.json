@@ -1,20 +1,24 @@
 {
   "class": "knight",
   "level": 0,
-  "displayName": "Level 0: Fundamental",
-  "description": "Begin your journey as a Knight",
+  "displayName": "Level 0: Squire",
+  "description": "Begin your path as a Knight",
   "requirements": [
     {
-      "item": "minecraft:iron_ingot",
-      "count": 6
+      "item": "minecraft:iron_sword",
+      "count": 1
     },
     {
-      "item": "minecraft:iron_sword",
+      "item": "minecraft:iron_chestplate",
       "count": 1
     }
   ],
   "unlocks": [
     "Iron Armor Set",
     "Basic Combat Skills"
-  ]
+  ],
+  "advancement": {
+    "title": "Knight: Squire",
+    "description": "Begin your path as a Knight"
+  }
 }

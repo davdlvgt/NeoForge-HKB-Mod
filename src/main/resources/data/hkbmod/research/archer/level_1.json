@@ -16,5 +16,9 @@
   "unlocks": [
     "Enhanced Bow",
     "Accurate Shot"
-  ]
+  ],
+    "advancement": {
+        "title": "Archer: Apprentice",
+        "description": "Improve your archery skills"
+    }
 }

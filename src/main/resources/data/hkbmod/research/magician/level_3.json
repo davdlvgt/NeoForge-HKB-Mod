@@ -16,5 +16,9 @@
   "unlocks": [
     "Fire Magic",
     "Spell Mastery"
-  ]
+  ],
+    "advancement": {
+        "title": "Magician: Expert",
+        "description": "Become an expert magician"
+    }
 }

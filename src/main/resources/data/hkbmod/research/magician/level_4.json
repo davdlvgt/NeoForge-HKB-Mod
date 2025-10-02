@@ -16,5 +16,9 @@
   "unlocks": [
     "Dragon Magic",
     "Arcane Master"
-  ]
+  ],
+    "advancement": {
+        "title": "Magician: Master",
+        "description": "Achieve magical mastery"
+    }
 }

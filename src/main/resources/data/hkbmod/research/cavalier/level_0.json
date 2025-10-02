@@ -16,5 +16,9 @@
   "unlocks": [
     "Mounted Combat",
     "Horse Bonding"
-  ]
+  ],
+    "advancement": {
+        "title": "Cavalier: Novice",
+        "description": "Start your journey as a Cavalier"
+    }
 }

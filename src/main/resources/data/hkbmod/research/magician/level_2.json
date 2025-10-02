@@ -16,5 +16,9 @@
   "unlocks": [
     "Teleportation Magic",
     "Advanced Spells"
-  ]
+  ],
+    "advancement": {
+        "title": "Magician: Advanced",
+        "description": "Master advanced magic"
+    }
 }

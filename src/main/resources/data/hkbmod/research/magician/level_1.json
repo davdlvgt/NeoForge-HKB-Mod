@@ -16,5 +16,9 @@
   "unlocks": [
     "Enhanced Enchanting",
     "Basic Spells"
-  ]
+  ],
+    "advancement": {
+        "title": "Magician: Journeyman",
+        "description": "Expand your magical knowledge"
+    }
 }

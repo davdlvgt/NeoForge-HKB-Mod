@@ -16,5 +16,9 @@
   "unlocks": [
     "Teleport Arrow",
     "Multi-Shot Expert"
-  ]
+  ],
+    "advancement": {
+        "title": "Archer: Master",
+        "description": "Achieve archery mastery"
+    }
 }

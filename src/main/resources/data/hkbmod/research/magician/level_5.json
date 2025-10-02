@@ -16,5 +16,9 @@
   "unlocks": [
     "Legendary Magician Status",
     "Ultimate Arcane Power"
-  ]
+  ],
+    "advancement": {
+        "title": "Magician: Legendary",
+        "description": "Become a legendary magician"
+    }
 }

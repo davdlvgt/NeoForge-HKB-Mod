@@ -16,5 +16,9 @@
   "unlocks": [
     "Netherite Armor Proficiency",
     "Battle Tactics"
-  ]
+  ],
+    "advancement": {
+        "title": "Knight: Expert",
+        "description": "Become an expert knight"
+    }
 }

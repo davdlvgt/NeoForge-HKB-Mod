@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import org.jetbrains.annotations.Debug;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -232,6 +233,9 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
                     HKBMod.LOGGER.info("Player {} completed research level {} for class {}",
                         serverPlayer.getName().getString(), selectedLevelIndex, selectedClass);
 
+                    // Grant advancement
+                    grantResearchAdvancement(serverPlayer, selectedClass, selectedLevelIndex);
+
                     // Sync to client
                     serverPlayer.connection.send(new SyncPlayerResearchPacket(researchData.getCompletedLevels()));
                 }
@@ -322,6 +326,43 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
         }
 
         return true;
+    }
+
+    private void grantResearchAdvancement(ServerPlayer player, String classType, int level) {
+        // Grant advancement for completing this research level
+        ResourceLocation advancementId = ResourceLocation.fromNamespaceAndPath(
+                HKBMod.MODID,
+                classType + "/level_" + level
+        );
+
+        HKBMod.LOGGER.info("[Advancement] Granting advancement {} to player {}",
+                advancementId, player.getName().getString());
+
+        net.minecraft.advancements.AdvancementHolder advancement = player.getServer().getAdvancements()
+                .get(advancementId);
+
+        HKBMod.LOGGER.info("[Advancement] Retrieved advancement: {}",
+                advancement != null ? advancement.id() : "null");
+
+        if (advancement != null) {
+            net.minecraft.advancements.AdvancementProgress progress = player.getAdvancements()
+                    .getOrStartProgress(advancement);
+
+            // Grant all criteria for the advancement
+            if (!progress.isDone()) {
+                for (String criterionName : progress.getRemainingCriteria()) {
+                    player.getAdvancements().award(advancement, criterionName);
+                }
+                HKBMod.LOGGER.info("Granted advancement {} to player {}",
+                        advancementId, player.getName().getString());
+            }
+        } else {
+            HKBMod.LOGGER.warn("Advancement {} not found!", advancementId);
+            // Debug: List all available advancements
+            HKBMod.LOGGER.info("Available advancements:");
+            player.getServer().getAdvancements().getAllAdvancements().forEach(adv ->
+                    HKBMod.LOGGER.info("  - {}", adv.id()));
+        }
     }
 
     public static void tick(ResearchTableBlockEntity blockEntity) {

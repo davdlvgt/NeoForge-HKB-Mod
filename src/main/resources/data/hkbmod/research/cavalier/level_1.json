@@ -16,5 +16,9 @@
   "unlocks": [
     "Horse Armor",
     "Mounted Charge"
-  ]
+  ],
+    "advancement": {
+        "title": "Cavalier: Squire",
+        "description": "Advance your mounted combat"
+    }
 }

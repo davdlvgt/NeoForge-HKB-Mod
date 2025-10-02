@@ -16,5 +16,9 @@
   "unlocks": [
     "Enhanced Mount Speed",
     "Cavalry Tactics"
-  ]
+  ],
+    "advancement": {
+        "title": "Cavalier: Advanced",
+        "description": "Master advanced cavalry tactics"
+    }
 }

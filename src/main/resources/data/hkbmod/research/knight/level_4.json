@@ -16,5 +16,9 @@
   "unlocks": [
     "Ultimate Defense",
     "Champion's Resilience"
-  ]
+  ],
+    "advancement": {
+        "title": "Knight: Master",
+        "description": "Achieve mastery of knighthood"
+    }
 }

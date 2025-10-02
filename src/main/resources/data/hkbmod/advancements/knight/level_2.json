@@ -1,0 +1,22 @@
+{
+  "parent": "hkbmod:knight/level_1",
+  "display": {
+    "icon": {
+      "id": "minecraft:diamond_sword"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.knight.level_2.title"
+    },
+    "description": {
+      "translate": "advancements.hkbmod.knight.level_2.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "research_completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -16,5 +16,9 @@
   "unlocks": [
     "Basic Spell Book",
     "Mana Regeneration"
-  ]
+  ],
+    "advancement": {
+        "title": "Magician: Apprentice",
+        "description": "Begin your magical studies"
+    }
 }
