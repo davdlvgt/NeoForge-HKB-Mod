@@ -1,0 +1,24 @@
+{
+  "class": "miner",
+  "level": 3,
+  "displayName": "Level 3: Expert Excavator",
+  "description": "Become an expert in resource extraction",
+  "requirements": [
+    {
+      "item": "minecraft:ancient_debris",
+      "count": 4
+    },
+    {
+      "item": "minecraft:gold_block",
+      "count": 2
+    }
+  ],
+  "unlocks": [
+    "Fortune Mining II",
+    "Vein Finder"
+  ],
+  "advancement": {
+    "title": "Miner: Expert Excavator",
+    "description": "Become an expert in resource extraction"
+  }
+}

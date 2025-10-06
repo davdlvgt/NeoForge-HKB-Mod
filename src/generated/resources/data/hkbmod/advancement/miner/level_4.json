@@ -1,0 +1,27 @@
+{
+  "parent": "hkbmod:miner/level_3",
+  "criteria": {
+    "research_completed": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.hkbmod.miner.level_4.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:dragon_egg"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.miner.level_4.title"
+    }
+  },
+  "requirements": [
+    [
+      "research_completed"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

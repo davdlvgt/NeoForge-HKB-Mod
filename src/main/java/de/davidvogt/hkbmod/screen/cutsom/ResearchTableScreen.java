@@ -117,6 +117,13 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
                 .bounds(this.leftPos + 69, this.topPos + 58, 42, 12)
                 .build()
         );
+        this.addRenderableWidget(Button.builder(
+                        Component.literal("Miner"),
+                        btn -> loadClassResearches("miner")
+                )
+                .bounds(this.leftPos + 69, this.topPos + 72, 42, 12)
+                .build()
+        );
         startResearchButton = Button.builder(
                         Component.literal("Start Research"),
                         btn -> {

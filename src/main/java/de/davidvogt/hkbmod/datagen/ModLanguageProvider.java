@@ -99,6 +99,20 @@ public class ModLanguageProvider extends LanguageProvider {
         add("advancements.hkbmod.magician.level_5.title", "Magician: Grandmaster");
         add("advancements.hkbmod.magician.level_5.description", "Master the Magician class completely");
 
+        // Miner Advancements
+        add("advancements.hkbmod.miner.level_0.title", "Miner: Digger");
+        add("advancements.hkbmod.miner.level_0.description", "Begin your journey as a Miner");
+        add("advancements.hkbmod.miner.level_1.title", "Miner: Prospector");
+        add("advancements.hkbmod.miner.level_1.description", "Advance your mining skills");
+        add("advancements.hkbmod.miner.level_2.title", "Miner: Excavator");
+        add("advancements.hkbmod.miner.level_2.description", "Become a skilled Excavator");
+        add("advancements.hkbmod.miner.level_3.title", "Miner: Master Miner");
+        add("advancements.hkbmod.miner.level_3.description", "Achieve Master Miner status");
+        add("advancements.hkbmod.miner.level_4.title", "Miner: Treasure Hunter");
+        add("advancements.hkbmod.miner.level_4.description", "Rise to Treasure Hunter rank");
+        add("advancements.hkbmod.miner.level_5.title", "Miner: Grandmaster");
+        add("advancements.hkbmod.miner.level_5.description", "Master the Miner class completely");
+
         // Tooltips (optional)
     }
 }

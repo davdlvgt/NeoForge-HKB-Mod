@@ -1,0 +1,27 @@
+{
+  "parent": "hkbmod:knight/level_4",
+  "criteria": {
+    "research_completed": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.hkbmod.knight.level_5.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:netherite_chestplate"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.knight.level_5.title"
+    }
+  },
+  "requirements": [
+    [
+      "research_completed"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

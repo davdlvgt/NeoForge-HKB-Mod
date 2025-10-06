@@ -1,0 +1,24 @@
+{
+  "class": "miner",
+  "level": 2,
+  "displayName": "Level 2: Deep Delver",
+  "description": "Master deep underground mining",
+  "requirements": [
+    {
+      "item": "minecraft:diamond_pickaxe",
+      "count": 1
+    },
+    {
+      "item": "minecraft:diamond",
+      "count": 8
+    }
+  ],
+  "unlocks": [
+    "Fortune Mining I",
+    "Cave Sense"
+  ],
+  "advancement": {
+    "title": "Miner: Deep Delver",
+    "description": "Master deep underground mining"
+  }
+}
