@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-06T22:57:59.7777444	My Recipes
+// 1.21.8	2025-10-07T00:54:38.8212978	My Recipes
 db84fa4fc2c5a8df81238b054bde784c73ca9dff data/hkbmod/advancement/recipes/combat/emerald_sword.json
 34a5b6928b734eaa06ae13ddf5576fb4eb5befe8 data/hkbmod/advancement/recipes/misc/custom_test_block.json
 586f6dc22df86418e6d4dc035e4cbfd0a09f4e6a data/hkbmod/advancement/recipes/misc/research_table.json
@@ -7,13 +7,15 @@ ecd5a2876c984c1f1f38b3009b5e4452c421cef9 data/hkbmod/advancement/recipes/tools/e
 33d6b3d280515c6ddc536c9fcdfcf1119615ef29 data/hkbmod/advancement/recipes/tools/emerald_hoe.json
 da88a2b6ce52b1867ab79311b12101629bdc3439 data/hkbmod/advancement/recipes/tools/emerald_pickaxe.json
 90bcb58512b2c8042351f3f6fcad79fbacdb2bf6 data/hkbmod/advancement/recipes/tools/emerald_shovel.json
-5feef65be1d6804e41f7cf573424f992c773ec76 data/hkbmod/advancement/recipes/tools/magic_pickaxe.json
+8b47651a6a17f560bb42fb6ce556fcc255c84fef data/hkbmod/advancement/recipes/tools/magic_pickaxe.json
+cddab82250a7a851c1bcd4f3726fd0c12799a0de data/hkbmod/advancement/recipes/tools/time_setter.json
 713c73264c276bc101ff1a07754825bd73f6aa45 data/hkbmod/recipe/custom_test_block.json
 619ec8948003dfd901e3738f766a893ff3fc253b data/hkbmod/recipe/emerald_axe.json
 79dc93f515544b628c12b907ddba67fe93ca4af1 data/hkbmod/recipe/emerald_hoe.json
 6ec2eddac13d93484fe1a0ae18815895a40257fd data/hkbmod/recipe/emerald_pickaxe.json
 f426cc56ddbae762c86deb9c0f77581d119fcecb data/hkbmod/recipe/emerald_shovel.json
 6c9c27cdaf5510304303c6b37fba6249298d5ab3 data/hkbmod/recipe/emerald_sword.json
-0765e2502b64677957757e6694d75750851a20e5 data/hkbmod/recipe/magic_pickaxe.json
+35faf232f78bb88b49f3e30953d2b54d2caae629 data/hkbmod/recipe/magic_pickaxe.json
 6a9c66869549e5d7ec9e1a284ca460545f53704e data/hkbmod/recipe/research_table.json
 a9a531a4b75130e9282c34a766aae458863f2939 data/hkbmod/recipe/test_block.json
+96ad18e1bbe59d3836ade8e52e3b7c08b0f30f1b data/hkbmod/recipe/time_setter.json

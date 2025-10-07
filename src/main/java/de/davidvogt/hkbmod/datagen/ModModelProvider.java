@@ -36,6 +36,7 @@ public class ModModelProvider extends ModelProvider {
         itemModels.generateFlatItem(ModItems.EMERALD_HOE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
         itemModels.generateFlatItem(ModItems.MAGIC_PICKAXE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModels.generateFlatItem(ModItems.TIME_SETTER.get(), ModelTemplates.FLAT_ITEM);
 
         // Block Models
         blockModels.createGenericCube(ModBlocks.TEST_BLOCK.get());

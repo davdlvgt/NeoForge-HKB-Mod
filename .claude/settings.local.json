@@ -20,7 +20,10 @@
       "Bash(dir:*)",
       "Bash(.gradlew.bat clean)",
       "Bash(.\\gradlew.bat runServer:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(.\\gradlew.bat runData:*)",
+      "Read(//d/**)",
+      "Bash(copy:*)"
     ],
     "deny": [],
     "ask": []

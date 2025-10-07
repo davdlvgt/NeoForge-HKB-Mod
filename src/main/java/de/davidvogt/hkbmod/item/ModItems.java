@@ -2,6 +2,7 @@ package de.davidvogt.hkbmod.item;
 
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
+import de.davidvogt.hkbmod.item.custom.TimeSetterItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ToolMaterial;
 import net.neoforged.bus.api.IEventBus;
@@ -78,6 +79,11 @@ public class ModItems {
                             0.0F                               // Type-specific attack speed modifier
                     )
             )
+    );
+
+    public static final DeferredItem<TimeSetterItem> TIME_SETTER = ITEMS.registerItem(
+            "time_setter",
+            (properties) -> new TimeSetterItem(properties.stacksTo(1).durability(3))
     );
 
     public static void register(IEventBus eventBus) {

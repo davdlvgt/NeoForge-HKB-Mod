@@ -32,6 +32,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModItems.EMERALD_SHOVEL.get(), "Emerald Shovel");
         add(ModItems.EMERALD_HOE.get(), "Emerald Hoe");
         add(ModItems.MAGIC_PICKAXE.get(), "Magic Pickaxe");
+        add(ModItems.TIME_SETTER.get(), "Time Setter");
 
         // Blocks
         add(ModBlocks.TEST_BLOCK.get(), "Test Block");
@@ -103,15 +104,15 @@ public class ModLanguageProvider extends LanguageProvider {
         add("advancements.hkbmod.miner.level_0.title", "Miner: Digger");
         add("advancements.hkbmod.miner.level_0.description", "Begin your journey as a Miner");
         add("advancements.hkbmod.miner.level_1.title", "Miner: Prospector");
-        add("advancements.hkbmod.miner.level_1.description", "Advance your mining skills");
-        add("advancements.hkbmod.miner.level_2.title", "Miner: Excavator");
-        add("advancements.hkbmod.miner.level_2.description", "Become a skilled Excavator");
-        add("advancements.hkbmod.miner.level_3.title", "Miner: Master Miner");
-        add("advancements.hkbmod.miner.level_3.description", "Achieve Master Miner status");
-        add("advancements.hkbmod.miner.level_4.title", "Miner: Treasure Hunter");
-        add("advancements.hkbmod.miner.level_4.description", "Rise to Treasure Hunter rank");
-        add("advancements.hkbmod.miner.level_5.title", "Miner: Grandmaster");
-        add("advancements.hkbmod.miner.level_5.description", "Master the Miner class completely");
+        add("advancements.hkbmod.miner.level_1.description", "Learn to find valuable resources");
+        add("advancements.hkbmod.miner.level_2.title", "Miner: Deep Delver");
+        add("advancements.hkbmod.miner.level_2.description", "Master deep underground mining");
+        add("advancements.hkbmod.miner.level_3.title", "Miner: Expert Excavator");
+        add("advancements.hkbmod.miner.level_3.description", "Become an expert in resource extraction");
+        add("advancements.hkbmod.miner.level_4.title", "Miner: Master Miner");
+        add("advancements.hkbmod.miner.level_4.description", "Achieve mining mastery");
+        add("advancements.hkbmod.miner.level_5.title", "Miner: Legendary Prospector");
+        add("advancements.hkbmod.miner.level_5.description", "Become a legendary master of the earth");
 
         // Tooltips (optional)
     }

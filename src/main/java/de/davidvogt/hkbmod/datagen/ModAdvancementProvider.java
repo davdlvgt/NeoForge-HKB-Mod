@@ -58,7 +58,7 @@ public class ModAdvancementProvider implements AdvancementSubProvider {
         // MAGICIAN
         addImpossibleAdvancement(saver, "magician/level_0", "research/root", Items.ENCHANTED_BOOK, AdvancementType.TASK);
         addImpossibleAdvancement(saver, "magician/level_1", "magician/level_0", Items.BLAZE_ROD, AdvancementType.TASK);
-        addImpossibleAdvancement(saver, "magician/level_2", "magician/level_1", Items.ENDER_PEARL, AdvancementType.TASK);
+        addCraftingAdvancement(saver, "magician/level_2", "magician/level_1", ModItems.TIME_SETTER, "time_setter");
         addImpossibleAdvancement(saver, "magician/level_3", "magician/level_2", Items.NETHER_STAR, AdvancementType.TASK);
         addImpossibleAdvancement(saver, "magician/level_4", "magician/level_3", Items.DRAGON_EGG, AdvancementType.GOAL);
         addImpossibleAdvancement(saver, "magician/level_5", "magician/level_4", Items.END_CRYSTAL, AdvancementType.CHALLENGE);

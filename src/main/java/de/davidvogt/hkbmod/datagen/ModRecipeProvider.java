@@ -68,12 +68,22 @@ public class ModRecipeProvider extends RecipeProvider {
 
         this.shaped(RecipeCategory.TOOLS, ModItems.MAGIC_PICKAXE.get())
                 .pattern("DED")
-                .pattern(" S ")
+                .pattern("TST")
                 .pattern(" S ")
                 .define('D', Items.DIAMOND)
                 .define('E', Items.ENDER_EYE)
                 .define('S', Items.STICK)
-                .unlockedBy("has_diamond", has(Items.ENDER_EYE))
+                .define('T', Items.TNT)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.TOOLS, ModItems.TIME_SETTER.get())
+                .pattern(" E ")
+                .pattern("ECE")
+                .pattern(" E ")
+                .define('E', Items.ENDER_PEARL)
+                .define('C', Items.CLOCK)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(this.output);
 
 

@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "hkbmod:magic_pickaxe"
+        "recipe": "hkbmod:time_setter"
       },
       "trigger": "minecraft:recipe_unlocked"
     },
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "hkbmod:magic_pickaxe"
+      "hkbmod:time_setter"
     ]
   }
 }
