@@ -81,6 +81,7 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
                     for (PrereqData prereq : data.prerequisites()) {
                         prerequisites.add(new Research.ResearchPrerequisite(prereq.classType(), prereq.level()));
                     }
+                  
                     Research research = new Research(
                             data.classType(),
                             data.level(),
@@ -109,10 +110,13 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
                 for (Research.ItemRequirement req : research.requirements()) {
                     requirements.add(new ItemReq(req.item(), req.count()));
                 }
+              
                 List<PrereqData> prerequisites = new ArrayList<>();
+              
                 for (Research.ResearchPrerequisite prereq : research.prerequisites()) {
                     prerequisites.add(new PrereqData(prereq.classType(), prereq.level()));
                 }
+              
                 researchList.add(new ResearchData(
                         research.classType(),
                         research.level(),
@@ -121,6 +125,7 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
                         research.unlocks(),
                         research.description(),
                         prerequisites
+
                 ));
             }
             data.put(classType, researchList);

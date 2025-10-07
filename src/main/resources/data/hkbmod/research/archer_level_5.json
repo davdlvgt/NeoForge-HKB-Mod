@@ -1,0 +1,20 @@
+{
+  "class": "archer",
+  "level": 5,
+  "displayName": "Level 5: Legendary",
+  "description": "Become a legendary archer",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_block",
+      "count": 1
+    },
+    {
+      "item": "minecraft:nether_star",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Legendary Archer Status",
+    "Arrow of Destiny"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "class": "cavalier",
+  "level": 4,
+  "displayName": "Level 4: Master",
+  "description": "Achieve cavalry mastery",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 8
+    },
+    {
+      "item": "minecraft:saddle",
+      "count": 3
+    }
+  ],
+  "unlocks": [
+    "Ultimate Cavalry",
+    "Mounted Champion"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "class": "magician",
+  "level": 1,
+  "displayName": "Level 1: Basic",
+  "description": "Expand your magical knowledge",
+  "requirements": [
+    {
+      "item": "minecraft:lapis_lazuli",
+      "count": 16
+    },
+    {
+      "item": "minecraft:diamond",
+      "count": 3
+    }
+  ],
+  "unlocks": [
+    "Enhanced Enchanting",
+    "Basic Spells"
+  ]
+}

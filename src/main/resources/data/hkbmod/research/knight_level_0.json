@@ -1,0 +1,20 @@
+{
+  "class": "knight",
+  "level": 0,
+  "displayName": "Level 0: Fundamental",
+  "description": "Begin your journey as a Knight",
+  "requirements": [
+    {
+      "item": "minecraft:iron_ingot",
+      "count": 6
+    },
+    {
+      "item": "minecraft:iron_sword",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Iron Armor Set",
+    "Basic Combat Skills"
+  ]
+}

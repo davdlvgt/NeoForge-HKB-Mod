@@ -1,0 +1,20 @@
+{
+  "class": "magician",
+  "level": 2,
+  "displayName": "Level 2: Advanced",
+  "description": "Master advanced magic",
+  "requirements": [
+    {
+      "item": "minecraft:ender_pearl",
+      "count": 12
+    },
+    {
+      "item": "minecraft:diamond",
+      "count": 6
+    }
+  ],
+  "unlocks": [
+    "Teleportation Magic",
+    "Advanced Spells"
+  ]
+}

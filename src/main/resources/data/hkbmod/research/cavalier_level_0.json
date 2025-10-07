@@ -1,0 +1,20 @@
+{
+  "class": "cavalier",
+  "level": 0,
+  "displayName": "Level 0: Fundamental",
+  "description": "Start your journey as a Cavalier",
+  "requirements": [
+    {
+      "item": "minecraft:saddle",
+      "count": 1
+    },
+    {
+      "item": "minecraft:iron_horse_armor",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Mounted Combat",
+    "Horse Bonding"
+  ]
+}

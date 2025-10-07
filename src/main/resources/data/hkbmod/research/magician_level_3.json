@@ -1,0 +1,20 @@
+{
+  "class": "magician",
+  "level": 3,
+  "displayName": "Level 3: Expert",
+  "description": "Become an expert magician",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 3
+    },
+    {
+      "item": "minecraft:blaze_rod",
+      "count": 8
+    }
+  ],
+  "unlocks": [
+    "Fire Magic",
+    "Spell Mastery"
+  ]
+}

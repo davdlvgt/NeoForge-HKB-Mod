@@ -1,0 +1,20 @@
+{
+  "class": "magician",
+  "level": 4,
+  "displayName": "Level 4: Master",
+  "description": "Achieve magical mastery",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 6
+    },
+    {
+      "item": "minecraft:dragon_breath",
+      "count": 3
+    }
+  ],
+  "unlocks": [
+    "Dragon Magic",
+    "Arcane Master"
+  ]
+}

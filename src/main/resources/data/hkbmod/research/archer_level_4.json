@@ -1,0 +1,20 @@
+{
+  "class": "archer",
+  "level": 4,
+  "displayName": "Level 4: Master",
+  "description": "Achieve archery mastery",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 6
+    },
+    {
+      "item": "minecraft:ender_pearl",
+      "count": 16
+    }
+  ],
+  "unlocks": [
+    "Teleport Arrow",
+    "Multi-Shot Expert"
+  ]
+}
