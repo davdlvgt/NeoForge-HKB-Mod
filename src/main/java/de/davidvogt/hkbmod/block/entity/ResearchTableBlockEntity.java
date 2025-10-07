@@ -234,6 +234,12 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
                     HKBMod.LOGGER.info("Player {} completed research level {} for class {}",
                         serverPlayer.getName().getString(), selectedLevelIndex, selectedClass);
 
+                    // Grant XP based on research level
+                    int xpAmount = getXPForLevel(selectedLevelIndex);
+                    serverPlayer.giveExperiencePoints(xpAmount);
+                    HKBMod.LOGGER.info("Player {} received {} XP for completing level {} research",
+                        serverPlayer.getName().getString(), xpAmount, selectedLevelIndex);
+
                     // Grant advancement
                     grantResearchAdvancement(serverPlayer, selectedClass, selectedLevelIndex);
 
@@ -276,6 +282,22 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
         if (!level.isClientSide()) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
+    }
+
+    /**
+     * Returns the XP amount for completing a research level.
+     * Level 0: 7 XP, Level 1: 9 XP, Level 2: 11 XP, Level 3: 13 XP, Level 4: 16 XP, Level 5: 20 XP
+     */
+    private int getXPForLevel(int level) {
+        return switch (level) {
+            case 0 -> 7;
+            case 1 -> 9;
+            case 2 -> 11;
+            case 3 -> 13;
+            case 4 -> 16;
+            case 5 -> 20;
+            default -> 0;
+        };
     }
 
     public float getResearchProgress() {
