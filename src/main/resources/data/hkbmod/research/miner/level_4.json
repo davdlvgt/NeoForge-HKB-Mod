@@ -1,6 +1,7 @@
 {
   "class": "miner",
   "level": 4,
+  "prerequisites": [{"class": "miner", "level": 3}],
   "displayName": "Level 4: Master Miner",
   "description": "Achieve mining mastery",
   "requirements": [

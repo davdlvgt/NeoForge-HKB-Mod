@@ -1,6 +1,7 @@
 {
   "class": "cavalier",
   "level": 1,
+  "prerequisites": [{"class": "cavalier", "level": 0}],
   "displayName": "Level 1: Basic",
   "description": "Advance your mounted combat",
   "requirements": [

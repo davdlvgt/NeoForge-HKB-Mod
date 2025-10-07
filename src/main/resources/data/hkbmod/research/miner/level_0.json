@@ -1,6 +1,7 @@
 {
   "class": "miner",
   "level": 0,
+  "prerequisites": [],
   "displayName": "Level 0: Digger",
   "description": "Begin your journey as a Miner",
   "requirements": [

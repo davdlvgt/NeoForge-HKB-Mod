@@ -1,6 +1,16 @@
 {
   "class": "magician",
   "level": 4,
+  "prerequisites": [
+    {
+      "class": "magician",
+      "level": 3
+    },
+    {
+      "class": "knight",
+      "level": 5
+    }
+  ],
   "displayName": "Level 4: Master",
   "description": "Achieve magical mastery",
   "requirements": [

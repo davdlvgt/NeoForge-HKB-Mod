@@ -1,6 +1,7 @@
 {
   "class": "cavalier",
   "level": 5,
+  "prerequisites": [{"class": "cavalier", "level": 4}],
   "displayName": "Level 5: Legendary",
   "description": "Become a legendary cavalier",
   "requirements": [

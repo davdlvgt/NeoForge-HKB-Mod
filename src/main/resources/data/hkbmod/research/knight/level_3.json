@@ -17,8 +17,18 @@
     "Netherite Armor Proficiency",
     "Battle Tactics"
   ],
-    "advancement": {
-        "title": "Knight: Expert",
-        "description": "Become an expert knight"
+  "advancement": {
+    "title": "Knight: Expert",
+    "description": "Become an expert knight"
+  },
+  "prerequisites": [
+    {
+      "class": "knight",
+      "level": 2
+    },
+    {
+      "class": "miner",
+      "level": 2
     }
+  ]
 }

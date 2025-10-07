@@ -38,6 +38,26 @@ public class PlayerResearchData {
         }
     }
 
+    public boolean canResearch(String classType, int level, Research research) {
+        // Cannot research if already completed
+        if (isLevelCompleted(classType, level)) {
+            return false;
+        }
+
+        // Check if all prerequisites are completed
+        if (research != null && research.prerequisites() != null) {
+            for (Research.ResearchPrerequisite prereq : research.prerequisites()) {
+                if (!isLevelCompleted(prereq.classType(), prereq.level())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    // Deprecated: Use canResearch(String, int, Research) instead
+    @Deprecated
     public boolean canResearch(String classType, int level) {
         // Level 0 is always available
         if (level == 0) {

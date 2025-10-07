@@ -1,6 +1,7 @@
 {
   "class": "miner",
   "level": 3,
+  "prerequisites": [{"class": "miner", "level": 2}],
   "displayName": "Level 3: Expert Excavator",
   "description": "Become an expert in resource extraction",
   "requirements": [

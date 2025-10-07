@@ -17,8 +17,18 @@
     "Teleport Arrow",
     "Multi-Shot Expert"
   ],
-    "advancement": {
-        "title": "Archer: Master",
-        "description": "Achieve archery mastery"
+  "advancement": {
+    "title": "Archer: Master",
+    "description": "Achieve archery mastery"
+  },
+  "prerequisites": [
+    {
+      "class": "archer",
+    "level": 3
+    },
+    {
+      "class": "magician",
+      "level": 2
     }
+  ]
 }

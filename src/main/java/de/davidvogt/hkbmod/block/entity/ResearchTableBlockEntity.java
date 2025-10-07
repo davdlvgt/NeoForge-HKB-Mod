@@ -185,7 +185,8 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
 
         // Check if player can research this level
         PlayerResearchData researchData = player.getData(ModAttachments.PLAYER_RESEARCH);
-        if (!researchData.canResearch(selectedClass, levelIndex)) {
+        Research research = ResearchManager.getResearch(selectedClass, levelIndex);
+        if (!researchData.canResearch(selectedClass, levelIndex, research)) {
             HKBMod.LOGGER.warn("Player cannot research level {} for class {} - prerequisites not met or already completed",
                 levelIndex, selectedClass);
             return;

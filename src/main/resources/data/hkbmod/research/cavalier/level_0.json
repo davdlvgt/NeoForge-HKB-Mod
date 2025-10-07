@@ -1,6 +1,7 @@
 {
   "class": "cavalier",
   "level": 0,
+  "prerequisites": [],
   "displayName": "Level 0: Fundamental",
   "description": "Start your journey as a Cavalier",
   "requirements": [

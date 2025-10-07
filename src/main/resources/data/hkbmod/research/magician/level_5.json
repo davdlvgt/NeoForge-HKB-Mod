@@ -1,6 +1,7 @@
 {
   "class": "magician",
   "level": 5,
+  "prerequisites": [{"class": "magician", "level": 4}],
   "displayName": "Level 5: Legendary",
   "description": "Become a legendary magician",
   "requirements": [

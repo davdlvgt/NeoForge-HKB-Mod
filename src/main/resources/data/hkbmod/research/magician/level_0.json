@@ -1,6 +1,7 @@
 {
   "class": "magician",
   "level": 0,
+  "prerequisites": [],
   "displayName": "Level 0: Fundamental",
   "description": "Begin your magical studies",
   "requirements": [

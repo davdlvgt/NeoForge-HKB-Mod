@@ -1,6 +1,16 @@
 {
   "class": "cavalier",
   "level": 2,
+  "prerequisites": [
+    {
+      "class": "cavalier",
+      "level": 1
+    },
+    {
+      "class": "knight",
+      "level": 0
+    }
+  ],
   "displayName": "Level 2: Advanced",
   "description": "Master advanced cavalry tactics",
   "requirements": [

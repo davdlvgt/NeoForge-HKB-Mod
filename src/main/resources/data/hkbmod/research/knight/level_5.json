@@ -17,8 +17,14 @@
     "Legendary Knight Status",
     "Divine Protection"
   ],
-    "advancement": {
-        "title": "Knight: Legendary",
-        "description": "Become a legendary knight"
+  "advancement": {
+    "title": "Knight: Legendary",
+    "description": "Become a legendary knight"
+  },
+  "prerequisites": [
+    {
+      "class": "knight",
+      "level": 4
     }
+  ]
 }

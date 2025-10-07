@@ -1,6 +1,7 @@
 {
   "class": "cavalier",
   "level": 4,
+  "prerequisites": [{"class": "cavalier", "level": 3}],
   "displayName": "Level 4: Master",
   "description": "Achieve cavalry mastery",
   "requirements": [

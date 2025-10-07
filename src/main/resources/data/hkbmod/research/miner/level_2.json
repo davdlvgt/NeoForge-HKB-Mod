@@ -1,6 +1,7 @@
 {
   "class": "miner",
   "level": 2,
+  "prerequisites": [{"class": "miner", "level": 1}],
   "displayName": "Level 2: Deep Delver",
   "description": "Master deep underground mining",
   "requirements": [

@@ -20,5 +20,11 @@
   "advancement": {
     "title": "Knight: Man-at-Arms",
     "description": "Advance your Knight training"
-  }
+  },
+  "prerequisites": [
+    {
+      "class": "knight",
+      "level": 0
+    }
+  ]
 }

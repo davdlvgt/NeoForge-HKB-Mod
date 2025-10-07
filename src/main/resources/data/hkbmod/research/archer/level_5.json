@@ -17,8 +17,14 @@
     "Legendary Archer Status",
     "Arrow of Destiny"
   ],
-    "advancement": {
-        "title": "Archer: Legendary",
-        "description": "Become a legendary archer"
+  "advancement": {
+    "title": "Archer: Legendary",
+    "description": "Become a legendary archer"
+  },
+  "prerequisites": [
+    {
+      "class": "archer",
+      "level": 4
     }
+  ]
 }

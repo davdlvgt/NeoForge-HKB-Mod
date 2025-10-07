@@ -1,6 +1,7 @@
 {
   "class": "magician",
   "level": 1,
+  "prerequisites": [{"class": "magician", "level": 0}],
   "displayName": "Level 1: Basic",
   "description": "Expand your magical knowledge",
   "requirements": [

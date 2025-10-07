@@ -17,8 +17,14 @@
     "Spectral Vision",
     "Rapid Fire"
   ],
-    "advancement": {
-        "title": "Archer: Advanced",
-        "description": "Master advanced archery techniques"
+  "advancement": {
+    "title": "Archer: Advanced",
+    "description": "Master advanced archery techniques"
+  },
+  "prerequisites": [
+    {
+      "class": "archer",
+      "level": 1
     }
+  ]
 }

@@ -17,8 +17,14 @@
     "Crossbow Mastery",
     "Piercing Shot"
   ],
-    "advancement": {
-        "title": "Archer: Expert",
-        "description": "Become an expert archer"
+  "advancement": {
+    "title": "Archer: Expert",
+    "description": "Become an expert archer"
+  },
+  "prerequisites": [
+    {
+      "class": "archer",
+      "level": 2
     }
+  ]
 }

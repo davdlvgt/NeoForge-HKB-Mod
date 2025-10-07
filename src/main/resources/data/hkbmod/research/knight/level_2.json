@@ -20,5 +20,11 @@
   "advancement": {
     "title": "Knight: Veteran",
     "description": "Master advanced combat techniques"
-  }
+  },
+  "prerequisites": [
+    {
+      "class": "knight",
+      "level": 1
+    }
+  ]
 }

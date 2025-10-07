@@ -17,8 +17,9 @@
     "Leather Armor Set",
     "Basic Archery Skills"
   ],
-    "advancement": {
-        "title": "Archer: Novice",
-        "description": "Begin your path as an Archer"
-    }
+  "advancement": {
+    "title": "Archer: Novice",
+    "description": "Begin your path as an Archer"
+  },
+  "prerequisites": []
 }

@@ -1,6 +1,7 @@
 {
   "class": "magician",
   "level": 2,
+  "prerequisites": [{"class": "magician", "level": 1}],
   "displayName": "Level 2: Advanced",
   "description": "Master advanced magic",
   "requirements": [

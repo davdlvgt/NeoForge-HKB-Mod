@@ -23,7 +23,8 @@
       "Bash(timeout:*)",
       "Bash(.\\gradlew.bat runData:*)",
       "Read(//d/**)",
-      "Bash(copy:*)"
+      "Bash(copy:*)",
+      "Bash(gradlew.bat compileJava:*)"
     ],
     "deny": [],
     "ask": []

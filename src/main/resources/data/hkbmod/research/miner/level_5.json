@@ -1,6 +1,16 @@
 {
   "class": "miner",
   "level": 5,
+  "prerequisites": [
+    {
+      "class": "miner",
+      "level": 4
+    },
+    {
+      "class": "magician",
+      "level": 4
+    }
+  ],
   "displayName": "Level 5: Legendary Prospector",
   "description": "Become a legendary master of the earth",
   "requirements": [

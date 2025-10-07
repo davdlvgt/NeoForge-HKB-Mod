@@ -17,8 +17,14 @@
     "Enhanced Bow",
     "Accurate Shot"
   ],
-    "advancement": {
-        "title": "Archer: Apprentice",
-        "description": "Improve your archery skills"
+  "advancement": {
+    "title": "Archer: Apprentice",
+    "description": "Improve your archery skills"
+  },
+  "prerequisites": [
+    {
+      "class": "archer",
+      "level": 0
     }
+  ]
 }

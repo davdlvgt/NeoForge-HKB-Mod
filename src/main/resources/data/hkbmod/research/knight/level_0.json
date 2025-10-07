@@ -20,5 +20,6 @@
   "advancement": {
     "title": "Knight: Squire",
     "description": "Begin your path as a Knight"
-  }
+  },
+  "prerequisites": []
 }
