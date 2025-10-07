@@ -89,6 +89,7 @@ public class HKBMod {
             event.accept(ModItems.EMERALD_HOE.get());
 
             event.accept(ModItems.MAGIC_PICKAXE.get());
+            event.accept(ModItems.TIME_SETTER.get());
         } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItems.EMERALD_SWORD.get());
         } else if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {

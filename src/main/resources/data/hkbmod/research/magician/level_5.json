@@ -1,0 +1,25 @@
+{
+  "class": "magician",
+  "level": 5,
+  "prerequisites": [{"class": "magician", "level": 4}],
+  "displayName": "Level 5: Legendary",
+  "description": "Become a legendary magician",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_block",
+      "count": 1
+    },
+    {
+      "item": "minecraft:nether_star",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Legendary Magician Status",
+    "Ultimate Arcane Power"
+  ],
+    "advancement": {
+        "title": "Magician: Legendary",
+        "description": "Become a legendary magician"
+    }
+}

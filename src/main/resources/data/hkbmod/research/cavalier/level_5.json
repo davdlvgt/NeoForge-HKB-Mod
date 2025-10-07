@@ -1,0 +1,25 @@
+{
+  "class": "cavalier",
+  "level": 5,
+  "prerequisites": [{"class": "cavalier", "level": 4}],
+  "displayName": "Level 5: Legendary",
+  "description": "Become a legendary cavalier",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_block",
+      "count": 2
+    },
+    {
+      "item": "minecraft:nether_star",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Legendary Cavalier Status",
+    "Divine Steed"
+  ],
+    "advancement": {
+        "title": "Cavalier: Legendary",
+        "description": "Become a legendary cavalier"
+    }
+}

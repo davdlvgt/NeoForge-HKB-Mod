@@ -1,0 +1,39 @@
+{
+  "parent": "hkbmod:miner/level_2",
+  "criteria": {
+    "has_hkbmod_emerald_pickaxe": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hkbmod:emerald_pickaxe"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.hkbmod.miner.level_3.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "hkbmod:emerald_pickaxe"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.miner.level_3.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_hkbmod_emerald_pickaxe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hkbmod:emerald_pickaxe"
+    ]
+  },
+  "sends_telemetry_event": true
+}

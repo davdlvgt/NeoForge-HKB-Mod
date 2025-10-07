@@ -1,0 +1,25 @@
+{
+  "class": "miner",
+  "level": 4,
+  "prerequisites": [{"class": "miner", "level": 3}],
+  "displayName": "Level 4: Master Miner",
+  "description": "Achieve mining mastery",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_pickaxe",
+      "count": 1
+    },
+    {
+      "item": "minecraft:diamond_block",
+      "count": 3
+    }
+  ],
+  "unlocks": [
+    "Fortune Mining III",
+    "Instant Mine"
+  ],
+  "advancement": {
+    "title": "Miner: Master",
+    "description": "Achieve mining mastery"
+  }
+}

@@ -21,7 +21,8 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
 
     // Simplified research data structure for network transmission
     public record ResearchData(String classType, int level, String displayName,
-                               List<ItemReq> requirements, List<String> unlocks, String description) {
+                               List<ItemReq> requirements, List<String> unlocks, String description,
+                               List<PrereqData> prerequisites) {
         public static final StreamCodec<ByteBuf, ResearchData> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, ResearchData::classType,
                 ByteBufCodecs.VAR_INT, ResearchData::level,
@@ -29,6 +30,7 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
                 ItemReq.STREAM_CODEC.apply(ByteBufCodecs.list()), ResearchData::requirements,
                 ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()), ResearchData::unlocks,
                 ByteBufCodecs.STRING_UTF8, ResearchData::description,
+                PrereqData.STREAM_CODEC.apply(ByteBufCodecs.list()), ResearchData::prerequisites,
                 ResearchData::new
         );
     }
@@ -38,6 +40,14 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
                 ByteBufCodecs.STRING_UTF8, ItemReq::item,
                 ByteBufCodecs.VAR_INT, ItemReq::count,
                 ItemReq::new
+        );
+    }
+
+    public record PrereqData(String classType, int level) {
+        public static final StreamCodec<ByteBuf, PrereqData> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, PrereqData::classType,
+                ByteBufCodecs.VAR_INT, PrereqData::level,
+                PrereqData::new
         );
     }
 
@@ -67,13 +77,20 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
                     for (ItemReq req : data.requirements()) {
                         requirements.add(new Research.ItemRequirement(req.item(), req.count()));
                     }
+                    List<Research.ResearchPrerequisite> prerequisites = new ArrayList<>();
+                    for (PrereqData prereq : data.prerequisites()) {
+                        prerequisites.add(new Research.ResearchPrerequisite(prereq.classType(), prereq.level()));
+                    }
+                  
                     Research research = new Research(
                             data.classType(),
                             data.level(),
                             data.displayName(),
                             requirements,
                             data.unlocks(),
-                            data.description()
+                            data.description(),
+                            null,
+                            prerequisites
                     );
                     ResearchManager.addResearch(research);
                     totalResearches++;
@@ -93,13 +110,22 @@ public record SyncResearchDataPacket(Map<String, List<ResearchData>> researches)
                 for (Research.ItemRequirement req : research.requirements()) {
                     requirements.add(new ItemReq(req.item(), req.count()));
                 }
+              
+                List<PrereqData> prerequisites = new ArrayList<>();
+              
+                for (Research.ResearchPrerequisite prereq : research.prerequisites()) {
+                    prerequisites.add(new PrereqData(prereq.classType(), prereq.level()));
+                }
+              
                 researchList.add(new ResearchData(
                         research.classType(),
                         research.level(),
                         research.displayName(),
                         requirements,
                         research.unlocks(),
-                        research.description()
+                        research.description(),
+                        prerequisites
+
                 ));
             }
             data.put(classType, researchList);

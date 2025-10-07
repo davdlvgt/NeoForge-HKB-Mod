@@ -1,0 +1,34 @@
+{
+  "class": "knight",
+  "level": 3,
+  "displayName": "Level 3: Expert",
+  "description": "Become an expert knight",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 4
+    },
+    {
+      "item": "minecraft:diamond_block",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Netherite Armor Proficiency",
+    "Battle Tactics"
+  ],
+  "advancement": {
+    "title": "Knight: Expert",
+    "description": "Become an expert knight"
+  },
+  "prerequisites": [
+    {
+      "class": "knight",
+      "level": 2
+    },
+    {
+      "class": "miner",
+      "level": 2
+    }
+  ]
+}

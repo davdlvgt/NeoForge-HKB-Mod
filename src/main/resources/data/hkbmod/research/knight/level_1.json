@@ -1,0 +1,30 @@
+{
+  "class": "knight",
+  "level": 1,
+  "displayName": "Level 1: Basic",
+  "description": "Advance your knightly prowess",
+  "requirements": [
+    {
+      "item": "minecraft:diamond",
+      "count": 4
+    },
+    {
+      "item": "minecraft:shield",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Diamond Sword Upgrade",
+    "Shield Mastery"
+  ],
+  "advancement": {
+    "title": "Knight: Man-at-Arms",
+    "description": "Advance your Knight training"
+  },
+  "prerequisites": [
+    {
+      "class": "knight",
+      "level": 0
+    }
+  ]
+}

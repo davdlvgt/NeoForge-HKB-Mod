@@ -1,0 +1,25 @@
+{
+  "class": "miner",
+  "level": 0,
+  "prerequisites": [],
+  "displayName": "Level 0: Digger",
+  "description": "Begin your journey as a Miner",
+  "requirements": [
+    {
+      "item": "minecraft:stone_pickaxe",
+      "count": 1
+    },
+    {
+      "item": "minecraft:cobblestone",
+      "count": 64
+    }
+  ],
+  "unlocks": [
+    "Basic Mining Efficiency",
+    "Ore Detection I"
+  ],
+  "advancement": {
+    "title": "Miner: Digger",
+    "description": "Begin your journey as a Miner"
+  }
+}

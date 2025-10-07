@@ -2,6 +2,7 @@ package de.davidvogt.hkbmod.item;
 
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
+import de.davidvogt.hkbmod.item.custom.TimeSetterItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ToolMaterial;
 import net.neoforged.bus.api.IEventBus;
@@ -46,7 +47,7 @@ public class ModItems {
                     props.sword(
                             ModMaterials.EMERALD_MATERIAL,   // Material to use
                             3.5F,                                  // Type-specific attack damage bonus
-                            -2.5F                               // Type-specific attack speed modifier
+                            -2.0F                               // Type-specific attack speed modifier
                     )
             )
     );
@@ -78,6 +79,11 @@ public class ModItems {
                             0.0F                               // Type-specific attack speed modifier
                     )
             )
+    );
+
+    public static final DeferredItem<TimeSetterItem> TIME_SETTER = ITEMS.registerItem(
+            "time_setter",
+            (properties) -> new TimeSetterItem(properties.stacksTo(1).durability(3))
     );
 
     public static void register(IEventBus eventBus) {

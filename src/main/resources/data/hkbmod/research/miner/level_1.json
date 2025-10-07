@@ -1,0 +1,25 @@
+{
+  "class": "miner",
+  "level": 1,
+  "prerequisites": [{"class": "miner", "level": 0}],
+  "displayName": "Level 1: Prospector",
+  "description": "Learn to find valuable resources",
+  "requirements": [
+    {
+      "item": "minecraft:iron_pickaxe",
+      "count": 1
+    },
+    {
+      "item": "minecraft:iron_ore",
+      "count": 32
+    }
+  ],
+  "unlocks": [
+    "Improved Mining Speed",
+    "Ore Detection II"
+  ],
+  "advancement": {
+    "title": "Miner: Prospector",
+    "description": "Learn to find valuable resources"
+  }
+}

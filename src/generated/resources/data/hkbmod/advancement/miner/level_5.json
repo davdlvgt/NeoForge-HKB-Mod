@@ -1,0 +1,39 @@
+{
+  "parent": "hkbmod:miner/level_4",
+  "criteria": {
+    "has_hkbmod_magic_pickaxe": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hkbmod:magic_pickaxe"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.hkbmod.miner.level_5.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "hkbmod:magic_pickaxe"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.miner.level_5.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_hkbmod_magic_pickaxe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hkbmod:magic_pickaxe"
+    ]
+  },
+  "sends_telemetry_event": true
+}

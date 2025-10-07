@@ -1,0 +1,34 @@
+{
+  "class": "miner",
+  "level": 5,
+  "prerequisites": [
+    {
+      "class": "miner",
+      "level": 4
+    },
+    {
+      "class": "magician",
+      "level": 4
+    }
+  ],
+  "displayName": "Level 5: Legendary Prospector",
+  "description": "Become a legendary master of the earth",
+  "requirements": [
+    {
+      "item": "minecraft:netherite_block",
+      "count": 2
+    },
+    {
+      "item": "minecraft:emerald_block",
+      "count": 1
+    }
+  ],
+  "unlocks": [
+    "Legendary Miner Status",
+    "Ultimate Mining Power"
+  ],
+  "advancement": {
+    "title": "Miner: Legendary Prospector",
+    "description": "Become a legendary master of the earth"
+  }
+}

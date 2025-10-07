@@ -117,6 +117,13 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
                 .bounds(this.leftPos + 69, this.topPos + 58, 42, 12)
                 .build()
         );
+        this.addRenderableWidget(Button.builder(
+                        Component.literal("Miner"),
+                        btn -> loadClassResearches("miner")
+                )
+                .bounds(this.leftPos + 69, this.topPos + 72, 42, 12)
+                .build()
+        );
         startResearchButton = Button.builder(
                         Component.literal("Start Research"),
                         btn -> {
@@ -214,7 +221,7 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
 
                 // Only allow selection of available (not completed, unlocked) research
                 PlayerResearchData researchData = menu.getPlayerResearchData();
-                if (!researchData.canResearch(research.classType(), research.level())) {
+                if (!researchData.canResearch(research.classType(), research.level(), research)) {
                     return true; // Prevent selection but consume click
                 }
 
@@ -259,7 +266,7 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
             // Get player research data
             PlayerResearchData researchData = menu.getPlayerResearchData();
             boolean isCompleted = researchData.isLevelCompleted(research.classType(), research.level());
-            boolean canResearch = researchData.canResearch(research.classType(), research.level());
+            boolean canResearch = researchData.canResearch(research.classType(), research.level(), research);
 
             // Prüfen ob Maus über Button ist
             boolean isHovered = mouseX >= btnX && mouseX <= btnX + btnW &&

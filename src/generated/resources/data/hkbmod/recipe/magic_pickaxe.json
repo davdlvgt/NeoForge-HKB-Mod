@@ -4,11 +4,12 @@
   "key": {
     "D": "minecraft:diamond",
     "E": "minecraft:ender_eye",
-    "S": "minecraft:stick"
+    "S": "minecraft:stick",
+    "T": "minecraft:tnt"
   },
   "pattern": [
     "DED",
-    " S ",
+    "TST",
     " S "
   ],
   "result": {

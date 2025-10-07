@@ -4,6 +4,7 @@ import de.davidvogt.hkbmod.HKBMod;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -39,6 +40,9 @@ public class DataGenerators {
         // generator.addProvider(true, blockTagsProvider);
         generator.addProvider(true, new ModItemTagProvider(packOutput, lookupProvider));
         // generator.addProvider(true, new ModDataMapProvider(packOutput, lookupProvider));
+
+        // Add advancement provider - commented out, using manual JSON files
+        generator.addProvider(true, new AdvancementProvider(packOutput, lookupProvider, List.of(new ModAdvancementProvider())));
     }
 
     @SubscribeEvent
@@ -58,6 +62,9 @@ public class DataGenerators {
         generator.addProvider(true, new ModDataMapProvider(packOutput, lookupProvider));
 
         generator.addProvider(true, new ModModelProvider(packOutput));
+
+        // Add advancement provider
+        generator.addProvider(true, new AdvancementProvider(packOutput, lookupProvider, List.of(new ModAdvancementProvider())));
 
 //        generator.addProvider(true, new ModDatapackProvider(packOutput, lookupProvider));
 //        generator.addProvider(true, new ModGlobalLootModifierProvider(packOutput, lookupProvider));

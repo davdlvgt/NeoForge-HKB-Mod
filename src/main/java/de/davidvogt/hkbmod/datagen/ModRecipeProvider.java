@@ -2,6 +2,7 @@ package de.davidvogt.hkbmod.datagen;
 
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.item.ModItems;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -35,7 +36,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .pattern(" S ")
                 .define('E', Items.EMERALD)
                 .define('S', Items.STICK)
-                .unlockedBy("has_emerald", has(Items.EMERALD))
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(this.output);
 
         this.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_SWORD.get())
@@ -44,7 +45,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .pattern(" S ")
                 .define('E', Items.EMERALD)
                 .define('S', Items.STICK)
-                .unlockedBy("has_emerald", has(Items.EMERALD))
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(this.output);
 
         this.shaped(RecipeCategory.TOOLS, ModItems.EMERALD_SHOVEL.get())
@@ -67,12 +68,22 @@ public class ModRecipeProvider extends RecipeProvider {
 
         this.shaped(RecipeCategory.TOOLS, ModItems.MAGIC_PICKAXE.get())
                 .pattern("DED")
-                .pattern(" S ")
+                .pattern("TST")
                 .pattern(" S ")
                 .define('D', Items.DIAMOND)
                 .define('E', Items.ENDER_EYE)
                 .define('S', Items.STICK)
-                .unlockedBy("has_diamond", has(Items.ENDER_EYE))
+                .define('T', Items.TNT)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.TOOLS, ModItems.TIME_SETTER.get())
+                .pattern(" E ")
+                .pattern("ECE")
+                .pattern(" E ")
+                .define('E', Items.ENDER_PEARL)
+                .define('C', Items.CLOCK)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(this.output);
 
 
