@@ -21,11 +21,11 @@ import java.util.Optional;
 public class ResearchOverviewScreen extends Screen {
     private static final int NODE_WIDTH = 60;
     private static final int NODE_HEIGHT = 15;
-    private static final int NODE_SPACING_X = 10;
-    private static final int NODE_SPACING_Y = 30;
+    private static final int NODE_SPACING_X = 20;
+    private static final int NODE_SPACING_Y = 50;
     private static final int CLASS_COLUMN_WIDTH = 75;
     private static final int LEFT_MARGIN = 10;
-    private static final int TOP_MARGIN = 10;
+    private static final int TOP_MARGIN = 0;
     private static final int BORDER_SIZE = 1;
 
     private final List<String> researchClasses;
@@ -230,11 +230,31 @@ public class ResearchOverviewScreen extends Screen {
             int prereqX = (int)(LEFT_MARGIN + CLASS_COLUMN_WIDTH + prereqIndex * (NODE_WIDTH + NODE_SPACING_X) + scrollX);
             int prereqY = (int)(TOP_MARGIN + prereqClassIndex * NODE_SPACING_Y + scrollY);
 
-            // Calculate connection points
-            int startX = prereqX + NODE_WIDTH;
-            int startY = prereqY + NODE_HEIGHT / 2;
-            int endX = nodeX;
-            int endY = nodeY + NODE_HEIGHT / 2;
+            // Calculate connection points based on whether it's same class or cross-class
+            int startX, startY, endX, endY;
+
+            if (prereqClassIndex == classIndex) {
+                // Same class: connect horizontally from right side to left side (middle of Y)
+                startX = prereqX + NODE_WIDTH;
+                startY = prereqY + NODE_HEIGHT / 2;
+                endX = nodeX;
+                endY = nodeY + NODE_HEIGHT / 2;
+            } else {
+                // Different class: connect vertically from bottom to top (middle of X)
+                if (prereqClassIndex < classIndex) {
+                    // Prerequisite is above (connect from bottom of prereq to top of current)
+                    startX = prereqX + NODE_WIDTH / 2;
+                    startY = prereqY + NODE_HEIGHT;
+                    endX = nodeX + NODE_WIDTH / 2;
+                    endY = nodeY;
+                } else {
+                    // Prerequisite is below (connect from top of prereq to bottom of current)
+                    startX = prereqX + NODE_WIDTH / 2;
+                    startY = prereqY;
+                    endX = nodeX + NODE_WIDTH / 2;
+                    endY = nodeY + NODE_HEIGHT;
+                }
+            }
 
             // Draw line
             int lineColor = playerResearchData.isLevelCompleted(prereq.classType(), prereq.level())
@@ -246,8 +266,7 @@ public class ResearchOverviewScreen extends Screen {
     }
 
     private void drawLine(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int color) {
-        // Simple line drawing using fill for horizontal/vertical lines
-        // For diagonal lines, we'll draw a simple approximation
+        // Draw the line
         if (y1 == y2) {
             // Horizontal line
             guiGraphics.fill(x1, y1, x2, y1 + 1, color);
@@ -262,6 +281,95 @@ public class ResearchOverviewScreen extends Screen {
                 int y = y1 + (y2 - y1) * i / steps;
                 guiGraphics.fill(x, y, x + 1, y + 1, color);
             }
+        }
+
+        // Draw arrowhead at the end (pointing to the dependent node)
+        drawArrowhead(guiGraphics, x1, y1, x2, y2, color);
+    }
+
+    private void drawArrowhead(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int color) {
+        // Calculate direction vector
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        double length = Math.sqrt(dx * dx + dy * dy);
+
+        if (length == 0) return;
+
+        // Normalize direction
+        double nx = dx / length;
+        double ny = dy / length;
+
+        // Arrowhead size
+        int arrowSize = 5;
+        double arrowAngle = Math.PI / 6; // 30 degrees
+
+        // Calculate arrowhead points
+        // Point back from end point
+        double backX = x2 - nx * arrowSize;
+        double backY = y2 - ny * arrowSize;
+
+        // Perpendicular vector
+        double px = -ny;
+        double py = nx;
+
+        // Two arrowhead wing points
+        int wing1X = (int)(backX + px * arrowSize * 0.5);
+        int wing1Y = (int)(backY + py * arrowSize * 0.5);
+        int wing2X = (int)(backX - px * arrowSize * 0.5);
+        int wing2Y = (int)(backY - py * arrowSize * 0.5);
+
+        // Draw the arrowhead triangle
+        drawTriangle(guiGraphics, x2, y2, wing1X, wing1Y, wing2X, wing2Y, color);
+    }
+
+    private void drawTriangle(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
+        // Draw lines connecting the three points to form a triangle arrowhead
+        drawLineSegment(guiGraphics, x1, y1, x2, y2, color);
+        drawLineSegment(guiGraphics, x2, y2, x3, y3, color);
+        drawLineSegment(guiGraphics, x3, y3, x1, y1, color);
+
+        // Simple fill - draw horizontal lines between edge intersections
+        int minY = Math.min(y1, Math.min(y2, y3));
+        int maxY = Math.max(y1, Math.max(y2, y3));
+
+        for (int y = minY; y <= maxY; y++) {
+            List<Integer> intersections = new ArrayList<>();
+
+            // Get X intersections for each edge at this Y
+            addIntersection(intersections, x1, y1, x2, y2, y);
+            addIntersection(intersections, x2, y2, x3, y3, y);
+            addIntersection(intersections, x3, y3, x1, y1, y);
+
+            if (intersections.size() >= 2) {
+                intersections.sort(Integer::compareTo);
+                int minX = intersections.get(0);
+                int maxX = intersections.get(intersections.size() - 1);
+                guiGraphics.fill(minX, y, maxX + 1, y + 1, color);
+            }
+        }
+    }
+
+    private void addIntersection(List<Integer> list, int x1, int y1, int x2, int y2, int y) {
+        if ((y1 <= y && y <= y2) || (y2 <= y && y <= y1)) {
+            if (y2 == y1) {
+                list.add(x1);
+            } else {
+                int x = x1 + (x2 - x1) * (y - y1) / (y2 - y1);
+                list.add(x);
+            }
+        }
+    }
+
+    private void drawLineSegment(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int color) {
+        int steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
+        if (steps == 0) {
+            guiGraphics.fill(x1, y1, x1 + 1, y1 + 1, color);
+            return;
+        }
+        for (int i = 0; i <= steps; i++) {
+            int x = x1 + (x2 - x1) * i / steps;
+            int y = y1 + (y2 - y1) * i / steps;
+            guiGraphics.fill(x, y, x + 1, y + 1, color);
         }
     }
 
