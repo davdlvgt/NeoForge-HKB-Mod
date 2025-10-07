@@ -72,5 +72,8 @@
   "item.hkbmod.emerald_sword": "Emerald Sword",
   "item.hkbmod.magic_pickaxe": "Magic Pickaxe",
   "item.hkbmod.time_setter": "Time Setter",
-  "itemGroup.hkbmod": "HKB Mod"
+  "itemGroup.hkbmod": "HKB Mod",
+  "key.categories.hkbmod": "HKB Mod",
+  "key.hkbmod.open_research_screen": "Open Research Overview",
+  "screen.hkbmod.research_overview": "Research Overview"
 }
