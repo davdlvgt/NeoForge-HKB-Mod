@@ -48,6 +48,16 @@ public class ModModelProvider extends ModelProvider {
                                 BlockModelGenerators.plainVariant(blockModels.createSuffixedVariant(ModBlocks.TEST_LAMP.get(), "_on", ModelTemplates.CUBE_ALL, TextureMapping::cube)),
                                 BlockModelGenerators.plainVariant(TexturedModel.CUBE.create(ModBlocks.TEST_LAMP.get(), blockModels.modelOutput))))
         );
+
+
+        blockModels.woodProvider(ModBlocks.ROBINIA_LOG.get()).logWithHorizontal(ModBlocks.ROBINIA_LOG.get()).wood(ModBlocks.ROBINIA_WOOD.get());
+        blockModels.woodProvider(ModBlocks.STRIPPED_ROBINIA_LOG.get()).logWithHorizontal(ModBlocks.STRIPPED_ROBINIA_LOG.get()).wood(ModBlocks.STRIPPED_ROBINIA_WOOD.get());
+
+        blockModels.createTrivialCube(ModBlocks.ROBINIA_PLANKS.get());
+
+        blockModels.createTintedLeaves(ModBlocks.ROBINIA_LEAVES.get(), TexturedModel.LEAVES, -12012264);
+
+        blockModels.createCrossBlock(ModBlocks.ROBINIA_SAPLING.get(), BlockModelGenerators.PlantType.TINTED);
     }
 
     @Override

@@ -98,6 +98,14 @@ public class HKBMod {
             event.accept(ModBlocks.TEST_LAMP.get());
         } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(ModBlocks.RESEARCH_TABLE.get());
+        } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
+            event.accept(ModBlocks.ROBINIA_LOG.get());
+            event.accept(ModBlocks.ROBINIA_WOOD.get());
+            event.accept(ModBlocks.STRIPPED_ROBINIA_LOG.get());
+            event.accept(ModBlocks.STRIPPED_ROBINIA_WOOD.get());
+            event.accept(ModBlocks.ROBINIA_PLANKS.get());
+            event.accept(ModBlocks.ROBINIA_SAPLING.get());
+            event.accept(ModBlocks.ROBINIA_LEAVES.get());
         }
     }
 

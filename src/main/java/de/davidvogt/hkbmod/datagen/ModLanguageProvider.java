@@ -40,6 +40,15 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModBlocks.TEST_LAMP.get(), "Test Lamp");
         add(ModBlocks.RESEARCH_TABLE.get(), "Research Table");
 
+        add(ModBlocks.ROBINIA_LOG.get(), "Robinia Log");
+        add(ModBlocks.ROBINIA_WOOD.get(), "Robinia Wood");
+        add(ModBlocks.STRIPPED_ROBINIA_LOG.get(), "Stripped Robinia Log");
+        add(ModBlocks.STRIPPED_ROBINIA_WOOD.get(), "Stripped Robinia Wood");
+
+        add(ModBlocks.ROBINIA_PLANKS.get(), "Robinia Planks");
+        add(ModBlocks.ROBINIA_SAPLING.get(), "Robinia Sapling");
+        add(ModBlocks.ROBINIA_LEAVES.get(),  "Robinia Leaves");
+
         // Advancements - Root
         add("advancements.hkbmod.root.title", "Research Classes");
         add("advancements.hkbmod.root.description", "Master different combat and magic classes");

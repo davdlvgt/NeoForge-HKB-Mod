@@ -24,25 +24,20 @@ public class DataGenerators {
         PackOutput packOutput = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        // Add language provider
-        generator.addProvider(true, new ModLanguageProvider(packOutput));
+        generator.addProvider(true , new LootTableProvider(packOutput, Collections.emptySet(),
+                List.of(new LootTableProvider.SubProviderEntry(ModBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
+        generator.addProvider(true, new ModRecipeProvider.Runner(packOutput, lookupProvider));
 
-        // Add model provider
+        BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(packOutput, lookupProvider);
+        generator.addProvider(true, blockTagsProvider);
+        generator.addProvider(true, new ModItemTagProvider(packOutput, lookupProvider));
+
+        generator.addProvider(true, new ModDataMapProvider(packOutput, lookupProvider));
+
         generator.addProvider(true, new ModModelProvider(packOutput));
 
-        // Add recipe provider
-        generator.addProvider(true, new ModRecipeProvider.Generator(packOutput, lookupProvider));
-
-        // Commented out until needed
-        // generator.addProvider(true , new LootTableProvider(packOutput, Collections.emptySet(),
-        //         List.of(new LootTableProvider.SubProviderEntry(ModBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
-        BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(packOutput, lookupProvider);
-        // generator.addProvider(true, blockTagsProvider);
-        generator.addProvider(true, new ModItemTagProvider(packOutput, lookupProvider));
-        // generator.addProvider(true, new ModDataMapProvider(packOutput, lookupProvider));
-
-        // Add advancement provider - commented out, using manual JSON files
-        generator.addProvider(true, new AdvancementProvider(packOutput, lookupProvider, List.of(new ModAdvancementProvider())));
+        generator.addProvider(true, new ModDatapackProvider(packOutput, lookupProvider));
+        //generator.addProvider(true, new ModGlobalLootModifierProvider(packOutput, lookupProvider));
     }
 
     @SubscribeEvent
@@ -53,7 +48,7 @@ public class DataGenerators {
 
         generator.addProvider(true, new LootTableProvider(packOutput, Collections.emptySet(),
                 List.of(new LootTableProvider.SubProviderEntry(ModBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
-        generator.addProvider(true, new ModRecipeProvider.Generator(packOutput, lookupProvider));
+        generator.addProvider(true, new ModRecipeProvider.Runner(packOutput, lookupProvider));
 
         BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(packOutput, lookupProvider);
         generator.addProvider(true, blockTagsProvider);
@@ -63,10 +58,7 @@ public class DataGenerators {
 
         generator.addProvider(true, new ModModelProvider(packOutput));
 
-        // Add advancement provider
-        generator.addProvider(true, new AdvancementProvider(packOutput, lookupProvider, List.of(new ModAdvancementProvider())));
-
-//        generator.addProvider(true, new ModDatapackProvider(packOutput, lookupProvider));
-//        generator.addProvider(true, new ModGlobalLootModifierProvider(packOutput, lookupProvider));
+        generator.addProvider(true, new ModDatapackProvider(packOutput, lookupProvider));
+        // generator.addProvider(true, new ModGlobalLootModifierProvider(packOutput, lookupProvider));
     }
 }

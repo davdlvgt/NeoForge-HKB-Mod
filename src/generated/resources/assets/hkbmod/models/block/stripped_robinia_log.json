@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "hkbmod:block/stripped_robinia_log_top",
+    "side": "hkbmod:block/stripped_robinia_log"
+  }
+}

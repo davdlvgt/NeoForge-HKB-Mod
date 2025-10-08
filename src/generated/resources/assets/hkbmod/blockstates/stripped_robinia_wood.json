@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "hkbmod:block/stripped_robinia_wood",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "hkbmod:block/stripped_robinia_wood"
+    },
+    "axis=z": {
+      "model": "hkbmod:block/stripped_robinia_wood",
+      "x": 90
+    }
+  }
+}

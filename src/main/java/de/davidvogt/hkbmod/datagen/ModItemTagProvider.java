@@ -1,9 +1,12 @@
 package de.davidvogt.hkbmod.datagen;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.util.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.data.ItemTagsProvider;
 
@@ -18,5 +21,14 @@ public class ModItemTagProvider extends ItemTagsProvider {
     protected void addTags(HolderLookup.Provider provider) {
         tag(ModTags.Items.TRANSFORMABLE_ITEMS)
                 .add(Items.COAL);
+
+        this.tag(ItemTags.LOGS_THAT_BURN)
+                .add(ModBlocks.ROBINIA_LOG.get().asItem())
+                .add(ModBlocks.ROBINIA_WOOD.get().asItem())
+                .add(ModBlocks.STRIPPED_ROBINIA_LOG.get().asItem())
+                .add(ModBlocks.STRIPPED_ROBINIA_WOOD.get().asItem());
+
+        this.tag(ItemTags.PLANKS)
+                .add(ModBlocks.ROBINIA_PLANKS.get().asItem());
     }
 }

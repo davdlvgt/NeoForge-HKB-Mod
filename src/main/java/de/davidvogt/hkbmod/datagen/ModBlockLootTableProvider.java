@@ -27,9 +27,20 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     @Override
     protected void generate() {
         // dropSelf(ModBlocks.HIER_MEIN_BLOCK.get());
-        dropSelf(ModBlocks.TEST_LAMP.get());
-        dropSelf(ModBlocks.RESEARCH_TABLE.get());
+        this.dropSelf(ModBlocks.TEST_LAMP.get());
+        this.dropSelf(ModBlocks.TEST_BLOCK.get());
 
+        this.dropSelf(ModBlocks.RESEARCH_TABLE.get());
+
+        this.dropSelf(ModBlocks.ROBINIA_LOG.get());
+        this.dropSelf(ModBlocks.ROBINIA_WOOD.get());
+        this.dropSelf(ModBlocks.STRIPPED_ROBINIA_LOG.get());
+        this.dropSelf(ModBlocks.STRIPPED_ROBINIA_WOOD.get());
+        this.dropSelf(ModBlocks.ROBINIA_PLANKS.get());
+        this.dropSelf(ModBlocks.ROBINIA_SAPLING.get());
+
+        this.add(ModBlocks.ROBINIA_LEAVES.get(), block ->
+                createLeavesDrops(block, ModBlocks.ROBINIA_SAPLING.get(), NORMAL_LEAVES_SAPLING_CHANCES));
         /*
         add(ModBlocks.MEIN_BLOCK_ORE_HIER.get(),
                 block -> createOreDrop(ModBlocks.MEIN_BLOCK_ORE_HIER.get(), ModItems.MEIN_RAW_BLOCK_HIER.get()));

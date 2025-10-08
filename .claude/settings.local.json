@@ -24,7 +24,8 @@
       "Bash(.\\gradlew.bat runData:*)",
       "Read(//d/**)",
       "Bash(copy:*)",
-      "Bash(gradlew.bat compileJava:*)"
+      "Bash(gradlew.bat compileJava:*)",
+      "Bash(./gradlew.bat runData:*)"
     ],
     "deny": [],
     "ask": []

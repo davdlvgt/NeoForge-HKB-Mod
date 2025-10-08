@@ -1,0 +1,11 @@
+// 1.21.8	2025-10-08T13:45:04.037751	Loot Tables
+c066bd23d91a63018548b5761007647891e483f0 data/hkbmod/loot_table/blocks/research_table.json
+5ab523ca97314b9babe9dd071c543200bd079027 data/hkbmod/loot_table/blocks/robinia_leaves.json
+e8638682a375905a85435bae1b719f5fee5d7374 data/hkbmod/loot_table/blocks/robinia_log.json
+a82e8327be5b9e9c91d30beb6291b1e86a9622bc data/hkbmod/loot_table/blocks/robinia_planks.json
+733d1dca129a1d4518173170988af745bc72f654 data/hkbmod/loot_table/blocks/robinia_sapling.json
+bf5be6096b6bb45e9a2e002540baa4a9b1058d96 data/hkbmod/loot_table/blocks/robinia_wood.json
+308cdb3cc82c23faf3e9326464fa283e3516112c data/hkbmod/loot_table/blocks/stripped_robinia_log.json
+ef61e5256351b3a7c13f2ae6f97a6bde1ca1968e data/hkbmod/loot_table/blocks/stripped_robinia_wood.json
+1dfafe4435cb15247792b7e3c3731a04f1ae51ad data/hkbmod/loot_table/blocks/test_block.json
+4957fa1d0ebd4a2e50faf76322e1e5b5e4387b3c data/hkbmod/loot_table/blocks/test_lamp.json

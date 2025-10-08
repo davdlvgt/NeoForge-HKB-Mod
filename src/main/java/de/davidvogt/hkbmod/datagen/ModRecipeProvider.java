@@ -18,6 +18,22 @@ public class ModRecipeProvider extends RecipeProvider {
         super(provider, recipeOutput);
     }
 
+    public static class Runner extends RecipeProvider.Runner {
+        public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> provider) {
+            super(packOutput, provider);
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
+            return new ModRecipeProvider(provider, recipeOutput);
+        }
+
+        @Override
+        public String getName() {
+            return "My Recipes";
+        }
+    }
+
     @Override
     protected void buildRecipes() {
 
@@ -110,21 +126,5 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('L', Items.OAK_LOG)
                 .define('P', Items.PAPER)
                 .unlockedBy("has_book", has(Items.BOOK)).save(output);
-    }
-
-    public static class Generator extends RecipeProvider.Runner {
-        public Generator(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-            super(packOutput, lookupProvider);
-        }
-
-        @Override
-        protected @NotNull RecipeProvider createRecipeProvider(HolderLookup.@NotNull Provider provider, @NotNull RecipeOutput output) {
-            return new ModRecipeProvider(provider, output);
-        }
-
-        @Override
-        public @NotNull String getName() {
-            return "My Recipes";
-        }
     }
 }

@@ -2,8 +2,10 @@ package de.davidvogt.hkbmod.datagen;
 
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.block.ModBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.tags.BlockTags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 
 import java.util.concurrent.CompletableFuture;
@@ -15,6 +17,12 @@ public class ModBlockTagProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
+
+        this.tag(BlockTags.LOGS_THAT_BURN)
+                .add(ModBlocks.ROBINIA_LOG.get())
+                .add(ModBlocks.ROBINIA_WOOD.get())
+                .add(ModBlocks.STRIPPED_ROBINIA_LOG.get())
+                .add(ModBlocks.STRIPPED_ROBINIA_WOOD.get());
 
 /*
         tag(BlockTags.MINEABLE_WITH_PICKAXE)
