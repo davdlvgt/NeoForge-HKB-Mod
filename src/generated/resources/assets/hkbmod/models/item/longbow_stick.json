@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "hkbmod:item/time_setter"
+    "layer0": "hkbmod:item/longbow_stick"
   }
 }

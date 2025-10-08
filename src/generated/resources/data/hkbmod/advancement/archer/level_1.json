@@ -1,0 +1,39 @@
+{
+  "parent": "hkbmod:archer/level_0",
+  "criteria": {
+    "has_hkbmod_elastic_wood": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hkbmod:elastic_wood"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.hkbmod.archer.level_1.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "hkbmod:elastic_wood"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.archer.level_1.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_hkbmod_elastic_wood"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hkbmod:elastic_wood"
+    ]
+  },
+  "sends_telemetry_event": true
+}

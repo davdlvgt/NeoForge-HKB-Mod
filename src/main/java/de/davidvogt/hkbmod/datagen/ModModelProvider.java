@@ -36,7 +36,12 @@ public class ModModelProvider extends ModelProvider {
         itemModels.generateFlatItem(ModItems.EMERALD_HOE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
         itemModels.generateFlatItem(ModItems.MAGIC_PICKAXE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModels.generateFlatItem(ModItems.TIME_SETTER.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(ModItems.TIME_SETTER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+
+        itemModels.generateFlatItem(ModItems.LONGBOW_STICK.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+
+        itemModels.createFlatItemModel(ModItems.LONGBOW.get(), ModelTemplates.BOW);
+        itemModels.generateBow(ModItems.LONGBOW.get());
 
         // Block Models
         blockModels.createGenericCube(ModBlocks.TEST_BLOCK.get());
@@ -66,6 +71,8 @@ public class ModModelProvider extends ModelProvider {
                 .pressurePlate(ModBlocks.ROBINIA_PRESSURE_PLATE.get())
                 .door(ModBlocks.ROBINIA_DOOR.get())
                 .trapdoor(ModBlocks.ROBINIA_TRAPDOOR.get());
+
+        blockModels.createTrivialCube(ModBlocks.ELASTIC_WOOD.get()); // One texture for all sides
     }
 
     @Override

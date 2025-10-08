@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "R": "hkbmod:robinia_log",
+    "S": "minecraft:string"
+  },
+  "pattern": [
+    "RSR",
+    "SRS",
+    "RSR"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hkbmod:elastic_wood"
+  }
+}

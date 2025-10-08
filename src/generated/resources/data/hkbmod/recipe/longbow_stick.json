@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "E": "hkbmod:elastic_wood"
+  },
+  "pattern": [
+    "EE ",
+    "  E",
+    "EE "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hkbmod:longbow_stick"
+  }
+}

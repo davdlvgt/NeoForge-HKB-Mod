@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Function;
@@ -49,6 +51,12 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> RESEARCH_TABLE = registerBlock("research_table",
             (properties) -> new ResearchTableBlock(properties.noOcclusion()));
+
+
+    public static final DeferredBlock<Block> ELASTIC_WOOD = registerBlock(
+            "elastic_wood",
+            Block::new
+    );
 
     /*    public static final DeferredBlock<Block> ROBINIA_LOG = registerBlock("robinia_log",
                 (properties) -> new ModFlammableRotatedPillarBlock(

@@ -1,0 +1,26 @@
+{
+  "parent": "hkbmod:knight/level_2",
+  "criteria": {
+    "research_completed": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.hkbmod.knight.level_3.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:diamond_chestplate"
+    },
+    "title": {
+      "translate": "advancements.hkbmod.knight.level_3.title"
+    }
+  },
+  "requirements": [
+    [
+      "research_completed"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

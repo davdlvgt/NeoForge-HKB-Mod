@@ -23,7 +23,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add("itemGroup.hkbmod", "HKB Mod");
 
         // Items
-
+        add(ModItems.LONGBOW_STICK.get(), "longbow_stick");
 
         // Tools
         add(ModItems.EMERALD_AXE.get(), "Emerald Axe");
@@ -58,6 +58,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModBlocks.ROBINIA_DOOR.get(), "Robinia Door");
         add(ModBlocks.ROBINIA_TRAPDOOR.get(), "Robinia Trapdoor");
 
+        add(ModBlocks.ELASTIC_WOOD.get(), "Elastic Wood");
 
         // Advancements - Root
         add("advancements.hkbmod.root.title", "Research Classes");

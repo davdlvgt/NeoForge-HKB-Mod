@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.event;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
 import de.davidvogt.hkbmod.network.SetDigSizePacket;
 import net.minecraft.client.Minecraft;
@@ -9,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 
 @EventBusSubscriber(modid = HKBMod.MODID, value = Dist.CLIENT)
@@ -33,6 +35,22 @@ public class ClientModEvents {
 
             event.setCanceled(true);
             player.displayClientMessage(Component.literal("Grabungsgröße: " + (current * 2 + 1) + "x" + (current * 2 + 1)), true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onComputeFovModifierEvent(ComputeFovModifierEvent event) {
+        if(event.getPlayer().isUsingItem() && event.getPlayer().getUseItem().getItem() == ModItems.LONGBOW.get()) {
+            float fovModifier = 1f;
+            int ticksUsingItem = event.getPlayer().getTicksUsingItem();
+            float deltaTicks = (float)ticksUsingItem / 20f;
+            if(deltaTicks > 1f) {
+                deltaTicks = 1f;
+            } else {
+                deltaTicks *= deltaTicks;
+            }
+            fovModifier *= 1f - deltaTicks * 0.15f;
+            event.setNewFovModifier(fovModifier);
         }
     }
 }

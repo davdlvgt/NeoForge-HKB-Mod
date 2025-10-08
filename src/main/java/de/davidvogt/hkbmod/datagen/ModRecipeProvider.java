@@ -11,7 +11,6 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -104,6 +103,14 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(this.output);
 
+        this.shaped(RecipeCategory.TOOLS, ModItems.LONGBOW_STICK.get())
+                .pattern("EE ")
+                .pattern("  E")
+                .pattern("EE ")
+                .define('E', ModBlocks.ELASTIC_WOOD.get())
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
+
 
         // BLOCK RECIPES
         shaped(RecipeCategory.MISC, ModBlocks.TEST_BLOCK.get())
@@ -128,6 +135,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('L', Items.OAK_LOG)
                 .define('P', Items.PAPER)
                 .unlockedBy("has_book", has(Items.BOOK)).save(output);
+
+        shaped(RecipeCategory.TOOLS, ModBlocks.ELASTIC_WOOD.get())
+                .pattern("RSR")
+                .pattern("SRS")
+                .pattern("RSR")
+                .define('R', ModBlocks.ROBINIA_LOG.get())
+                .define('S', Items.STRING)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
 
         shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.ROBINIA_PLANKS.get(), 4)
                 .requires(ModTags.Items.ROBINIA_LOG)

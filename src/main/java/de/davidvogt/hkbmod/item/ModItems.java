@@ -3,6 +3,7 @@ package de.davidvogt.hkbmod.item;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
 import de.davidvogt.hkbmod.item.custom.TimeSetterItem;
+import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ToolMaterial;
 import net.neoforged.bus.api.IEventBus;
@@ -54,8 +55,8 @@ public class ModItems {
 
     public static final DeferredItem<MagicPickaxeItem> MAGIC_PICKAXE = ITEMS.registerItem(
             "magic_pickaxe",
-            (properties) -> new MagicPickaxeItem(
-                    properties.pickaxe(ModMaterials.EMERALD_MATERIAL, 7F, -3.5F)
+            (props) -> new MagicPickaxeItem(
+                    props.pickaxe(ModMaterials.EMERALD_MATERIAL, 7F, -3.5F)
             )
     );
 
@@ -83,7 +84,17 @@ public class ModItems {
 
     public static final DeferredItem<TimeSetterItem> TIME_SETTER = ITEMS.registerItem(
             "time_setter",
-            (properties) -> new TimeSetterItem(properties.stacksTo(1).durability(3))
+            (props) -> new TimeSetterItem(props.stacksTo(1).durability(3))
+    );
+
+    public static final DeferredItem<Item> LONGBOW_STICK = ITEMS.registerItem(
+            "longbow_stick",
+            (props) -> new Item(props.stacksTo(32))
+    );
+    
+    public static final DeferredItem<Item> LONGBOW = ITEMS.registerItem(
+            "longbow",
+            (props) -> new BowItem(props.durability(500))
     );
 
     public static void register(IEventBus eventBus) {

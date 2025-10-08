@@ -90,12 +90,16 @@ public class HKBMod {
 
             event.accept(ModItems.MAGIC_PICKAXE.get());
             event.accept(ModItems.TIME_SETTER.get());
+
+            event.accept(ModItems.LONGBOW_STICK.get());
         } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItems.EMERALD_SWORD.get());
+            event.accept(ModItems.LONGBOW.get());
         } else if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModBlocks.TEST_BLOCK.get());
             event.accept(ModBlocks.CUSTOM_TEST_BLOCK.get());
             event.accept(ModBlocks.TEST_LAMP.get());
+            event.accept(ModBlocks.ELASTIC_WOOD.get());
         } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(ModBlocks.RESEARCH_TABLE.get());
         } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
