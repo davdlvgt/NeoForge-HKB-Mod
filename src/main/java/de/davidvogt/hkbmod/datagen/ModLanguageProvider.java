@@ -49,6 +49,16 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModBlocks.ROBINIA_SAPLING.get(), "Robinia Sapling");
         add(ModBlocks.ROBINIA_LEAVES.get(),  "Robinia Leaves");
 
+        add(ModBlocks.ROBINIA_STAIRS.get(),  "Robinia Stairs");
+        add(ModBlocks.ROBINIA_SLAB.get(),  "Robinia Slab");
+        add(ModBlocks.ROBINIA_PRESSURE_PLATE.get(), "Robinia Pressure Plate");
+        add(ModBlocks.ROBINIA_BUTTON.get(), "Robinia Button");
+        add(ModBlocks.ROBINIA_FENCE.get(), "Robinia Fence");
+        add(ModBlocks.ROBINIA_FENCE_GATE.get(), "Robinia Fence Gate");
+        add(ModBlocks.ROBINIA_DOOR.get(), "Robinia Door");
+        add(ModBlocks.ROBINIA_TRAPDOOR.get(), "Robinia Trapdoor");
+
+
         // Advancements - Root
         add("advancements.hkbmod.root.title", "Research Classes");
         add("advancements.hkbmod.root.description", "Master different combat and magic classes");

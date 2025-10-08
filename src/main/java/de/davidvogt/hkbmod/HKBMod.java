@@ -106,6 +106,16 @@ public class HKBMod {
             event.accept(ModBlocks.ROBINIA_PLANKS.get());
             event.accept(ModBlocks.ROBINIA_SAPLING.get());
             event.accept(ModBlocks.ROBINIA_LEAVES.get());
+
+            event.accept(ModBlocks.ROBINIA_STAIRS.get());
+            event.accept(ModBlocks.ROBINIA_SLAB.get());
+            event.accept(ModBlocks.ROBINIA_PRESSURE_PLATE.get());
+            event.accept(ModBlocks.ROBINIA_BUTTON.get());
+            event.accept(ModBlocks.ROBINIA_FENCE.get());
+            event.accept(ModBlocks.ROBINIA_FENCE_GATE.get());
+            event.accept(ModBlocks.ROBINIA_DOOR.get());
+            event.accept(ModBlocks.ROBINIA_TRAPDOOR.get());
+
         }
     }
 

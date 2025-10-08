@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "hkbmod:block/robinia_pressure_plate"
+    },
+    "powered=true": {
+      "model": "hkbmod:block/robinia_pressure_plate_down"
+    }
+  }
+}

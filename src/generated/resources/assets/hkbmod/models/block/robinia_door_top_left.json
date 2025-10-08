@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_left",
+  "textures": {
+    "bottom": "hkbmod:block/robinia_door_bottom",
+    "top": "hkbmod:block/robinia_door_top"
+  }
+}

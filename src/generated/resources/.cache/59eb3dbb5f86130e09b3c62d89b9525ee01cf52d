@@ -1,9 +1,17 @@
-// 1.21.8	2025-10-08T13:45:04.037751	Loot Tables
+// 1.21.8	2025-10-08T15:11:14.7306232	Loot Tables
 c066bd23d91a63018548b5761007647891e483f0 data/hkbmod/loot_table/blocks/research_table.json
+439b4807be55d2eef37e233803e509996a5317ce data/hkbmod/loot_table/blocks/robinia_button.json
+dd3453b34f518c34612fa085db7d4c2a99b1ffd2 data/hkbmod/loot_table/blocks/robinia_door.json
+220af5377c85358d7fbdfa025c8627015b7217f5 data/hkbmod/loot_table/blocks/robinia_fence.json
+5b11b628a74c2730a3ca965b4ecdfb2172e74e39 data/hkbmod/loot_table/blocks/robinia_fence_gate.json
 5ab523ca97314b9babe9dd071c543200bd079027 data/hkbmod/loot_table/blocks/robinia_leaves.json
 e8638682a375905a85435bae1b719f5fee5d7374 data/hkbmod/loot_table/blocks/robinia_log.json
 a82e8327be5b9e9c91d30beb6291b1e86a9622bc data/hkbmod/loot_table/blocks/robinia_planks.json
+8f11591bba67d0e86437bb2f87ceb5b595c654f6 data/hkbmod/loot_table/blocks/robinia_pressure_plate.json
 733d1dca129a1d4518173170988af745bc72f654 data/hkbmod/loot_table/blocks/robinia_sapling.json
+2107c682630a6e7b459014879cd3070cccb019bb data/hkbmod/loot_table/blocks/robinia_slab.json
+28ef002d3a9b3eabd55a6b63c62f245a9f221d11 data/hkbmod/loot_table/blocks/robinia_stairs.json
+e3dfd58dd59cf7d26e8a0b88196030df45f210be data/hkbmod/loot_table/blocks/robinia_trapdoor.json
 bf5be6096b6bb45e9a2e002540baa4a9b1058d96 data/hkbmod/loot_table/blocks/robinia_wood.json
 308cdb3cc82c23faf3e9326464fa283e3516112c data/hkbmod/loot_table/blocks/stripped_robinia_log.json
 ef61e5256351b3a7c13f2ae6f97a6bde1ca1968e data/hkbmod/loot_table/blocks/stripped_robinia_wood.json

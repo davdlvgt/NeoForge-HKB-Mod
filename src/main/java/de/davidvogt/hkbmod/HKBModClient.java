@@ -8,6 +8,7 @@ import de.davidvogt.hkbmod.screen.cutsom.ResearchTableScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -43,6 +44,8 @@ public class HKBModClient {
         HKBMod.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.ROBINIA_SAPLING.get(), ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.ROBINIA_DOOR.get(),  ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.ROBINIA_TRAPDOOR.get(),  ChunkSectionLayer.CUTOUT);
     }
 
     @SubscribeEvent

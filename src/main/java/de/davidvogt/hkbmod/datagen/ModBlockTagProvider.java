@@ -24,7 +24,11 @@ public class ModBlockTagProvider extends BlockTagsProvider {
                 .add(ModBlocks.STRIPPED_ROBINIA_LOG.get())
                 .add(ModBlocks.STRIPPED_ROBINIA_WOOD.get());
 
-/*
+
+        this.tag(BlockTags.FENCES).add(ModBlocks.ROBINIA_FENCE.get());
+        this.tag(BlockTags.FENCE_GATES).add(ModBlocks.ROBINIA_FENCE_GATE.get());
+
+        /*
         tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(ModBlocks.BISMUTH_BLOCK.get())
                 .add(ModBlocks.BISMUTH_ORE.get())

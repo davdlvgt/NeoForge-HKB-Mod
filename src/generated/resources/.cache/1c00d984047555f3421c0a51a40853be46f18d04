@@ -1,2 +1,4 @@
-// 1.21.8	2025-10-08T13:45:04.037751	Tags for minecraft:block mod id hkbmod
+// 1.21.8	2025-10-08T15:48:58.7141459	Tags for minecraft:block mod id hkbmod
+4628896b026debffbe73cdac7eac541de06e66a8 data/minecraft/tags/block/fences.json
+8ff2ce2bbbd85ed8f88fb815e1609f53ad183190 data/minecraft/tags/block/fence_gates.json
 18ca9e177d844b17e7a4e3ec9cbd03f69d49ccbf data/minecraft/tags/block/logs_that_burn.json

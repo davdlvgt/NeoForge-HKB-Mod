@@ -15,7 +15,9 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
@@ -118,6 +120,27 @@ public class ModBlocks {
             (properties) -> new SaplingBlock(ModTreeGrowers.ROBINIA,
                     properties.mapColor(MapColor.PLANT).noCollission().randomTicks().instabreak()
                             .sound(SoundType.GRASS).pushReaction(PushReaction.DESTROY)));
+
+    public static final DeferredBlock<StairBlock> ROBINIA_STAIRS = registerBlock("robinia_stairs",
+            (properties) -> new StairBlock(ModBlocks.ROBINIA_WOOD.get().defaultBlockState(),
+                    properties.strength(2f).requiresCorrectToolForDrops()));
+    public static final DeferredBlock<SlabBlock> ROBINIA_SLAB = registerBlock("robinia_slab",
+            (properties) -> new SlabBlock(properties.strength(2f).requiresCorrectToolForDrops()));
+
+    public static final DeferredBlock<PressurePlateBlock> ROBINIA_PRESSURE_PLATE = registerBlock("robinia_pressure_plate",
+            (properties) -> new PressurePlateBlock(BlockSetType.OAK, properties.strength(2f).requiresCorrectToolForDrops())); // ToDo: BlockSetType.ROBINIA
+    public static final DeferredBlock<ButtonBlock> ROBINIA_BUTTON = registerBlock("robinia_button",
+            (properties) -> new ButtonBlock(BlockSetType.OAK, 20, properties.strength(2f).requiresCorrectToolForDrops().noCollission()));  // ToDo: BlockSetType.ROBINIA
+
+    public static final DeferredBlock<FenceBlock> ROBINIA_FENCE = registerBlock("robinia_fence",
+            (properties) -> new FenceBlock(properties.strength(2f).requiresCorrectToolForDrops()));
+    public static final DeferredBlock<FenceGateBlock> ROBINIA_FENCE_GATE = registerBlock("robinia_fence_gate",
+            (properties) -> new FenceGateBlock(WoodType.OAK, properties.strength(2f).requiresCorrectToolForDrops())); // ToDo: WoodType.ROBINIA
+
+    public static final DeferredBlock<DoorBlock> ROBINIA_DOOR = registerBlock("robinia_door",
+            (properties) -> new DoorBlock(BlockSetType.OAK, properties.strength(2f).requiresCorrectToolForDrops().noOcclusion()));
+    public static final DeferredBlock<TrapDoorBlock> ROBINIA_TRAPDOOR = registerBlock("robinia_trapdoor",
+            (properties) -> new TrapDoorBlock(BlockSetType.OAK, properties.strength(2f).requiresCorrectToolForDrops().noOcclusion()));
 
     /*public static final DeferredBlock<Block> ROBINIA_PLANKS = registerBlock("robinia_planks",
             (properties) -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)) {

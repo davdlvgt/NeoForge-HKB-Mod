@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hkbmod:block/robinia_slab"
+    },
+    "type=double": {
+      "model": "hkbmod:block/robinia_planks"
+    },
+    "type=top": {
+      "model": "hkbmod:block/robinia_slab_top"
+    }
+  }
+}

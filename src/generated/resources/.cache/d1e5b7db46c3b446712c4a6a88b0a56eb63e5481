@@ -1,8 +1,17 @@
-// 1.21.8	2025-10-07T00:54:38.8212978	My Recipes
+// 1.21.8	2025-10-08T15:48:58.7141459	My Recipes
+604c4c7c6c064b16ee2bb6e9a4e3cfade266a8b3 data/hkbmod/advancement/recipes/building_blocks/robinia_planks.json
+48159894de840b98453008c3690e87aff0c83314 data/hkbmod/advancement/recipes/building_blocks/robinia_slab.json
+c3e67ab7209596974b8a71ea5c0ca292205dc838 data/hkbmod/advancement/recipes/building_blocks/robinia_stairs.json
 db84fa4fc2c5a8df81238b054bde784c73ca9dff data/hkbmod/advancement/recipes/combat/emerald_sword.json
+e5911d5e70d15afd5b6e4a102801a98b02f9ae17 data/hkbmod/advancement/recipes/decorations/robinia_fence.json
 34a5b6928b734eaa06ae13ddf5576fb4eb5befe8 data/hkbmod/advancement/recipes/misc/custom_test_block.json
 586f6dc22df86418e6d4dc035e4cbfd0a09f4e6a data/hkbmod/advancement/recipes/misc/research_table.json
 37dc0dc1b426549ad99ddb03217bcb31b18007ee data/hkbmod/advancement/recipes/misc/test_block.json
+72dc6c7b3dedfd43cdeb6a06456716768454702f data/hkbmod/advancement/recipes/redstone/robinia_button.json
+62c7d3474e1f2e90fc7788f37ffe134d8158a1b0 data/hkbmod/advancement/recipes/redstone/robinia_door.json
+1e48c52ae36b9d1d2e28f022348129053f469d09 data/hkbmod/advancement/recipes/redstone/robinia_fence_gate.json
+62629f4f896e1509078e8017ce8c4aa18a4dc941 data/hkbmod/advancement/recipes/redstone/robinia_pressure_plate.json
+8913485e920f09cb014ced8de260414154febd02 data/hkbmod/advancement/recipes/redstone/robinia_trapdoor.json
 ecd5a2876c984c1f1f38b3009b5e4452c421cef9 data/hkbmod/advancement/recipes/tools/emerald_axe.json
 33d6b3d280515c6ddc536c9fcdfcf1119615ef29 data/hkbmod/advancement/recipes/tools/emerald_hoe.json
 da88a2b6ce52b1867ab79311b12101629bdc3439 data/hkbmod/advancement/recipes/tools/emerald_pickaxe.json
@@ -17,5 +26,14 @@ f426cc56ddbae762c86deb9c0f77581d119fcecb data/hkbmod/recipe/emerald_shovel.json
 6c9c27cdaf5510304303c6b37fba6249298d5ab3 data/hkbmod/recipe/emerald_sword.json
 35faf232f78bb88b49f3e30953d2b54d2caae629 data/hkbmod/recipe/magic_pickaxe.json
 6a9c66869549e5d7ec9e1a284ca460545f53704e data/hkbmod/recipe/research_table.json
+fbed486f5c4da5c9e3550cd9ad966a2d461f4efd data/hkbmod/recipe/robinia_button.json
+7f2c68bca7f0ee765b09ff1920719558b3b304f1 data/hkbmod/recipe/robinia_door.json
+d2be550f2af69bb174e4169a7a24e22788b9d868 data/hkbmod/recipe/robinia_fence.json
+ee32a2685a41d99bd10c71845acd5ffcc254f498 data/hkbmod/recipe/robinia_fence_gate.json
+86c4d6d8c9894f3b840afec2e716c1b4f36a42d9 data/hkbmod/recipe/robinia_planks.json
+01b5360c8df4b7e7769082096504e18f620f32f4 data/hkbmod/recipe/robinia_pressure_plate.json
+bc1d3cce3e7ba5fa68e780d32cb2c39136ead9db data/hkbmod/recipe/robinia_slab.json
+94d586529ded6d2207a6424a1578cdd70c11fe06 data/hkbmod/recipe/robinia_stairs.json
+f803f22be23d9a7c3864d2c8fcd9090405f22849 data/hkbmod/recipe/robinia_trapdoor.json
 a9a531a4b75130e9282c34a766aae458863f2939 data/hkbmod/recipe/test_block.json
 96ad18e1bbe59d3836ade8e52e3b7c08b0f30f1b data/hkbmod/recipe/time_setter.json

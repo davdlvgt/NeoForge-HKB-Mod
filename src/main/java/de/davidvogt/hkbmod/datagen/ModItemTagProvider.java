@@ -30,5 +30,11 @@ public class ModItemTagProvider extends ItemTagsProvider {
 
         this.tag(ItemTags.PLANKS)
                 .add(ModBlocks.ROBINIA_PLANKS.get().asItem());
+
+        this.tag(ModTags.Items.ROBINIA_LOG)
+                .add(ModBlocks.ROBINIA_LOG.get().asItem())
+                .add(ModBlocks.ROBINIA_WOOD.get().asItem())
+                .add(ModBlocks.STRIPPED_ROBINIA_LOG.get().asItem())
+                .add(ModBlocks.STRIPPED_ROBINIA_WOOD.get().asItem());
     }
 }

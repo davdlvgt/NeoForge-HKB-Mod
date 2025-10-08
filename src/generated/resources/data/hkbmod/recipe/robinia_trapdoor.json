@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "group": "robinia_planks",
+  "key": {
+    "#": "hkbmod:robinia_planks"
+  },
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "result": {
+    "count": 2,
+    "id": "hkbmod:robinia_trapdoor"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "group": "robinia_planks",
+  "ingredients": [
+    "hkbmod:robinia_planks"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hkbmod:robinia_button"
+  }
+}

@@ -2,6 +2,7 @@ package de.davidvogt.hkbmod.datagen;
 
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.item.ModItems;
+import de.davidvogt.hkbmod.util.ModTags;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -9,6 +10,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
@@ -126,5 +128,28 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('L', Items.OAK_LOG)
                 .define('P', Items.PAPER)
                 .unlockedBy("has_book", has(Items.BOOK)).save(output);
+
+        shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.ROBINIA_PLANKS.get(), 4)
+                .requires(ModTags.Items.ROBINIA_LOG)
+                .unlockedBy("has_robinia_log", has(ModBlocks.ROBINIA_LOG.get()))
+                .save(output);
+
+        stairBuilder(ModBlocks.ROBINIA_STAIRS.get(), Ingredient.of(ModBlocks.ROBINIA_PLANKS.get())).group("robinia_planks")
+                .unlockedBy("has_robinia_planks", has(ModBlocks.ROBINIA_PLANKS.get())).save(output);
+        slab(RecipeCategory.BUILDING_BLOCKS, ModBlocks.ROBINIA_SLAB.get(), ModBlocks.ROBINIA_PLANKS.get());
+
+        buttonBuilder(ModBlocks.ROBINIA_BUTTON.get(), Ingredient.of(ModBlocks.ROBINIA_PLANKS.get())).group("robinia_planks")
+                .unlockedBy("has_robinia_planks", has(ModBlocks.ROBINIA_PLANKS.get())).save(output);
+        pressurePlate(ModBlocks.ROBINIA_PRESSURE_PLATE.get(), ModBlocks.ROBINIA_PLANKS.get());
+
+        fenceBuilder(ModBlocks.ROBINIA_FENCE.get(), Ingredient.of(ModBlocks.ROBINIA_PLANKS.get())).group("robinia_planks")
+                .unlockedBy("has_robinia_planks", has(ModBlocks.ROBINIA_PLANKS.get())).save(output);
+        fenceGateBuilder(ModBlocks.ROBINIA_FENCE_GATE.get(), Ingredient.of(ModBlocks.ROBINIA_PLANKS.get())).group("robinia_planks")
+                .unlockedBy("has_robinia_planks", has(ModBlocks.ROBINIA_PLANKS.get())).save(output);
+
+        doorBuilder(ModBlocks.ROBINIA_DOOR.get(), Ingredient.of(ModBlocks.ROBINIA_PLANKS.get())).group("robinia_planks")
+                .unlockedBy("has_robinia_planks", has(ModBlocks.ROBINIA_PLANKS.get())).save(output);
+        trapdoorBuilder(ModBlocks.ROBINIA_TRAPDOOR.get(), Ingredient.of(ModBlocks.ROBINIA_PLANKS.get())).group("robinia_planks")
+                .unlockedBy("has_robinia_planks", has(ModBlocks.ROBINIA_PLANKS.get())).save(output);
     }
 }

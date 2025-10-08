@@ -53,11 +53,19 @@ public class ModModelProvider extends ModelProvider {
         blockModels.woodProvider(ModBlocks.ROBINIA_LOG.get()).logWithHorizontal(ModBlocks.ROBINIA_LOG.get()).wood(ModBlocks.ROBINIA_WOOD.get());
         blockModels.woodProvider(ModBlocks.STRIPPED_ROBINIA_LOG.get()).logWithHorizontal(ModBlocks.STRIPPED_ROBINIA_LOG.get()).wood(ModBlocks.STRIPPED_ROBINIA_WOOD.get());
 
-        blockModels.createTrivialCube(ModBlocks.ROBINIA_PLANKS.get());
-
         blockModels.createTintedLeaves(ModBlocks.ROBINIA_LEAVES.get(), TexturedModel.LEAVES, -12012264);
 
         blockModels.createCrossBlock(ModBlocks.ROBINIA_SAPLING.get(), BlockModelGenerators.PlantType.TINTED);
+
+        blockModels.family(ModBlocks.ROBINIA_PLANKS.get())
+                .fence(ModBlocks.ROBINIA_FENCE.get())
+                .fenceGate(ModBlocks.ROBINIA_FENCE_GATE.get())
+                .stairs(ModBlocks.ROBINIA_STAIRS.get())
+                .slab(ModBlocks.ROBINIA_SLAB.get())
+                .button(ModBlocks.ROBINIA_BUTTON.get())
+                .pressurePlate(ModBlocks.ROBINIA_PRESSURE_PLATE.get())
+                .door(ModBlocks.ROBINIA_DOOR.get())
+                .trapdoor(ModBlocks.ROBINIA_TRAPDOOR.get());
     }
 
     @Override

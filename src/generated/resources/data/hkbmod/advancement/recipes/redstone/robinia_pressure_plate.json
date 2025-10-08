@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_robinia_planks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hkbmod:robinia_planks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hkbmod:robinia_pressure_plate"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_robinia_planks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hkbmod:robinia_pressure_plate"
+    ]
+  }
+}
