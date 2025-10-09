@@ -35,7 +35,7 @@ public class ModAdvancementProvider implements AdvancementSubProvider {
         addImpossibleAdvancement(saver, "archer/level_0", "research/root", Items.BOW, AdvancementType.TASK);
         addCraftingAdvancement(saver, "archer/level_1", "archer/level_0", ModBlocks.ELASTIC_WOOD, "elastic_wood");
         addCraftingAdvancement(saver, "archer/level_2", "archer/level_1", ModItems.LONGBOW_STICK, "longbow_stick");
-        addImpossibleAdvancement(saver, "archer/level_3", "archer/level_2", Items.TIPPED_ARROW, AdvancementType.TASK);
+        addCraftingAdvancement(saver, "archer/level_3", "archer/level_2", ModItems.LONGBOW, "longbow");
         addImpossibleAdvancement(saver, "archer/level_4", "archer/level_3", Items.ARROW, AdvancementType.GOAL);
         addImpossibleAdvancement(saver, "archer/level_5", "archer/level_4", Items.GOLDEN_APPLE, AdvancementType.CHALLENGE);
 

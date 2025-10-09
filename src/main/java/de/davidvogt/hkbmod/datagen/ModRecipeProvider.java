@@ -104,10 +104,19 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(this.output);
 
         this.shaped(RecipeCategory.TOOLS, ModItems.LONGBOW_STICK.get())
-                .pattern("EE ")
+                .pattern(" EE")
                 .pattern("  E")
-                .pattern("EE ")
+                .pattern(" EE")
                 .define('E', ModBlocks.ELASTIC_WOOD.get())
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.TOOLS, ModItems.LONGBOW.get())
+                .pattern("S ")
+                .pattern("SL")
+                .pattern("S ")
+                .define('L', ModItems.LONGBOW_STICK.get())
+                .define('S', Items.STRING)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(this.output);
 
