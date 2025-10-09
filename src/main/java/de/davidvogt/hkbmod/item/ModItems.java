@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.item;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.item.custom.LongbowItem;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
 import de.davidvogt.hkbmod.item.custom.TimeSetterItem;
 import net.minecraft.world.item.BowItem;
@@ -94,7 +95,8 @@ public class ModItems {
     
     public static final DeferredItem<Item> LONGBOW = ITEMS.registerItem(
             "longbow",
-            (props) -> new BowItem(props.durability(500))
+            (props) -> new LongbowItem(props.durability(500),
+                    stack -> stack.is(ModItems.CUSTOM_ARROW.get()))
     );
 
     public static void register(IEventBus eventBus) {
