@@ -1,11 +1,21 @@
 {
   "parent": "hkbmod:archer/level_2",
   "criteria": {
-    "has_hkbmod_longbow": {
+    "has_hkbmod_longbow_0": {
       "conditions": {
         "items": [
           {
             "items": "hkbmod:longbow"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_hkbmod_longbow_arrow_1": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hkbmod:longbow_arrow"
           }
         ]
       },
@@ -27,12 +37,14 @@
   },
   "requirements": [
     [
-      "has_hkbmod_longbow"
+      "has_hkbmod_longbow_0",
+      "has_hkbmod_longbow_arrow_1"
     ]
   ],
   "rewards": {
     "recipes": [
-      "hkbmod:longbow"
+      "hkbmod:longbow",
+      "hkbmod:longbow_arrow"
     ]
   },
   "sends_telemetry_event": true

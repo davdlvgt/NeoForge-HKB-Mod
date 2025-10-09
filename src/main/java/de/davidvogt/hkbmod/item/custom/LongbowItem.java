@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.item.custom;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.item.ModItems;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +34,8 @@ public class LongbowItem extends BowItem {
 
     @Override
     public Predicate<ItemStack> getAllSupportedProjectiles() {
-        return supportedProjectiles;
+        // Support both custom longbow arrows and vanilla arrows
+        return stack -> stack.is(ModItems.LONGBOW_ARROW.get());
     }
 
     @Override

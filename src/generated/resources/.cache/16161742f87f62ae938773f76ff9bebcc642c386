@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-08T20:18:03.3341303	Model Definitions - hkbmod
+// 1.21.8	2025-10-09T11:36:17.182342	Model Definitions - hkbmod
 098162d3c53084529de99da150feb937cc6f06d1 assets/hkbmod/blockstates/custom_test_block.json
 36c5d1a71329972be809a6b6d81bd92a5cc14576 assets/hkbmod/blockstates/elastic_wood.json
 92c0371b1d3e88a3d0afec49941ed8054a363697 assets/hkbmod/blockstates/robinia_button.json
@@ -26,6 +26,7 @@ dc745a78f41cd55c196213999cff6fc6a1456da4 assets/hkbmod/items/elastic_wood.json
 c2fbb310c6b63cc2d8abccc43dfeda497aa94c08 assets/hkbmod/items/emerald_shovel.json
 e20217067c1ec81fbfe667a59993cc327118cd3d assets/hkbmod/items/emerald_sword.json
 069226dde89f9e074240f09e53476d14fd937c6c assets/hkbmod/items/longbow.json
+6a3f228fc0923eb78f47f9e26b70f5a1abe442cf assets/hkbmod/items/longbow_arrow.json
 850c4e7abc177244159eadde1f116f211f888996 assets/hkbmod/items/longbow_stick.json
 b9976d61266bb6e72192816100bd2aa91cd13cf5 assets/hkbmod/items/magic_pickaxe.json
 6b52a5eb4fb3c298c3026c4dd5b7723d730bc18d assets/hkbmod/items/research_table.json
@@ -95,6 +96,9 @@ c36893a026defe2830ef31506e3955ef8af37ffc assets/hkbmod/models/block/test_lamp.js
 93a3bc6e649bc80ff5ae63511ff717d9e0f29206 assets/hkbmod/models/item/emerald_shovel.json
 d21c389cad582329f1ff6f793adb7e2f8785763c assets/hkbmod/models/item/emerald_sword.json
 376aee64f6a7007116c1258fbee042289a64c099 assets/hkbmod/models/item/longbow.json
+17be79db90a083b1c1d7fe5e7ecef871cf29f1fe assets/hkbmod/models/item/longbow_arrow_pulling_0.json
+e8d40ee66b221e56e1923022afb4a007e782b624 assets/hkbmod/models/item/longbow_arrow_pulling_1.json
+3f20f13df93b9fd57156ebe61d82ff81a1317cdb assets/hkbmod/models/item/longbow_arrow_pulling_2.json
 c4215b5c996fa0c5321dca9e7f2368a951820618 assets/hkbmod/models/item/longbow_pulling_0.json
 5b8b6d64ac4b777a3a4d0adbb39b73e7994721d8 assets/hkbmod/models/item/longbow_pulling_1.json
 db051ecca35469d5b603a09addc6fc6218cc1adc assets/hkbmod/models/item/longbow_pulling_2.json

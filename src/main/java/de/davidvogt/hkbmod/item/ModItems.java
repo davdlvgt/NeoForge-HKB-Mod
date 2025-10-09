@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.item;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.item.custom.LongbowArrowItem;
 import de.davidvogt.hkbmod.item.custom.LongbowItem;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
 import de.davidvogt.hkbmod.item.custom.TimeSetterItem;
@@ -92,11 +93,16 @@ public class ModItems {
             "longbow_stick",
             (props) -> new Item(props.stacksTo(32))
     );
-    
+
+    public static final DeferredItem<LongbowArrowItem> LONGBOW_ARROW = ITEMS.registerItem(
+            "longbow_arrow",
+            (props) -> new LongbowArrowItem(props.stacksTo(32))
+    );
+
     public static final DeferredItem<LongbowItem> LONGBOW = ITEMS.registerItem(
             "longbow",
             (props) -> new LongbowItem(props.durability(500),
-                    stack -> stack.is(ModItems.LONGBOW.get()))
+                    stack -> stack.is(ModItems.LONGBOW_ARROW.get()))
     );
 
     public static void register(IEventBus eventBus) {

@@ -43,6 +43,8 @@ public class ModModelProvider extends ModelProvider {
         itemModels.createFlatItemModel(ModItems.LONGBOW.get(), ModelTemplates.BOW);
         itemModels.generateBow(ModItems.LONGBOW.get());
 
+        itemModels.generateBow(ModItems.LONGBOW_ARROW.get());
+
         // Block Models
         blockModels.createGenericCube(ModBlocks.TEST_BLOCK.get());
         blockModels.createGenericCube(ModBlocks.CUSTOM_TEST_BLOCK.get());

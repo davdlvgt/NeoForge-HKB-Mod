@@ -35,7 +35,10 @@ public class ModAdvancementProvider implements AdvancementSubProvider {
         addImpossibleAdvancement(saver, "archer/level_0", "research/root", Items.BOW, AdvancementType.TASK);
         addCraftingAdvancement(saver, "archer/level_1", "archer/level_0", ModBlocks.ELASTIC_WOOD, "elastic_wood");
         addCraftingAdvancement(saver, "archer/level_2", "archer/level_1", ModItems.LONGBOW_STICK, "longbow_stick");
-        addCraftingAdvancement(saver, "archer/level_3", "archer/level_2", ModItems.LONGBOW, "longbow");
+        addCraftingAdvancement(saver, "archer/level_3","archer/level_2",
+                ModItems.LONGBOW,
+                new ItemLike[]{ModItems.LONGBOW, ModItems.LONGBOW_ARROW},
+                new String[]{"longbow", "longbow_arrow"});
         addImpossibleAdvancement(saver, "archer/level_4", "archer/level_3", Items.ARROW, AdvancementType.GOAL);
         addImpossibleAdvancement(saver, "archer/level_5", "archer/level_4", Items.GOLDEN_APPLE, AdvancementType.CHALLENGE);
 
@@ -177,6 +180,54 @@ public class ModAdvancementProvider implements AdvancementSubProvider {
     public void addCraftingAdvancement(Consumer<AdvancementHolder> saver, String path, String parent,
                                        ItemLike craftedItem, String recipeReward) {
         addSimpleAdvancement(saver, path, parent, craftedItem, craftedItem, AdvancementType.GOAL, 0, recipeReward);
+    }
+
+    /**
+     * Fügt ein Crafting-Advancement mit mehreren Rezept-Belohnungen hinzu
+     * @param saver Der Consumer für das Advancement
+     * @param path Pfad des Advancements (z.B. "crafting/workbench")
+     * @param parent Parent-Advancement
+     * @param displayItem Item das im Advancement-Tab angezeigt wird
+     * @param triggerItems Items die aufgehoben werden müssen (eines davon reicht)
+     * @param recipeRewards Rezepte die freigeschaltet werden sollen
+     */
+    public void addCraftingAdvancement(Consumer<AdvancementHolder> saver, String path, String parent,
+                                       ItemLike displayItem, ItemLike[] triggerItems, String[] recipeRewards) {
+        Advancement.Builder builder = Advancement.Builder.advancement();
+
+        // Parent setzen
+        builder.parent(AdvancementSubProvider.createPlaceholder(parent.contains(":") ? parent : "hkbmod:" + parent));
+
+        // Display konfigurieren
+        builder.display(new ItemStack(displayItem),
+                Component.translatable("advancements.hkbmod." + path.replace("/", ".") + ".title"),
+                Component.translatable("advancements.hkbmod." + path.replace("/", ".") + ".description"),
+                null, AdvancementType.GOAL, true, true, false);
+
+        // Kriterien für alle trigger items hinzufügen (OR-Verknüpfung)
+        for (int i = 0; i < triggerItems.length; i++) {
+            builder.addCriterion("has_" + getItemName(triggerItems[i]) + "_" + i,
+                    InventoryChangeTrigger.TriggerInstance.hasItems(triggerItems[i]));
+        }
+
+        // Alle Rezepte als Belohnung hinzufügen
+        AdvancementRewards.Builder rewardsBuilder = AdvancementRewards.Builder.experience(0);
+        for (String recipe : recipeRewards) {
+            rewardsBuilder.addRecipe(ResourceKey.create(
+                    Registries.RECIPE, ResourceLocation.fromNamespaceAndPath("hkbmod", recipe)
+            ));
+        }
+        builder.rewards(rewardsBuilder);
+
+        // Requirements setzen: Mindestens EINES der Kriterien muss erfüllt sein
+        String[][] requirements = new String[triggerItems.length][];
+        for (int i = 0; i < triggerItems.length; i++) {
+            requirements[i] = new String[]{"has_" + getItemName(triggerItems[i]) + "_" + i};
+        }
+        builder.requirements(AdvancementRequirements.Strategy.OR);
+
+        // Speichern
+        builder.save(saver, ResourceLocation.fromNamespaceAndPath("hkbmod", path));
     }
 
     /**
