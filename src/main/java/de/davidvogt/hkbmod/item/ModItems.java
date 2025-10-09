@@ -93,10 +93,10 @@ public class ModItems {
             (props) -> new Item(props.stacksTo(32))
     );
     
-    public static final DeferredItem<Item> LONGBOW = ITEMS.registerItem(
+    public static final DeferredItem<LongbowItem> LONGBOW = ITEMS.registerItem(
             "longbow",
             (props) -> new LongbowItem(props.durability(500),
-                    stack -> stack.is(ModItems.CUSTOM_ARROW.get()))
+                    stack -> stack.is(ModItems.LONGBOW.get()))
     );
 
     public static void register(IEventBus eventBus) {
