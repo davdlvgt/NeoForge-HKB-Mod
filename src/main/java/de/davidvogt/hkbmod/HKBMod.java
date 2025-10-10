@@ -92,6 +92,8 @@ public class HKBMod {
             event.accept(ModItems.TIME_SETTER.get());
 
             event.accept(ModItems.LONGBOW_STICK.get());
+            event.accept(ModItems.LONG_STICK.get());
+            event.accept(ModItems.LONG_STRING.get());
         } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItems.EMERALD_SWORD.get());
             event.accept(ModItems.LONGBOW.get());

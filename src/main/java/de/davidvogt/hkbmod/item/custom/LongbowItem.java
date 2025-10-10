@@ -23,7 +23,7 @@ public class LongbowItem extends BowItem {
 
     // Longbow configuration - stronger than vanilla bow
     private static final float VELOCITY_MULTIPLIER = 1.35F; // 35% more velocity than vanilla bow (3.0 base -> 4.05)
-    private static final float DAMAGE_BONUS = 2.5F; // +2.5 extra damage
+    private static final float DAMAGE_BONUS = 1; // +2.5 extra damage
     private static final int DRAW_TIME = 15; // Slightly slower than vanilla (20 ticks) - balanced for power
     private static final float BASE_DAMAGE = 2.0F;
 

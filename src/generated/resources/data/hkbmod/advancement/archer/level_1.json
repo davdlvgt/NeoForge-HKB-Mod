@@ -1,11 +1,31 @@
 {
   "parent": "hkbmod:archer/level_0",
   "criteria": {
-    "has_hkbmod_elastic_wood": {
+    "has_hkbmod_elastic_wood_0": {
       "conditions": {
         "items": [
           {
             "items": "hkbmod:elastic_wood"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_hkbmod_long_stick_1": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hkbmod:long_stick"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_hkbmod_long_string_2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hkbmod:long_string"
           }
         ]
       },
@@ -27,12 +47,16 @@
   },
   "requirements": [
     [
-      "has_hkbmod_elastic_wood"
+      "has_hkbmod_elastic_wood_0",
+      "has_hkbmod_long_stick_1",
+      "has_hkbmod_long_string_2"
     ]
   ],
   "rewards": {
     "recipes": [
-      "hkbmod:elastic_wood"
+      "hkbmod:elastic_wood",
+      "hkbmod:long_stick",
+      "hkbmod:long_string"
     ]
   },
   "sends_telemetry_event": true

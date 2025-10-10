@@ -1,4 +1,5 @@
-// 1.21.8	2025-10-08T15:53:46.0988917	Tags for minecraft:item mod id hkbmod
+// 1.21.8	2025-10-09T15:25:41.2367663	Tags for minecraft:item mod id hkbmod
+2100f9774ec5c3a28ce761f5185c11c43557860c data/hkbmod/tags/item/planks.json
 18ca9e177d844b17e7a4e3ec9cbd03f69d49ccbf data/hkbmod/tags/item/robinia_log.json
 05abdd0d8560b0671f8c122f795fcb1bc2155276 data/hkbmod/tags/item/transformable_items.json
 18ca9e177d844b17e7a4e3ec9cbd03f69d49ccbf data/minecraft/tags/item/logs_that_burn.json

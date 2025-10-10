@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/bow",
-  "textures": {
-    "layer0": "hkbmod:item/longbow_arrow_pulling_1"
-  }
-}

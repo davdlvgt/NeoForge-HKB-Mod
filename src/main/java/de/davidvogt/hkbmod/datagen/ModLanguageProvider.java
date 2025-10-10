@@ -24,6 +24,8 @@ public class ModLanguageProvider extends LanguageProvider {
 
         // Items
         add(ModItems.LONGBOW_STICK.get(), "longbow_stick");
+        add(ModItems.LONG_STICK.get(), "long_stick");
+        add(ModItems.LONG_STRING.get(), "long_string");
 
         // Tools
         add(ModItems.EMERALD_AXE.get(), "Emerald Axe");

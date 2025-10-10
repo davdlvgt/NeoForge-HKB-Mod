@@ -103,19 +103,45 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(this.output);
 
-        this.shaped(RecipeCategory.TOOLS, ModItems.LONGBOW_STICK.get())
-                .pattern(" EE")
-                .pattern("  E")
-                .pattern(" EE")
-                .define('E', ModBlocks.ELASTIC_WOOD.get())
-                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
-
-        this.shaped(RecipeCategory.TOOLS, ModItems.LONGBOW.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.LONGBOW.get())
                 .pattern("S ")
                 .pattern("SL")
                 .pattern("S ")
                 .define('L', ModItems.LONGBOW_STICK.get())
+                .define('S', Items.STRING)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.TOOLS, ModItems.LONGBOW_STICK.get())
+                .pattern("L ")
+                .pattern(" L")
+                .pattern("L ")
+                .define('L', ModItems.LONG_STICK.get())
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, ModItems.LONGBOW_ARROW.get())
+                .pattern(" A ")
+                .pattern(" L ")
+                .pattern(" F ")
+                .define('A', Items.FLINT)
+                .define('L', ModItems.LONG_STICK)
+                .define('F', Items.FEATHER)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, ModItems.LONG_STICK.get())
+                .pattern("S")
+                .pattern("S")
+                .pattern("S")
+                .define('S', Items.STICK)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, ModItems.LONG_STRING.get())
+                .pattern("S")
+                .pattern("S")
+                .pattern("S")
                 .define('S', Items.STRING)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(this.output);

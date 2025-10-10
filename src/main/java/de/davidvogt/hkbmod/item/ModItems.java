@@ -7,6 +7,7 @@ import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
 import de.davidvogt.hkbmod.item.custom.TimeSetterItem;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ToolMaterial;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -87,6 +88,16 @@ public class ModItems {
     public static final DeferredItem<TimeSetterItem> TIME_SETTER = ITEMS.registerItem(
             "time_setter",
             (props) -> new TimeSetterItem(props.stacksTo(1).durability(3))
+    );
+
+    public static final DeferredItem<Item> LONG_STICK = ITEMS.registerItem(
+            "long_stick",
+            (props) -> new Item(props.stacksTo(32))
+    );
+
+    public static final DeferredItem<Item> LONG_STRING = ITEMS.registerItem(
+            "long_string",
+            (props) -> new Item(props.stacksTo(32))
     );
 
     public static final DeferredItem<Item> LONGBOW_STICK = ITEMS.registerItem(

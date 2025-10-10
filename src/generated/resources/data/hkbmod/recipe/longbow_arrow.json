@@ -2,15 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
+    "A": "minecraft:flint",
+    "F": "minecraft:feather",
     "L": "hkbmod:long_stick"
   },
   "pattern": [
-    "L ",
-    " L",
-    "L "
+    " A ",
+    " L ",
+    " F "
   ],
   "result": {
     "count": 1,
-    "id": "hkbmod:longbow_stick"
+    "id": "hkbmod:longbow_arrow"
   }
 }

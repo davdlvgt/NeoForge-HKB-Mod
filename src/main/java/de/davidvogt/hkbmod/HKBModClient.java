@@ -3,6 +3,8 @@ package de.davidvogt.hkbmod;
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.client.ModKeyBindings;
 import de.davidvogt.hkbmod.client.screen.ResearchOverviewScreen;
+import de.davidvogt.hkbmod.item.entity.ModEntities;
+import de.davidvogt.hkbmod.item.entity.renderer.LongbowArrowRenderer;
 import de.davidvogt.hkbmod.screen.ModMenuTypes;
 import de.davidvogt.hkbmod.screen.cutsom.ResearchTableScreen;
 import net.minecraft.client.Minecraft;
@@ -15,6 +17,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
@@ -56,6 +59,11 @@ public class HKBModClient {
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(ModKeyBindings.OPEN_RESEARCH_SCREEN);
+    }
+
+    @SubscribeEvent
+    public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.LONGBOW_ARROW.get(), LongbowArrowRenderer::new);
     }
 
     public static void onClientTick(ClientTickEvent.Post event) {

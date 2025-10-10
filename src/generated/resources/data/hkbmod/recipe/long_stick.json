@@ -2,15 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "L": "hkbmod:long_stick"
+    "S": "minecraft:stick"
   },
   "pattern": [
-    "L ",
-    " L",
-    "L "
+    "S",
+    "S",
+    "S"
   ],
   "result": {
     "count": 1,
-    "id": "hkbmod:longbow_stick"
+    "id": "hkbmod:long_stick"
   }
 }

@@ -38,12 +38,14 @@ public class ModModelProvider extends ModelProvider {
         itemModels.generateFlatItem(ModItems.MAGIC_PICKAXE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(ModItems.TIME_SETTER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
+        itemModels.generateFlatItem(ModItems.LONG_STICK.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModels.generateFlatItem(ModItems.LONG_STRING.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(ModItems.LONGBOW_STICK.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
         itemModels.createFlatItemModel(ModItems.LONGBOW.get(), ModelTemplates.BOW);
         itemModels.generateBow(ModItems.LONGBOW.get());
 
-        itemModels.generateBow(ModItems.LONGBOW_ARROW.get());
+        itemModels.generateFlatItem(ModItems.LONGBOW_ARROW.get(), ModelTemplates.FLAT_ITEM);
 
         // Block Models
         blockModels.createGenericCube(ModBlocks.TEST_BLOCK.get());

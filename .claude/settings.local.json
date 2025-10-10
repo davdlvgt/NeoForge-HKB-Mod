@@ -26,7 +26,8 @@
       "Bash(copy:*)",
       "Bash(gradlew.bat compileJava:*)",
       "Bash(./gradlew.bat runData:*)",
-      "Bash(cmd.exe /c gradlew.bat compileJava)"
+      "Bash(cmd.exe /c gradlew.bat compileJava)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []
