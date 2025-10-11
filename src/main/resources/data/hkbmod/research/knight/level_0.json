@@ -1,6 +1,7 @@
 {
   "class": "knight",
   "level": 0,
+  "prerequisites": [],
   "displayName": "Level 0: Squire",
   "description": "Begin your path as a Knight",
   "requirements": [
@@ -13,12 +14,9 @@
       "count": 1
     }
   ],
-  "unlocks": [
-    "emerald_sword"
-  ],
+  "unlocks": [],
   "advancement": {
     "title": "Knight: Squire",
     "description": "Begin your path as a Knight"
-  },
-  "prerequisites": []
+  }
 }

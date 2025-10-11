@@ -5,6 +5,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.attachment.ModAttachments;
+import de.davidvogt.hkbmod.network.SyncUnlockedRecipesPacket;
 import de.davidvogt.hkbmod.research.PlayerResearchHelper;
 import de.davidvogt.hkbmod.util.RecipeHelper;
 import net.minecraft.commands.CommandSourceStack;
@@ -81,6 +83,10 @@ public class RecipeUnlockCommands {
             boolean wasUnlocked = PlayerResearchHelper.unlockRecipe(player, recipeLocation);
 
             if (wasUnlocked) {
+                // Sync to client
+                player.connection.send(SyncUnlockedRecipesPacket.fromSet(
+                        player.getData(ModAttachments.PLAYER_RESEARCH).getUnlockedRecipes()));
+
                 context.getSource().sendSuccess(
                         () -> Component.literal("Unlocked recipe '" + recipeId + "' for " + player.getName().getString()),
                         true
@@ -110,6 +116,10 @@ public class RecipeUnlockCommands {
             boolean wasLocked = PlayerResearchHelper.lockRecipe(player, recipeLocation);
 
             if (wasLocked) {
+                // Sync to client
+                player.connection.send(SyncUnlockedRecipesPacket.fromSet(
+                        player.getData(ModAttachments.PLAYER_RESEARCH).getUnlockedRecipes()));
+
                 context.getSource().sendSuccess(
                         () -> Component.literal("Locked recipe '" + recipeId + "' for " + player.getName().getString()),
                         true
@@ -142,6 +152,10 @@ public class RecipeUnlockCommands {
                 }
             }
 
+            // Sync to client
+            player.connection.send(SyncUnlockedRecipesPacket.fromSet(
+                    player.getData(ModAttachments.PLAYER_RESEARCH).getUnlockedRecipes()));
+
             int finalCount = count;
             context.getSource().sendSuccess(
                     () -> Component.literal("Unlocked " + finalCount + " recipes for " + player.getName().getString()),
@@ -163,6 +177,10 @@ public class RecipeUnlockCommands {
             int count = PlayerResearchHelper.getUnlockedRecipeCount(player);
 
             PlayerResearchHelper.clearUnlockedRecipes(player);
+
+            // Sync to client
+            player.connection.send(SyncUnlockedRecipesPacket.fromSet(
+                    player.getData(ModAttachments.PLAYER_RESEARCH).getUnlockedRecipes()));
 
             int finalCount = count;
             context.getSource().sendSuccess(

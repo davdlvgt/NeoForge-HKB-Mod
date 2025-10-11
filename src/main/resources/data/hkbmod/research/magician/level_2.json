@@ -15,8 +15,7 @@
     }
   ],
   "unlocks": [
-    "Teleportation Magic",
-    "Advanced Spells"
+    "time_setter"
   ],
     "advancement": {
         "title": "Magician: Advanced",

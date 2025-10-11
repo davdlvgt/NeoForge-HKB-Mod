@@ -100,7 +100,9 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
                     // Update crafting grid: consume items and place remaining items
                     for (int i = 0; i < 9; i++) {
                         ItemStack slotStack = ResearchCraftingTableMenu.this.blockEntity.inventory.getStackInSlot(i);
-                        ItemStack remainingItem = remainingItems.get(i);
+
+                        // Check if remainingItems has enough elements
+                        ItemStack remainingItem = (i < remainingItems.size()) ? remainingItems.get(i) : ItemStack.EMPTY;
 
                         if (!slotStack.isEmpty()) {
                             // Consume one item from the slot
@@ -163,7 +165,7 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
     @Override
     public void slotsChanged(Container container) {
         this.access.execute((level, pos) -> {
-            if (!level.isClientSide()) {
+            if (!level.isClientSide() && level.getServer() != null) {
                 // Create CraftingInput from block entity inventory
                 CraftingInput craftingInput = createCraftingInput();
 
@@ -202,6 +204,11 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
      */
     @Nullable
     private RecipeHolder<CraftingRecipe> findMatchingRecipe(CraftingInput craftingInput, Level level) {
+        // Check if server is available
+        if (level.getServer() == null) {
+            return null;
+        }
+
         // Get all whitelisted recipe IDs
         for (String recipeId : RecipeHelper.getAllowedRecipeIds()) {
             // Create ResourceKey for the recipe

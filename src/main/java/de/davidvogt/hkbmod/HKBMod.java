@@ -10,6 +10,7 @@ import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.network.NetworkHandler;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
 import de.davidvogt.hkbmod.network.SyncResearchDataPacket;
+import de.davidvogt.hkbmod.network.SyncUnlockedRecipesPacket;
 import de.davidvogt.hkbmod.registry.ModCreativeTabs;
 import de.davidvogt.hkbmod.research.PlayerResearchData;
 import de.davidvogt.hkbmod.research.ResearchManager;
@@ -150,6 +151,11 @@ public class HKBMod {
             serverPlayer.connection.send(new SyncPlayerResearchPacket(researchData.getCompletedLevels()));
             LOGGER.info("Synced research data for player {} - {} classes completed",
                 serverPlayer.getName().getString(), researchData.getCompletedLevels().size());
+
+            // Sync unlocked recipes to client
+            serverPlayer.connection.send(SyncUnlockedRecipesPacket.fromSet(researchData.getUnlockedRecipes()));
+            LOGGER.info("Synced unlocked recipes for player {} - {} recipes unlocked",
+                serverPlayer.getName().getString(), researchData.getUnlockedRecipeCount());
         }
     }
 

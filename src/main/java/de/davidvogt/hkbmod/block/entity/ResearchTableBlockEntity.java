@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.attachment.ModAttachments;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
+import de.davidvogt.hkbmod.network.SyncUnlockedRecipesPacket;
 import de.davidvogt.hkbmod.research.PlayerResearchData;
 import de.davidvogt.hkbmod.research.PlayerResearchHelper;
 import de.davidvogt.hkbmod.research.Research;
@@ -247,8 +248,11 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
                     // Unlock recipes defined in the research
                     unlockRecipesFromResearch(serverPlayer, research);
 
-                    // Sync to client
+                    // Sync research levels to client
                     serverPlayer.connection.send(new SyncPlayerResearchPacket(researchData.getCompletedLevels()));
+
+                    // Sync unlocked recipes to client
+                    serverPlayer.connection.send(SyncUnlockedRecipesPacket.fromSet(researchData.getUnlockedRecipes()));
                 }
 
                 // Count how many of each item to remove

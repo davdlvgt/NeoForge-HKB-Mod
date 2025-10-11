@@ -48,6 +48,12 @@ public class NetworkHandler {
             SyncResearchDataPacket::handle
         );
 
+        registrar.playToClient(
+            SyncUnlockedRecipesPacket.TYPE,
+            SyncUnlockedRecipesPacket.STREAM_CODEC,
+            SyncUnlockedRecipesPacket::handle
+        );
+
         HKBMod.LOGGER.info("Registered network packets");
     }
 }
