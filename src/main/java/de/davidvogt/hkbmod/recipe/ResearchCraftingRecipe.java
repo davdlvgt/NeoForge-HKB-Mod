@@ -52,8 +52,9 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public RecipeType<CraftingRecipe> getType() {
-        return RecipeType.CRAFTING;
+        return (RecipeType<CraftingRecipe>) (RecipeType<?>) ModRecipeTypes.RESEARCH_CRAFTING_TYPE.get();
     }
 
     @Override

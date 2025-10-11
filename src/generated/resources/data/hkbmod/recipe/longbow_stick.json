@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "hkbmod:research_crafting",
   "category": "equipment",
   "key": {
     "L": "hkbmod:long_stick"

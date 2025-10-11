@@ -1,7 +1,10 @@
 package de.davidvogt.hkbmod.datagen;
 
+import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.item.ModItems;
+import de.davidvogt.hkbmod.recipe.ModRecipeTypes;
+import de.davidvogt.hkbmod.recipe.ResearchCraftingRecipe;
 import de.davidvogt.hkbmod.util.ModTags;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
@@ -9,9 +12,15 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapedRecipePattern;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class ModRecipeProvider extends RecipeProvider {
@@ -35,6 +44,35 @@ public class ModRecipeProvider extends RecipeProvider {
         }
     }
 
+    /**
+     * Creates a RecipeOutput wrapper that converts ShapedRecipes to ResearchCraftingRecipes
+     */
+    private RecipeOutput researchRecipeOutput() {
+        return new RecipeOutput() {
+            @Override
+            public void accept(net.minecraft.resources.ResourceKey<net.minecraft.world.item.crafting.Recipe<?>> recipeKey, net.minecraft.world.item.crafting.Recipe<?> recipe, @javax.annotation.Nullable net.minecraft.advancements.AdvancementHolder advancement, net.neoforged.neoforge.common.conditions.ICondition... conditions) {
+                if (recipe instanceof ShapedRecipe shapedRecipe) {
+                    // Wrap the shaped recipe in a ResearchCraftingRecipe
+                    ResearchCraftingRecipe researchRecipe = new ResearchCraftingRecipe(shapedRecipe);
+                    output.accept(recipeKey, researchRecipe, advancement, conditions);
+                } else {
+                    // Pass through non-shaped recipes unchanged
+                    output.accept(recipeKey, recipe, advancement, conditions);
+                }
+            }
+
+            @Override
+            public net.minecraft.advancements.Advancement.Builder advancement() {
+                return output.advancement();
+            }
+
+            @Override
+            public void includeRootAdvancement() {
+                output.includeRootAdvancement();
+            }
+        };
+    }
+
     @Override
     protected void buildRecipes() {
 
@@ -47,6 +85,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_emerald", has(Items.EMERALD))
                 .save(this.output);
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.TOOLS, ModItems.EMERALD_PICKAXE.get())
                 .pattern("EEE")
                 .pattern(" S ")
@@ -54,8 +93,9 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('E', Items.EMERALD)
                 .define('S', Items.STICK)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_SWORD.get())
                 .pattern(" E ")
                 .pattern(" E ")
@@ -63,7 +103,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('E', Items.EMERALD)
                 .define('S', Items.STICK)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
         this.shaped(RecipeCategory.TOOLS, ModItems.EMERALD_SHOVEL.get())
                 .pattern(" E ")
@@ -83,6 +123,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_emerald", has(Items.EMERALD))
                 .save(this.output);
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.TOOLS, ModItems.MAGIC_PICKAXE.get())
                 .pattern("DED")
                 .pattern("TST")
@@ -92,8 +133,9 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('S', Items.STICK)
                 .define('T', Items.TNT)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.TOOLS, ModItems.TIME_SETTER.get())
                 .pattern(" E ")
                 .pattern("ECE")
@@ -101,8 +143,9 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('E', Items.ENDER_PEARL)
                 .define('C', Items.CLOCK)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.COMBAT, ModItems.LONGBOW.get())
                 .pattern("S ")
                 .pattern("SL")
@@ -110,16 +153,18 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('L', ModItems.LONGBOW_STICK.get())
                 .define('S', Items.STRING)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.TOOLS, ModItems.LONGBOW_STICK.get())
                 .pattern("L ")
                 .pattern(" L")
                 .pattern("L ")
                 .define('L', ModItems.LONG_STICK.get())
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.COMBAT, ModItems.LONGBOW_ARROW.get())
                 .pattern(" A ")
                 .pattern(" L ")
@@ -128,23 +173,25 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('L', ModItems.LONG_STICK)
                 .define('F', Items.FEATHER)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.COMBAT, ModItems.LONG_STICK.get())
                 .pattern("S")
                 .pattern("S")
                 .pattern("S")
                 .define('S', Items.STICK)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
+        // Research recipe - only works in Research Crafting Table
         this.shaped(RecipeCategory.COMBAT, ModItems.LONG_STRING.get())
                 .pattern("S")
                 .pattern("S")
                 .pattern("S")
                 .define('S', Items.STRING)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
 
         // BLOCK RECIPES
@@ -171,6 +218,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('P', Items.PAPER)
                 .unlockedBy("has_book", has(Items.BOOK)).save(output);
 
+        // Research recipe - only works in Research Crafting Table
         shaped(RecipeCategory.TOOLS, ModBlocks.ELASTIC_WOOD.get())
                 .pattern("RSR")
                 .pattern("SRS")
@@ -178,7 +226,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('R', ModBlocks.ROBINIA_LOG.get())
                 .define('S', Items.STRING)
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
-                .save(this.output);
+                .save(researchRecipeOutput());
 
         shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.ROBINIA_PLANKS.get(), 4)
                 .requires(ModTags.Items.ROBINIA_LOG)

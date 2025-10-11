@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.util;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.recipe.ResearchCraftingRecipe;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
@@ -15,23 +16,15 @@ public class RecipeHelper {
 
     /**
      * Checks if a recipe is allowed in the research crafting table.
-     * Uses a whitelist approach based on recipe IDs.
+     * Now checks if the recipe is a ResearchCraftingRecipe type.
      */
     public static boolean isResearchCraftingTableRecipe(RecipeHolder<?> recipeHolder) {
         if (recipeHolder == null) {
             return false;
         }
 
-        ResourceKey<Recipe<?>> recipeKey = recipeHolder.id();
-        ResourceLocation location = recipeKey.location();
-
-        // Only allow recipes from your mod
-        if (!location.getNamespace().equals(HKBMod.MODID)) {
-            return false;
-        }
-
-        // Whitelist specific recipes that can be crafted
-        return isWhitelistedRecipe(location.getPath());
+        // Check if the recipe is a ResearchCraftingRecipe
+        return recipeHolder.value() instanceof ResearchCraftingRecipe;
     }
 
     /**
