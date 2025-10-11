@@ -2,13 +2,7 @@ package de.davidvogt.hkbmod.recipe;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.PlacementInfo;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 /**
@@ -19,6 +13,7 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
 
     private final ShapedRecipe internalRecipe;
     private final CraftingBookCategory category;
+    private final ItemStack resultItem;
 
     /**
      * Creates a research crafting recipe from a shaped recipe
@@ -26,6 +21,8 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
     public ResearchCraftingRecipe(ShapedRecipe recipe) {
         this.internalRecipe = recipe;
         this.category = recipe.category();
+        // Assemble with empty input to get the result item for display
+        this.resultItem = recipe.assemble(CraftingInput.of(3, 3, java.util.List.of()), null);
     }
 
     /**
@@ -34,6 +31,8 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
     public ResearchCraftingRecipe(CraftingBookCategory category, ShapedRecipe recipe) {
         this.internalRecipe = recipe;
         this.category = category;
+        // Assemble with empty input to get the result item for display
+        this.resultItem = recipe.assemble(CraftingInput.of(3, 3, java.util.List.of()), null);
     }
 
     @Override
@@ -86,5 +85,12 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
      */
     public int getHeight() {
         return internalRecipe.getHeight();
+    }
+
+    /**
+     * Gets the result item stack (for displaying in recipe book)
+     */
+    public ItemStack getResultItem() {
+        return resultItem.copy();
     }
 }
