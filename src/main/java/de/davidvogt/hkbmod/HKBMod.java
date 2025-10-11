@@ -11,6 +11,7 @@ import de.davidvogt.hkbmod.network.NetworkHandler;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
 import de.davidvogt.hkbmod.network.SyncResearchDataPacket;
 import de.davidvogt.hkbmod.network.SyncUnlockedRecipesPacket;
+import de.davidvogt.hkbmod.recipe.ModRecipeTypes;
 import de.davidvogt.hkbmod.registry.ModCreativeTabs;
 import de.davidvogt.hkbmod.research.PlayerResearchData;
 import de.davidvogt.hkbmod.research.ResearchManager;
@@ -63,6 +64,7 @@ public class HKBMod {
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
         ModAttachments.register(modEventBus);
         ModEntities.register(modEventBus);
+        ModRecipeTypes.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
