@@ -21,8 +21,13 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
     public ResearchCraftingRecipe(ShapedRecipe recipe) {
         this.internalRecipe = recipe;
         this.category = recipe.category();
-        // Assemble with empty input to get the result item for display
-        this.resultItem = recipe.assemble(CraftingInput.of(3, 3, java.util.List.of()), null);
+        // Create empty 3x3 grid for getting result item
+        java.util.List<ItemStack> emptyGrid = java.util.List.of(
+            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
+            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
+            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY
+        );
+        this.resultItem = recipe.assemble(CraftingInput.of(3, 3, emptyGrid), null);
     }
 
     /**
@@ -31,8 +36,13 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
     public ResearchCraftingRecipe(CraftingBookCategory category, ShapedRecipe recipe) {
         this.internalRecipe = recipe;
         this.category = category;
-        // Assemble with empty input to get the result item for display
-        this.resultItem = recipe.assemble(CraftingInput.of(3, 3, java.util.List.of()), null);
+        // Create empty 3x3 grid for getting result item
+        java.util.List<ItemStack> emptyGrid = java.util.List.of(
+            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
+            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
+            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY
+        );
+        this.resultItem = recipe.assemble(CraftingInput.of(3, 3, emptyGrid), null);
     }
 
     @Override
