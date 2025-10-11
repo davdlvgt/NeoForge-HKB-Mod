@@ -21,6 +21,14 @@ public class ModBlockEntities {
                     )
             );
 
+    public static final Supplier<BlockEntityType<ResearchCraftingTableBlockEntity>> RESEARCH_CRAFTING_TABLE_BE =
+            BLOCK_ENTITIES.register("research_crafting_table_be",
+                    () -> new BlockEntityType<>(
+                            ResearchCraftingTableBlockEntity::new,
+                            ModBlocks.RESEARCH_CRAFTING_TABLE.get()
+                    )
+            );
+
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);
     }

@@ -1,10 +1,7 @@
 package de.davidvogt.hkbmod.block;
 
 import de.davidvogt.hkbmod.HKBMod;
-import de.davidvogt.hkbmod.block.custom.CustomTestBlock;
-import de.davidvogt.hkbmod.block.custom.ModFlammableRotatedPillarBlock;
-import de.davidvogt.hkbmod.block.custom.ResearchTableBlock;
-import de.davidvogt.hkbmod.block.custom.TestLampBlock;
+import de.davidvogt.hkbmod.block.custom.*;
 import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.worldgen.tree.ModTreeGrowers;
 import net.minecraft.core.BlockPos;
@@ -51,6 +48,9 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> RESEARCH_TABLE = registerBlock("research_table",
             (properties) -> new ResearchTableBlock(properties.noOcclusion()));
+
+    public static final DeferredBlock<Block> RESEARCH_CRAFTING_TABLE = registerBlock("research_crafting_table",
+            (properties) -> new ResearchCraftingTableBlock(properties.noOcclusion().requiresCorrectToolForDrops()));
 
 
     public static final DeferredBlock<Block> ELASTIC_WOOD = registerBlock(

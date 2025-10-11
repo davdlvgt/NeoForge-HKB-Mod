@@ -1,5 +1,6 @@
-// 1.21.8	2025-10-08T18:44:28.1928792	Loot Tables
+// 1.21.8	2025-10-11T13:09:45.8003421	Loot Tables
 9977d922b31c56740e38597ad0d4dbbe4c97d7fe data/hkbmod/loot_table/blocks/elastic_wood.json
+870ff03e227792ec709b6a389667910c57243241 data/hkbmod/loot_table/blocks/research_crafting_table.json
 c066bd23d91a63018548b5761007647891e483f0 data/hkbmod/loot_table/blocks/research_table.json
 439b4807be55d2eef37e233803e509996a5317ce data/hkbmod/loot_table/blocks/robinia_button.json
 dd3453b34f518c34612fa085db7d4c2a99b1ffd2 data/hkbmod/loot_table/blocks/robinia_door.json

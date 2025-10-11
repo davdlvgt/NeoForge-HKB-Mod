@@ -105,6 +105,7 @@ public class HKBMod {
             event.accept(ModBlocks.ELASTIC_WOOD.get());
         } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(ModBlocks.RESEARCH_TABLE.get());
+            event.accept(ModBlocks.RESEARCH_CRAFTING_TABLE.get());
         } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
             event.accept(ModBlocks.ROBINIA_LOG.get());
             event.accept(ModBlocks.ROBINIA_WOOD.get());

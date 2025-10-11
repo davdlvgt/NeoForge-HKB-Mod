@@ -6,6 +6,7 @@ import de.davidvogt.hkbmod.client.screen.ResearchOverviewScreen;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
 import de.davidvogt.hkbmod.item.entity.renderer.LongbowArrowRenderer;
 import de.davidvogt.hkbmod.screen.ModMenuTypes;
+import de.davidvogt.hkbmod.screen.cutsom.ResearchCraftingTableScreen;
 import de.davidvogt.hkbmod.screen.cutsom.ResearchTableScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -54,6 +55,7 @@ public class HKBModClient {
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.RESEARCH_TABLE_MENU.get(), ResearchTableScreen::new);
+        event.register(ModMenuTypes.RESEARCH_CRAFTING_TABLE_MENU.get(), ResearchCraftingTableScreen::new);
     }
 
     @SubscribeEvent

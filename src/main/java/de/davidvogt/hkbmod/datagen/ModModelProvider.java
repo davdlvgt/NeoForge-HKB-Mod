@@ -81,7 +81,7 @@ public class ModModelProvider extends ModelProvider {
 
     @Override
     protected Stream<? extends Holder<Block>> getKnownBlocks() {
-        return ModBlocks.BLOCKS.getEntries().stream().filter(x -> !x.is(ModBlocks.RESEARCH_TABLE));
+        return ModBlocks.BLOCKS.getEntries().stream().filter(x -> !x.is(ModBlocks.RESEARCH_TABLE) &&  !x.is(ModBlocks.RESEARCH_CRAFTING_TABLE));
     }
 
     @Override

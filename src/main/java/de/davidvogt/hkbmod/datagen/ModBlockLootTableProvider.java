@@ -31,6 +31,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.TEST_BLOCK.get());
 
         this.dropSelf(ModBlocks.RESEARCH_TABLE.get());
+        this.dropSelf(ModBlocks.RESEARCH_CRAFTING_TABLE.get());
 
         this.dropSelf(ModBlocks.ROBINIA_LOG.get());
         this.dropSelf(ModBlocks.ROBINIA_WOOD.get());

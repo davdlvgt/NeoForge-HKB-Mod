@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-10T12:26:05.7694195	Model Definitions - hkbmod
+// 1.21.8	2025-10-11T13:09:45.8003421	Model Definitions - hkbmod
 098162d3c53084529de99da150feb937cc6f06d1 assets/hkbmod/blockstates/custom_test_block.json
 36c5d1a71329972be809a6b6d81bd92a5cc14576 assets/hkbmod/blockstates/elastic_wood.json
 92c0371b1d3e88a3d0afec49941ed8054a363697 assets/hkbmod/blockstates/robinia_button.json
@@ -31,6 +31,7 @@ e20217067c1ec81fbfe667a59993cc327118cd3d assets/hkbmod/items/emerald_sword.json
 ed3b8cfb78c70db34a12109fd5f1d2d0e4b86794 assets/hkbmod/items/long_stick.json
 13516445240981993b6fa6a201d7fa799f3dfd5f assets/hkbmod/items/long_string.json
 b9976d61266bb6e72192816100bd2aa91cd13cf5 assets/hkbmod/items/magic_pickaxe.json
+2c9b97bb98e73bcd1ccbde4020a6b9c593c7cd58 assets/hkbmod/items/research_crafting_table.json
 6b52a5eb4fb3c298c3026c4dd5b7723d730bc18d assets/hkbmod/items/research_table.json
 455247a8d2bf4b7996418ee5d7be3e3d49c41a92 assets/hkbmod/items/robinia_button.json
 23a29a8f800cb6a3c269c9a51b088392658c35b4 assets/hkbmod/items/robinia_door.json

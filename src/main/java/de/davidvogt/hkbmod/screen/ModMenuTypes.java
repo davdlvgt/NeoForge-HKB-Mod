@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.screen;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.screen.cutsom.ResearchCraftingTableMenu;
 import de.davidvogt.hkbmod.screen.cutsom.ResearchTableMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -17,6 +18,9 @@ public class ModMenuTypes {
 
     public static final DeferredHolder<MenuType<?>, MenuType<ResearchTableMenu>> RESEARCH_TABLE_MENU =
             registerMenuType("research_table_menu", ResearchTableMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<ResearchCraftingTableMenu>> RESEARCH_CRAFTING_TABLE_MENU =
+            registerMenuType("research_crafting_table_menu", ResearchCraftingTableMenu::new);
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name,
                                                                                                                IContainerFactory<T> factory) {

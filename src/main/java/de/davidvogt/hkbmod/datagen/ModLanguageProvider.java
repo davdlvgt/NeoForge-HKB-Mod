@@ -41,6 +41,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModBlocks.CUSTOM_TEST_BLOCK.get(), "Custom Test Block");
         add(ModBlocks.TEST_LAMP.get(), "Test Lamp");
         add(ModBlocks.RESEARCH_TABLE.get(), "Research Table");
+        add(ModBlocks.RESEARCH_CRAFTING_TABLE.get(), "Research Crafting Table");
 
         add(ModBlocks.ROBINIA_LOG.get(), "Robinia Log");
         add(ModBlocks.ROBINIA_WOOD.get(), "Robinia Wood");
