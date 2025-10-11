@@ -14,8 +14,8 @@
     }
   ],
   "unlocks": [
-    "Crossbow Mastery",
-    "Piercing Shot"
+    "longbow",
+    "longbow_arrow"
   ],
   "advancement": {
     "title": "Archer: Expert",

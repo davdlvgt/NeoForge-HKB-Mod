@@ -15,8 +15,7 @@
     }
   ],
   "unlocks": [
-    "Basic Spell Book",
-    "Mana Regeneration"
+    "time_setter"
   ],
     "advancement": {
         "title": "Magician: Apprentice",

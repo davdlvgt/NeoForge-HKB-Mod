@@ -5,6 +5,7 @@ import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.attachment.ModAttachments;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
 import de.davidvogt.hkbmod.research.PlayerResearchData;
+import de.davidvogt.hkbmod.research.PlayerResearchHelper;
 import de.davidvogt.hkbmod.research.Research;
 import de.davidvogt.hkbmod.research.ResearchManager;
 import de.davidvogt.hkbmod.screen.cutsom.ResearchTableMenu;
@@ -243,6 +244,9 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
                     // Grant advancement
                     grantResearchAdvancement(serverPlayer, selectedClass, selectedLevelIndex);
 
+                    // Unlock recipes defined in the research
+                    unlockRecipesFromResearch(serverPlayer, research);
+
                     // Sync to client
                     serverPlayer.connection.send(new SyncPlayerResearchPacket(researchData.getCompletedLevels()));
                 }
@@ -385,6 +389,34 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
             HKBMod.LOGGER.info("Available advancements:");
             player.getServer().getAdvancements().getAllAdvancements().forEach(adv ->
                     HKBMod.LOGGER.info("  - {}", adv.id()));
+        }
+    }
+
+    /**
+     * Unlocks recipes defined in the research for the player
+     * @param player The player to unlock recipes for
+     * @param research The research object containing the recipe IDs to unlock
+     */
+    private void unlockRecipesFromResearch(ServerPlayer player, Research research) {
+        if (research == null || research.unlocks() == null || research.unlocks().isEmpty()) {
+            return;
+        }
+
+        int unlockedCount = 0;
+        for (String recipeId : research.unlocks()) {
+            ResourceLocation recipeLocation = ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, recipeId);
+            boolean wasUnlocked = PlayerResearchHelper.unlockRecipe(player, recipeLocation);
+
+            if (wasUnlocked) {
+                unlockedCount++;
+                HKBMod.LOGGER.info("Unlocked recipe '{}' for player {}",
+                        recipeId, player.getName().getString());
+            }
+        }
+
+        if (unlockedCount > 0) {
+            HKBMod.LOGGER.info("Research completion: Unlocked {} recipes for player {}",
+                    unlockedCount, player.getName().getString());
         }
     }
 
