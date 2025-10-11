@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import de.davidvogt.hkbmod.attachment.ModAttachments;
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.block.entity.ModBlockEntities;
+import de.davidvogt.hkbmod.command.RecipeUnlockCommands;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
 import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.network.NetworkHandler;
@@ -25,6 +26,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
@@ -149,6 +151,12 @@ public class HKBMod {
             LOGGER.info("Synced research data for player {} - {} classes completed",
                 serverPlayer.getName().getString(), researchData.getCompletedLevels().size());
         }
+    }
+
+    @SubscribeEvent
+    public void onRegisterCommands(RegisterCommandsEvent event) {
+        RecipeUnlockCommands.register(event.getDispatcher());
+        LOGGER.info("Registered HKB recipe unlock commands");
     }
 
 

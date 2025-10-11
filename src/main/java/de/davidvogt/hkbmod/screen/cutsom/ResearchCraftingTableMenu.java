@@ -3,6 +3,7 @@ package de.davidvogt.hkbmod.screen.cutsom;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.block.entity.ResearchCraftingTableBlockEntity;
+import de.davidvogt.hkbmod.research.PlayerResearchHelper;
 import de.davidvogt.hkbmod.screen.ModMenuTypes;
 import de.davidvogt.hkbmod.util.RecipeHelper;
 import net.minecraft.core.registries.Registries;
@@ -23,7 +24,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Menu for the Research Crafting Table.
  * This crafting table allows crafting with a 3x3 grid stored in the block entity.
- * TODO: Add recipe filtering to only allow custom recipes (non-vanilla).
+ * Only whitelisted recipes from RecipeHelper can be crafted.
+ * Recipes must be unlocked by the player via research before they can see the output.
  */
 public class ResearchCraftingTableMenu extends AbstractContainerMenu {
     private final ResearchCraftingTableBlockEntity blockEntity;
@@ -196,7 +198,7 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
 
     /**
      * Finds a matching recipe that is allowed in the research crafting table.
-     * Only checks whitelisted recipes from RecipeHelper.
+     * Only checks whitelisted recipes from RecipeHelper and recipes the player has unlocked.
      */
     @Nullable
     private RecipeHolder<CraftingRecipe> findMatchingRecipe(CraftingInput craftingInput, Level level) {
@@ -204,6 +206,12 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
         for (String recipeId : RecipeHelper.getAllowedRecipeIds()) {
             // Create ResourceKey for the recipe
             ResourceLocation recipeLocation = ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, recipeId);
+
+            // Check if the player has unlocked this recipe
+            if (!PlayerResearchHelper.hasRecipeUnlocked(this.player, recipeLocation)) {
+                continue; // Skip locked recipes - player cannot see output
+            }
+
             ResourceKey<Recipe<?>> recipeKey = ResourceKey.create(Registries.RECIPE, recipeLocation);
 
             // Look up the recipe from the server
