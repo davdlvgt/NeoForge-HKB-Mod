@@ -52,7 +52,7 @@ public class ModItems {
                             ModMaterials.EMERALD_MATERIAL,   // Material to use
                             3.5F,                                  // Type-specific attack damage bonus
                             -2.0F                               // Type-specific attack speed modifier
-                    ).enchantable()
+                    )
             )
     );
 
