@@ -134,6 +134,11 @@ public class HKBMod {
             event.accept(ModBlocks.ROBINIA_DOOR.get());
             event.accept(ModBlocks.ROBINIA_TRAPDOOR.get());
 
+        } else if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
+            event.accept(ModItems.DEER_BEEF.get());
+            event.accept(ModItems.COOKED_DEER_BEEF.get());
+        } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(ModItems.DEER_ANTLERS.get());
         }
     }
 

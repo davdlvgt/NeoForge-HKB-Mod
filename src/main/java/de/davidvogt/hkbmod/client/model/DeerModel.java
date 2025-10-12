@@ -65,17 +65,44 @@ public class DeerModel extends EntityModel<LivingEntityRenderState> {
                         .addBox(-2.0F, -1.0F, -8.0F, 4.0F, 3.0F, 2.0F),
                 PartPose.offset(0.0F, 7.0F, -7.0F));
 
-        // Antlers (simple prongs) - only visible on adults
+        // Left Antler - Complex branching structure
         PartDefinition antlerLeft = head.addOrReplaceChild("antler_left",
                 CubeListBuilder.create()
+                        // Main beam (vertical)
                         .texOffs(0, 34)
-                        .addBox(0.0F, -6.0F, -1.0F, 1.0F, 6.0F, 1.0F),
+                        .addBox(0.0F, -6.0F, -0.5F, 1.0F, 6.0F, 1.0F)
+                        // First tine (lower, angled forward)
+                        .texOffs(0, 34)
+                        .addBox(0.0F, -3.0F, -2.5F, 1.0F, 2.0F, 1.0F)
+                        // Second tine (middle, angled back)
+                        .texOffs(0, 34)
+                        .addBox(0.0F, -4.5F, 0.5F, 1.0F, 2.0F, 1.0F)
+                        // Third tine (upper, angled forward-up)
+                        .texOffs(0, 34)
+                        .addBox(0.0F, -5.5F, -1.5F, 1.0F, 1.5F, 1.0F)
+                        // Top fork point
+                        .texOffs(0, 34)
+                        .addBox(-0.5F, -7.0F, -0.5F, 1.5F, 1.0F, 1.0F),
                 PartPose.offset(2.0F, -4.0F, -2.0F));
 
+        // Right Antler - Mirror of left with complex branching
         PartDefinition antlerRight = head.addOrReplaceChild("antler_right",
                 CubeListBuilder.create()
+                        // Main beam (vertical)
                         .texOffs(4, 34)
-                        .addBox(-1.0F, -6.0F, -1.0F, 1.0F, 6.0F, 1.0F),
+                        .addBox(-1.0F, -6.0F, -0.5F, 1.0F, 6.0F, 1.0F)
+                        // First tine (lower, angled forward)
+                        .texOffs(4, 34)
+                        .addBox(-1.0F, -3.0F, -2.5F, 1.0F, 2.0F, 1.0F)
+                        // Second tine (middle, angled back)
+                        .texOffs(4, 34)
+                        .addBox(-1.0F, -4.5F, 0.5F, 1.0F, 2.0F, 1.0F)
+                        // Third tine (upper, angled forward-up)
+                        .texOffs(4, 34)
+                        .addBox(-1.0F, -5.5F, -1.5F, 1.0F, 1.5F, 1.0F)
+                        // Top fork point
+                        .texOffs(4, 34)
+                        .addBox(-0.5F, -7.0F, -0.5F, 1.5F, 1.0F, 1.0F),
                 PartPose.offset(-2.0F, -4.0F, -2.0F));
 
         // Front left leg - thin and tall

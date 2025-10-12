@@ -29,7 +29,10 @@
       "Bash(cmd.exe /c gradlew.bat compileJava)",
       "Bash(powershell:*)",
       "Bash(cd:*)",
-      "Bash(.gradlew.bat clean build)"
+      "Bash(.gradlew.bat clean build)",
+      "Bash(.gradlew.bat build:*)",
+      "Bash(Select-String -Pattern \"(BUILD|FAILED|error|warning)\" -Context 0,2)",
+      "Bash(.gradlew.bat compileJava:*)"
     ],
     "deny": [],
     "ask": []

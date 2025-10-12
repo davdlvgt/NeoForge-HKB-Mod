@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-11T13:09:45.8003421	Model Definitions - hkbmod
+// 1.21.8	2025-10-12T13:46:19.2258628	Model Definitions - hkbmod
 098162d3c53084529de99da150feb937cc6f06d1 assets/hkbmod/blockstates/custom_test_block.json
 36c5d1a71329972be809a6b6d81bd92a5cc14576 assets/hkbmod/blockstates/elastic_wood.json
 92c0371b1d3e88a3d0afec49941ed8054a363697 assets/hkbmod/blockstates/robinia_button.json
@@ -18,7 +18,10 @@ e8c534d94ed4c7491e51f9ed15cb42af7fbbc688 assets/hkbmod/blockstates/stripped_robi
 11b11bb988507be9d51525946c83f22c66be1d7e assets/hkbmod/blockstates/stripped_robinia_wood.json
 d7a63bdda4d35dc85c083539387f5a9fa871ad30 assets/hkbmod/blockstates/test_block.json
 ee686ac4c0cb536ccfd29374afc863df03ac1ca4 assets/hkbmod/blockstates/test_lamp.json
+6206ccabfdd6991daa234c1f4932721269f9927a assets/hkbmod/items/cooked_deer_beef.json
 3fd4829c7f1612a778dd43b101a096f2c858823c assets/hkbmod/items/custom_test_block.json
+6bffa850c63903b497b5c24f91e876bd39d6528a assets/hkbmod/items/deer_antlers.json
+831de1efb80be8f18e0297f0b60638832b9f76c2 assets/hkbmod/items/deer_beef.json
 dc745a78f41cd55c196213999cff6fc6a1456da4 assets/hkbmod/items/elastic_wood.json
 62a5437cf60ed977ee511eb1dcf0e6b54c94d89d assets/hkbmod/items/emerald_axe.json
 8ca5ac8be867dc898aaee3ce3527b0c182f2ba15 assets/hkbmod/items/emerald_hoe.json
@@ -93,6 +96,9 @@ b016b478b6af9095df2bd9f00cd243895f4a150d assets/hkbmod/models/block/stripped_rob
 ac467e51ec47f4ab636f667cf397d567cb4d492c assets/hkbmod/models/block/test_block.json
 c36893a026defe2830ef31506e3955ef8af37ffc assets/hkbmod/models/block/test_lamp.json
 129e37be59b3eaec62122dff098ec286452b46c5 assets/hkbmod/models/block/test_lamp_on.json
+f2a1e61ab99ad23135390757dfd3feed84e8c866 assets/hkbmod/models/item/cooked_deer_beef.json
+044a43857ace0aa8256dccfb1d3ec2bc1a1225b7 assets/hkbmod/models/item/deer_antlers.json
+1a3652e2f94f3e94ab117d2e6972fb5cefa18fd4 assets/hkbmod/models/item/deer_beef.json
 4fef92ca0d6c6000b94de27071dbbef1277c6b4a assets/hkbmod/models/item/emerald_axe.json
 3e766c7ddfced88d4939b505c53bd8b977e6c32d assets/hkbmod/models/item/emerald_hoe.json
 85c28ab6e819171691ef663bf64cdda347d1a4dc assets/hkbmod/models/item/emerald_pickaxe.json

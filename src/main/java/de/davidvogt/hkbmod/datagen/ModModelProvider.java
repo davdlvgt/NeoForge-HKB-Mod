@@ -45,6 +45,10 @@ public class ModModelProvider extends ModelProvider {
         itemModels.createFlatItemModel(ModItems.LONGBOW.get(), ModelTemplates.BOW);
         itemModels.generateBow(ModItems.LONGBOW.get());
 
+        itemModels.generateFlatItem(ModItems.DEER_BEEF.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(ModItems.COOKED_DEER_BEEF.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(ModItems.DEER_ANTLERS.get(), ModelTemplates.FLAT_ITEM);
+
         itemModels.generateFlatItem(ModItems.LONGBOW_ARROW.get(), ModelTemplates.FLAT_ITEM);
 
         // Block Models
