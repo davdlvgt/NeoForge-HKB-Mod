@@ -1,5 +1,6 @@
 package de.davidvogt.hkbmod.item.entity.custom;
 
+import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -122,6 +123,31 @@ public class DeerEntity extends Animal {
     @Override
     protected float getSoundVolume() {
         return 0.4F;
+    }
+
+    /**
+     * Custom death loot drops
+     * Deer drop venison and antlers when killed
+     */
+    @Override
+    protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean hitByPlayer) {
+        super.dropCustomDeathLoot(level, damageSource, hitByPlayer);
+
+        // Drop deer beef (venison) - 1-3 pieces
+        int beefCount = 1 + this.random.nextInt(3);
+        for (int i = 0; i < beefCount; i++) {
+            // Drop cooked beef if killed by fire, otherwise raw
+            if (this.isOnFire()) {
+                this.spawnAtLocation(level, new ItemStack(ModItems.COOKED_DEER_BEEF.get()));
+            } else {
+                this.spawnAtLocation(level, new ItemStack(ModItems.DEER_BEEF.get()));
+            }
+        }
+
+        // Drop antlers - 50% chance, only from adults
+        if (!this.isBaby() && this.random.nextBoolean()) {
+            this.spawnAtLocation(level, new ItemStack(ModItems.DEER_ANTLERS.get()));
+        }
     }
 
 }

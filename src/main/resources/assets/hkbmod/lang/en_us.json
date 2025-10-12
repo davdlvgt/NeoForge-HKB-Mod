@@ -4,6 +4,9 @@
     "item.hkbmod.emerald_sword": "Emerald Sword",
 
     "entity.hkbmod.deer": "Deer",
+    "item.hkbmod.deer_beef": "Raw Venison",
+    "item.hkbmod.cooked_deer_beef": "Cooked Venison",
+    "item.hkbmod.deer_antlers": "Deer Antlers",
 
     "gui.hkbmod.recipe_book.ingredients": "Required Ingredients:",
 

@@ -3,6 +3,9 @@
     "item.hkbmod.emerald_pickaxe": "Smaragdpickel",
 
     "entity.hkbmod.deer": "Hirsch",
+    "item.hkbmod.deer_beef": "Rohes Wildfleisch",
+    "item.hkbmod.cooked_deer_beef": "Gebratenes Wildfleisch",
+    "item.hkbmod.deer_antlers": "Hirschgeweih",
 
     "advancements.hkbmod.root.title": "HKB Mod",
     "advancements.hkbmod.root.description": "Beginne deine Reise mit den Heldenklassen",

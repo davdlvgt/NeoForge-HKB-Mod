@@ -116,6 +116,22 @@ public class ModItems {
                     stack -> stack.is(ModItems.LONGBOW_ARROW.get()))
     );
 
+    // Deer drops
+    public static final DeferredItem<Item> DEER_BEEF = ITEMS.registerSimpleItem(
+            "deer_beef",
+            new Item.Properties().food(net.minecraft.world.food.Foods.BEEF)
+    );
+
+    public static final DeferredItem<Item> COOKED_DEER_BEEF = ITEMS.registerSimpleItem(
+            "cooked_deer_beef",
+            new Item.Properties().food(net.minecraft.world.food.Foods.COOKED_BEEF)
+    );
+
+    public static final DeferredItem<Item> DEER_ANTLERS = ITEMS.registerSimpleItem(
+            "deer_antlers",
+            new Item.Properties()
+    );
+
     // TODO: Add deer spawn egg when SpawnEggItem API is clarified for NeoForge 21.8
     // Spawn eggs require special handling in 1.21.8
     // For now, use /summon hkbmod:deer to spawn deer

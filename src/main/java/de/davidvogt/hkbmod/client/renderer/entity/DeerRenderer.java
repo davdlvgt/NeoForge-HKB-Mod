@@ -43,13 +43,22 @@ public class DeerRenderer extends MobRenderer<DeerEntity, LivingEntityRenderStat
     }
 
     /**
-     * Optional: Scale the deer model
-     * Uncomment and modify if you want to adjust the deer's size
+     * Extract render state from the deer entity
+     */
+    @Override
+    public void extractRenderState(DeerEntity entity, LivingEntityRenderState renderState, float partialTick) {
+        super.extractRenderState(entity, renderState, partialTick);
+        renderState.isBaby = entity.isBaby();
+    }
+
+    /**
+     * Scale the deer model - make babies smaller
      */
     @Override
     protected void scale(LivingEntityRenderState renderState, PoseStack poseStack) {
-        super.scale(renderState, poseStack);
-        // Example: scale the deer to be slightly smaller
-        // poseStack.scale(0.9F, 0.9F, 0.9F);
+        // Scale down baby deer to 50% size
+        if (renderState.isBaby) {
+            poseStack.scale(0.5F, 0.5F, 0.5F);
+        }
     }
 }
