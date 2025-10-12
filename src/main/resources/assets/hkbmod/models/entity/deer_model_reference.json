@@ -1,0 +1,307 @@
+{
+  "__comment": "This is a JSON representation of the DeerModel Java class for reference/documentation purposes",
+  "__warning": "This file is NOT used by Minecraft/NeoForge. Entity models must be defined in Java code.",
+  "__usage": "Use this as reference for recreating the model in BlockBench or other 3D modeling tools",
+
+  "model_name": "deer",
+  "texture_size": {
+    "width": 64,
+    "height": 64
+  },
+
+  "parts": [
+    {
+      "name": "body",
+      "parent": "root",
+      "pivot": {
+        "x": 0.0,
+        "y": 11.0,
+        "z": 0.0
+      },
+      "cubes": [
+        {
+          "texture_offset": {
+            "u": 0,
+            "v": 0
+          },
+          "origin": {
+            "x": -4.0,
+            "y": 3.0,
+            "z": -7.0
+          },
+          "size": {
+            "width": 8.0,
+            "height": 8.0,
+            "depth": 14.0
+          },
+          "description": "Main body of the deer"
+        }
+      ]
+    },
+
+    {
+      "name": "head",
+      "parent": "root",
+      "pivot": {
+        "x": 0.0,
+        "y": 7.0,
+        "z": -7.0
+      },
+      "cubes": [
+        {
+          "texture_offset": {
+            "u": 0,
+            "v": 22
+          },
+          "origin": {
+            "x": -3.0,
+            "y": 3.0,
+            "z": -13.0
+          },
+          "size": {
+            "width": 6.0,
+            "height": 6.0,
+            "depth": 6.0
+          },
+          "description": "Main head cube"
+        },
+        {
+          "texture_offset": {
+            "u": 24,
+            "v": 22
+          },
+          "origin": {
+            "x": -2.0,
+            "y": 6.0,
+            "z": -15.0
+          },
+          "size": {
+            "width": 4.0,
+            "height": 3.0,
+            "depth": 2.0
+          },
+          "description": "Snout/nose"
+        }
+      ],
+      "children": [
+        {
+          "name": "antler_left",
+          "pivot": {
+            "x": 2.0,
+            "y": 3.0,
+            "z": -9.0
+          },
+          "cubes": [
+            {
+              "texture_offset": {
+                "u": 0,
+                "v": 34
+              },
+              "origin": {
+                "x": 2.0,
+                "y": -3.0,
+                "z": -10.0
+              },
+              "size": {
+                "width": 1.0,
+                "height": 6.0,
+                "depth": 1.0
+              },
+              "description": "Left antler"
+            }
+          ]
+        },
+        {
+          "name": "antler_right",
+          "pivot": {
+            "x": -2.0,
+            "y": 3.0,
+            "z": -9.0
+          },
+          "cubes": [
+            {
+              "texture_offset": {
+                "u": 4,
+                "v": 34
+              },
+              "origin": {
+                "x": -3.0,
+                "y": -3.0,
+                "z": -10.0
+              },
+              "size": {
+                "width": 1.0,
+                "height": 6.0,
+                "depth": 1.0
+              },
+              "description": "Right antler"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "leg_front_left",
+      "parent": "root",
+      "pivot": {
+        "x": 2.5,
+        "y": 11.0,
+        "z": -5.0
+      },
+      "cubes": [
+        {
+          "texture_offset": {
+            "u": 30,
+            "v": 0
+          },
+          "origin": {
+            "x": 1.0,
+            "y": -2.0,
+            "z": -6.5
+          },
+          "size": {
+            "width": 3.0,
+            "height": 13.0,
+            "depth": 3.0
+          },
+          "description": "Front left leg"
+        }
+      ]
+    },
+
+    {
+      "name": "leg_front_right",
+      "parent": "root",
+      "pivot": {
+        "x": -2.5,
+        "y": 11.0,
+        "z": -5.0
+      },
+      "cubes": [
+        {
+          "texture_offset": {
+            "u": 42,
+            "v": 0
+          },
+          "origin": {
+            "x": -4.0,
+            "y": -2.0,
+            "z": -6.5
+          },
+          "size": {
+            "width": 3.0,
+            "height": 13.0,
+            "depth": 3.0
+          },
+          "description": "Front right leg"
+        }
+      ]
+    },
+
+    {
+      "name": "leg_back_left",
+      "parent": "root",
+      "pivot": {
+        "x": 2.5,
+        "y": 11.0,
+        "z": 5.0
+      },
+      "cubes": [
+        {
+          "texture_offset": {
+            "u": 30,
+            "v": 16
+          },
+          "origin": {
+            "x": 1.0,
+            "y": -2.0,
+            "z": 3.5
+          },
+          "size": {
+            "width": 3.0,
+            "height": 13.0,
+            "depth": 3.0
+          },
+          "description": "Back left leg"
+        }
+      ]
+    },
+
+    {
+      "name": "leg_back_right",
+      "parent": "root",
+      "pivot": {
+        "x": -2.5,
+        "y": 11.0,
+        "z": 5.0
+      },
+      "cubes": [
+        {
+          "texture_offset": {
+            "u": 42,
+            "v": 16
+          },
+          "origin": {
+            "x": -4.0,
+            "y": -2.0,
+            "z": 3.5
+          },
+          "size": {
+            "width": 3.0,
+            "height": 13.0,
+            "depth": 3.0
+          },
+          "description": "Back right leg"
+        }
+      ]
+    }
+  ],
+
+  "animations": {
+    "walk": {
+      "description": "Walking animation - legs swing back and forth",
+      "loop": true,
+      "animated_parts": {
+        "leg_front_left": {
+          "rotation": {
+            "formula": "cos(limbSwing * 0.6662) * 1.4 * limbSwingAmount",
+            "axis": "x"
+          }
+        },
+        "leg_front_right": {
+          "rotation": {
+            "formula": "cos(limbSwing * 0.6662 + PI) * 1.4 * limbSwingAmount",
+            "axis": "x"
+          }
+        },
+        "leg_back_left": {
+          "rotation": {
+            "formula": "cos(limbSwing * 0.6662 + PI) * 1.4 * limbSwingAmount",
+            "axis": "x"
+          }
+        },
+        "leg_back_right": {
+          "rotation": {
+            "formula": "cos(limbSwing * 0.6662) * 1.4 * limbSwingAmount",
+            "axis": "x"
+          }
+        }
+      }
+    }
+  },
+
+  "metadata": {
+    "created_from": "DeerModel.java",
+    "texture_file": "assets/hkbmod/textures/entity/deer.png",
+    "texture_dimensions": "64x64 pixels",
+    "notes": [
+      "All positions are in Minecraft's coordinate system (1 unit = 1/16 of a block)",
+      "Pivot points are the rotation centers for each model part",
+      "Origin points define where each cube starts in 3D space",
+      "Texture offsets (u,v) map to positions on the texture file",
+      "This model uses vanilla Minecraft's model structure",
+      "To use in BlockBench: Import as 'Generic Model' and manually recreate based on these specifications"
+    ]
+  }
+}
