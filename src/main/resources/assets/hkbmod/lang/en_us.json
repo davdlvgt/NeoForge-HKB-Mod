@@ -1,0 +1,10 @@
+{
+    "item.hkbmod.emerald_axe": "Emerald Axe",
+    "item.hkbmod.emerald_pickaxe": "Emerald Pickaxe",
+    "item.hkbmod.emerald_sword": "Emerald Sword",
+
+    "gui.hkbmod.recipe_book.ingredients": "Required Ingredients:",
+
+    "advancements.hkbmod.root.title": "HKB Mod",
+    "advancements.hkbmod.root.description": "Begin your journey with hero classes"
+}

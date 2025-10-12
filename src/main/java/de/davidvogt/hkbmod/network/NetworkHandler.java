@@ -36,6 +36,18 @@ public class NetworkHandler {
             SetDigSizePacket::handle
         );
 
+        registrar.playToServer(
+            RequestRecipeSyncPacket.TYPE,
+            RequestRecipeSyncPacket.STREAM_CODEC,
+            RequestRecipeSyncPacket::handle
+        );
+
+        registrar.playToServer(
+            PlaceRecipePacket.TYPE,
+            PlaceRecipePacket.STREAM_CODEC,
+            PlaceRecipePacket::handle
+        );
+
         registrar.playToClient(
             SyncPlayerResearchPacket.TYPE,
             SyncPlayerResearchPacket.STREAM_CODEC,
@@ -52,6 +64,18 @@ public class NetworkHandler {
             SyncUnlockedRecipesPacket.TYPE,
             SyncUnlockedRecipesPacket.STREAM_CODEC,
             SyncUnlockedRecipesPacket::handle
+        );
+
+        registrar.playToClient(
+            ResearchRecipeSyncPacket.TYPE,
+            ResearchRecipeSyncPacket.STREAM_CODEC,
+            ResearchRecipeSyncPacket::handle
+        );
+
+        registrar.playToClient(
+            SetGhostRecipePacket.TYPE,
+            SetGhostRecipePacket.STREAM_CODEC,
+            SetGhostRecipePacket::handle
         );
 
         HKBMod.LOGGER.info("Registered network packets");

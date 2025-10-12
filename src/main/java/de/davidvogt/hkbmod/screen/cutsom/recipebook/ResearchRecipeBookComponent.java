@@ -1,9 +1,14 @@
 package de.davidvogt.hkbmod.screen.cutsom.recipebook;
 
 import com.google.common.collect.Lists;
+import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.network.PlaceRecipePacket;
 import de.davidvogt.hkbmod.recipe.ModRecipeTypes;
 import de.davidvogt.hkbmod.recipe.ResearchCraftingRecipe;
 import de.davidvogt.hkbmod.screen.cutsom.ResearchCraftingTableMenu;
+import de.davidvogt.hkbmod.util.RecipeHelper;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -32,9 +37,13 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
 
     private static final int BOOK_WIDTH = 147;
     private static final int BOOK_HEIGHT = 166;
+    private static final int TAB_WIDTH = 28;
+    private static final int TAB_HEIGHT = 32;
 
     private final Map<ResearchRecipeCategory, ResearchRecipeCollection> recipeCollections = new EnumMap<>(ResearchRecipeCategory.class);
     private final List<ResearchRecipeButton> recipeButtons = Lists.newArrayList();
+    private final List<RecipeHolder<ResearchCraftingRecipe>> cachedRecipes = new ArrayList<>();
+    private final Map<ResearchRecipeCategory, CategoryTab> categoryTabs = new EnumMap<>(ResearchRecipeCategory.class);
 
     private ResearchCraftingTableMenu menu;
     private Minecraft minecraft;
@@ -51,6 +60,7 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
     private int currentPage = 0;
     private int totalPages = 0;
     private static final int RECIPES_PER_PAGE = 20; // 4x5 grid
+    private boolean recipesLoaded = false;
 
     public ResearchRecipeBookComponent() {
         // Initialize recipe collections for each category
@@ -61,6 +71,12 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
         // Initialize recipe buttons
         for (int i = 0; i < RECIPES_PER_PAGE; i++) {
             recipeButtons.add(new ResearchRecipeButton());
+        }
+
+        // Initialize category tabs
+        ResearchRecipeCategory[] categories = ResearchRecipeCategory.values();
+        for (int i = 0; i < categories.length; i++) {
+            categoryTabs.put(categories[i], new CategoryTab(categories[i], i));
         }
     }
 
@@ -99,28 +115,36 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
                 }
             }
         }
+
+        // Position category tabs at the top
+        int tabStartX = bookX;
+        int tabY = bookY;
+        for (CategoryTab tab : categoryTabs.values()) {
+            tab.updatePosition(tabStartX, tabY);
+        }
+    }
+
+    /**
+     * Sets the available recipes (called from screen after recipes are loaded)
+     */
+    public void setRecipes(List<RecipeHolder<ResearchCraftingRecipe>> recipes) {
+        this.cachedRecipes.clear();
+        this.cachedRecipes.addAll(recipes);
+        this.recipesLoaded = true;
+        updateRecipeCollections();
     }
 
     /**
      * Updates all recipe collections with current unlocked recipes
      */
     public void updateRecipeCollections() {
-        if (player == null || menu == null) {
+        if (player == null || !recipesLoaded) {
             return;
         }
 
-        // Get all whitelisted recipe IDs from RecipeHelper
-        List<RecipeHolder<ResearchCraftingRecipe>> allResearchRecipes = new ArrayList<>();
-
-        // For now, we'll populate recipes when the menu is updated
-        // The client doesn't have easy access to server recipe manager
-        // We'll need to pass recipes through the menu or use network sync later
-
-        // TODO: Implement proper recipe syncing from server
-
-        // Update each category collection
+        // Update each category collection with cached recipes
         for (ResearchRecipeCollection collection : recipeCollections.values()) {
-            collection.updateUnlockedRecipes(allResearchRecipes, player);
+            collection.updateUnlockedRecipes(cachedRecipes, player);
         }
 
         updateRecipeButtons();
@@ -195,8 +219,10 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, RECIPE_BOOK_TEXTURE,
             bookX, bookY, 1, 1, BOOK_WIDTH, BOOK_HEIGHT, 256, 256);
 
-        // Render category tabs (simplified for now)
-        // TODO: Add proper tab rendering and switching
+        // Render category tabs
+        for (CategoryTab tab : categoryTabs.values()) {
+            tab.render(guiGraphics, mouseX, mouseY, currentCategory);
+        }
 
         // Render recipe buttons
         for (ResearchRecipeButton button : recipeButtons) {
@@ -218,6 +244,19 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
             return false;
         }
 
+        // Check if any category tab was clicked
+        for (CategoryTab tab : categoryTabs.values()) {
+            if (tab.isMouseOver(mouseX, mouseY)) {
+                if (currentCategory != tab.getCategory()) {
+                    currentCategory = tab.getCategory();
+                    currentPage = 0;
+                    selectedRecipe = null;
+                    updateRecipeButtons();
+                }
+                return true;
+            }
+        }
+
         // Check if any recipe button was clicked
         for (ResearchRecipeButton recipeButton : recipeButtons) {
             if (recipeButton.isHoveredOrFocused() && recipeButton.getRecipe() != null) {
@@ -236,8 +275,18 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
         this.selectedRecipe = recipe;
         updateRecipeButtons();
 
-        // TODO: Send packet to server to place recipe items
-        // TODO: Show ghost items in crafting grid
+        // Check if shift is held for "place all" behavior
+        boolean placeAll = minecraft.options.keyShift.isDown();
+
+        // Send packet to server to place recipe items in crafting grid
+        ResourceLocation recipeId = recipe.id().location();
+        HKBMod.LOGGER.info("Recipe clicked: {}, placeAll: {}", recipeId, placeAll);
+        if (minecraft.getConnection() != null) {
+            minecraft.getConnection().send(new PlaceRecipePacket(recipeId, placeAll));
+            HKBMod.LOGGER.info("Sent PlaceRecipePacket to server");
+        } else {
+            HKBMod.LOGGER.warn("Cannot send packet - connection is null");
+        }
     }
 
     @Override
@@ -274,5 +323,51 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
     @Override
     public boolean isFocused() {
         return visible;
+    }
+
+    /**
+     * Inner class representing a category tab
+     */
+    private static class CategoryTab {
+        private final ResearchRecipeCategory category;
+        private final int index;
+        private int x;
+        private int y;
+
+        public CategoryTab(ResearchRecipeCategory category, int index) {
+            this.category = category;
+            this.index = index;
+        }
+
+        public void updatePosition(int bookX, int bookY) {
+            // Tabs are positioned horizontally at the top of the book
+            this.x = bookX + (index * TAB_WIDTH);
+            this.y = bookY - TAB_HEIGHT + 3; // Slightly overlap with book
+        }
+
+        public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, ResearchRecipeCategory currentCategory) {
+            boolean isSelected = category == currentCategory;
+            boolean isHovered = isMouseOver(mouseX, mouseY);
+
+            // Texture coordinates for tabs
+            int u = isSelected ? 153 : 181; // Selected tab has different texture
+            int v = isHovered ? 32 : 0;
+
+            // Render tab background
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, RECIPE_BOOK_TEXTURE,
+                x, y, u, v, TAB_WIDTH, TAB_HEIGHT, 256, 256);
+
+            // Render category icon
+            guiGraphics.renderItem(category.getIcon(), x + 6, y + 9);
+        }
+
+        public boolean isMouseOver(double mouseX, double mouseY) {
+            return mouseX >= x && mouseX < x + TAB_WIDTH &&
+                   mouseY >= y && mouseY < y + TAB_HEIGHT;
+        }
+
+        public ResearchRecipeCategory getCategory() {
+            return category;
+        }
     }
 }

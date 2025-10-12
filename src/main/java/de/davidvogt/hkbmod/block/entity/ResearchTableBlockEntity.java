@@ -71,7 +71,7 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
     private String selectedClass = "";
     private long researchStartTime = 0;
     private UUID researchingPlayerUUID = null;
-    private static final long RESEARCH_DURATION_MS = 10000; // 10 seconds
+    private static final long RESEARCH_DURATION_MS = 3000; // 10 seconds
 
     public ResearchTableBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.RESEARCH_TABLE_BE.get(), pos, blockState);
