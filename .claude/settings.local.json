@@ -28,7 +28,8 @@
       "Bash(./gradlew.bat runData:*)",
       "Bash(cmd.exe /c gradlew.bat compileJava)",
       "Bash(powershell:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(.gradlew.bat clean build)"
     ],
     "deny": [],
     "ask": []

@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.item.entity;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.item.entity.custom.DeerEntity;
 import de.davidvogt.hkbmod.item.entity.custom.LongbowArrowEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -24,6 +25,17 @@ public class ModEntities {
                     .build(ResourceKey.create(
                             Registries.ENTITY_TYPE,
                             ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "longbow_arrow"))
+                    ));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DeerEntity>> DEER =
+            ENTITY_TYPES.register("deer", () -> EntityType.Builder.<DeerEntity>of(
+                            DeerEntity::new, MobCategory.CREATURE)
+                    .sized(0.9F, 1.4F)  // Width and height (slightly taller than cow: 0.9, 1.4 vs cow's 0.9, 1.3)
+                    .clientTrackingRange(10)  // How far away clients can see this entity
+                    .updateInterval(3)  // How often to send updates to clients (lower = more frequent)
+                    .build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "deer"))
                     ));
 
     public static void register(IEventBus eventBus) {

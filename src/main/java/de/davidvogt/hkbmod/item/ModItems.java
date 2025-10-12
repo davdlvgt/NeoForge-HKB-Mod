@@ -116,6 +116,10 @@ public class ModItems {
                     stack -> stack.is(ModItems.LONGBOW_ARROW.get()))
     );
 
+    // TODO: Add deer spawn egg when SpawnEggItem API is clarified for NeoForge 21.8
+    // Spawn eggs require special handling in 1.21.8
+    // For now, use /summon hkbmod:deer to spawn deer
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

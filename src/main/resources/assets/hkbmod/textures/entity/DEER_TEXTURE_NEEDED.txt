@@ -1,0 +1,26 @@
+DEER TEXTURE NEEDED
+===================
+
+A deer.png texture file needs to be placed in this directory.
+
+Location: src/main/resources/assets/hkbmod/textures/entity/deer.png
+
+Texture Requirements:
+- Format: PNG
+- Recommended size: 64x64 pixels
+- UV mapping based on the DeerModel class definition
+
+The texture should include:
+- Body (main texture area)
+- Head with snout
+- Antlers (for adult deer)
+- Four legs
+- Brown/tan deer coloring
+
+You can:
+1. Create a custom texture using an image editor
+2. Use a texture from a resource pack
+3. Use BlockBench to create and texture a deer model
+4. Temporarily use a copy of the cow texture (minecraft:textures/entity/cow/cow.png) for testing
+
+Once you have a deer.png file, place it in this directory and delete this text file.

@@ -6,6 +6,7 @@ import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.block.entity.ModBlockEntities;
 import de.davidvogt.hkbmod.command.RecipeUnlockCommands;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
+import de.davidvogt.hkbmod.item.entity.custom.DeerEntity;
 import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.network.NetworkHandler;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
@@ -29,6 +30,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
@@ -49,6 +51,9 @@ public class HKBMod {
 
         // Register the creative tab content event on the mod event bus
         modEventBus.addListener(this::addCreative);
+
+        // Register entity attributes
+        modEventBus.addListener(this::registerEntityAttributes);
 
         // Register network packets
         modEventBus.addListener(NetworkHandler::register);
@@ -167,5 +172,12 @@ public class HKBMod {
         LOGGER.info("Registered HKB recipe unlock commands");
     }
 
+    /**
+     * Register entity attributes for custom entities
+     */
+    private void registerEntityAttributes(EntityAttributeCreationEvent event) {
+        event.put(ModEntities.DEER.get(), DeerEntity.createAttributes().build());
+        LOGGER.info("Registered deer entity attributes");
+    }
 
 }
