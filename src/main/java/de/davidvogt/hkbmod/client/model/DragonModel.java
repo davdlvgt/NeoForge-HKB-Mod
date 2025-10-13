@@ -42,6 +42,16 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
     private final ModelPart rightRearLegTip;
     private final ModelPart rightRearFoot;
 
+    // Track movement speed for walking animation
+    private float movementSpeed = 0.0F;
+
+    /**
+     * Sets the movement speed for the dragon, used to control walking animation
+     */
+    public void setMovementSpeed(float speed) {
+        this.movementSpeed = speed;
+    }
+
     public DragonModel(ModelPart root) {
         super(root);
         this.root = root;
@@ -200,13 +210,42 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         float flap = state.flapTime * ((float)Math.PI * 2F);
         this.jaw.xRot = (Mth.sin(flap) + 1.0F) * 0.2F;
 
-        // Flügelbewegung
-        this.leftWing.xRot = 0.125F - Mth.cos(flap) * 0.2F;
-        this.leftWing.zRot = -(Mth.sin(flap) + 0.125F) * 0.8F;
-        this.leftWingTip.zRot = (Mth.sin(flap + 2.0F) + 0.5F) * 0.75F;
-        this.rightWing.xRot = leftWing.xRot;
-        this.rightWing.zRot = -leftWing.zRot;
-        this.rightWingTip.zRot = -leftWingTip.zRot;
+        // Check if dragon is landed (flapTime is 0 or very small when landed)
+        boolean isLanded = state.flapTime < 0.01F;
+
+        if (isLanded) {
+            // Wings folded tightly against body when landed
+            // The wings should fold back along the dragon's sides
+            this.leftWing.xRot = 0.2F;      // Slight upward tilt
+            this.leftWing.yRot = -0.5F;      // No forward/back rotation
+            this.leftWing.zRot = 0.6F;      // Fold IN toward body (positive for left wing)
+
+            this.leftWingTip.xRot = 0.0F;
+            this.leftWingTip.yRot = -0.5F;
+            this.leftWingTip.zRot = 0.8F;   // Fold the tip even more inward
+
+            this.rightWing.xRot = 0.2F;     // Slight upward tilt (same as left)
+            this.rightWing.yRot = 0.5F;     // No forward/back rotation
+            this.rightWing.zRot = -0.6F;    // Fold IN toward body (negative for right wing)
+
+            this.rightWingTip.xRot = 0.0F;
+            this.rightWingTip.yRot = 0.5F;
+            this.rightWingTip.zRot = -0.8F; // Fold the tip even more inward
+
+            // Log once every 40 ticks (2 seconds) when landed
+            if (state.ageInTicks % 40 == 0) {
+                System.out.println("[MODEL-CLIENT] Applying LANDED pose - wings folded, flapTime=" +
+                    String.format("%.4f", state.flapTime));
+            }
+        } else {
+            // Flügelbewegung (flying animation)
+            this.leftWing.xRot = 0.125F - Mth.cos(flap) * 0.2F;
+            this.leftWing.zRot = -(Mth.sin(flap) + 0.125F) * 0.8F;
+            this.leftWingTip.zRot = (Mth.sin(flap + 2.0F) + 0.5F) * 0.75F;
+            this.rightWing.xRot = leftWing.xRot;
+            this.rightWing.zRot = -leftWing.zRot;
+            this.rightWingTip.zRot = -leftWingTip.zRot;
+        }
 // Positionierung und Animation von Hals
         DragonFlightHistory.Sample neckBase = state.getHistoricalPos(6);
         float headYawOffset = Mth.wrapDegrees(state.getHistoricalPos(5).yRot() - state.getHistoricalPos(10).yRot());
@@ -217,12 +256,19 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         float z = neckParts[0].z;
         float flapOffset;
 
+        // Add head bobbing when landed and walking
+        float headBob = 0.0F;
+        if (isLanded && this.movementSpeed > 0.005F) {
+            // Head bobs up and down while walking
+            headBob = Mth.sin(state.ageInTicks * 0.2F) * 0.15F;
+        }
+
         for (int i = 0; i < NECK_PART_COUNT; i++) {
             ModelPart neck = neckParts[i];
             DragonFlightHistory.Sample sample = state.getHistoricalPos(5 - i);
             flapOffset = Mth.cos(i * 0.45F + flap) * 0.15F;
             neck.yRot = Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * ((float)Math.PI / 180F) * 1.5F;
-            neck.xRot = flapOffset + state.getHeadPartYOffset(i, neckBase, sample) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
+            neck.xRot = flapOffset + headBob + state.getHeadPartYOffset(i, neckBase, sample) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
             neck.zRot = -Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
             neck.x = x;
             neck.y = y;
@@ -238,15 +284,15 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         head.z = z;
         DragonFlightHistory.Sample headSample = state.getHistoricalPos(0);
         head.yRot = Mth.wrapDegrees(headSample.yRot() - neckBase.yRot()) * ((float)Math.PI / 180F);
-        head.xRot = Mth.wrapDegrees(state.getHeadPartYOffset(6, neckBase, headSample)) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
+        head.xRot = headBob + Mth.wrapDegrees(state.getHeadPartYOffset(6, neckBase, headSample)) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
         head.zRot = -Mth.wrapDegrees(headSample.yRot() - headYawAvg) * ((float)Math.PI / 180F);
 
 // Drehung des Körpers
         body.zRot = -headYawOffset * 1.5F * ((float)Math.PI / 180F);
 
-// Beine posieren
-        poseLimbs(flap, leftFrontLeg, leftFrontLegTip, leftFrontFoot, leftRearLeg, leftRearLegTip, leftRearFoot);
-        poseLimbs(flap, rightFrontLeg, rightFrontLegTip, rightFrontFoot, rightRearLeg, rightRearLegTip, rightRearFoot);
+// Beine posieren - each side needs separate animation
+        poseLimbsLeft(state, flap, leftFrontLeg, leftFrontLegTip, leftFrontFoot, leftRearLeg, leftRearLegTip, leftRearFoot);
+        poseLimbsRight(state, flap, rightFrontLeg, rightFrontLegTip, rightFrontFoot, rightRearLeg, rightRearLegTip, rightRearFoot);
 
 // Schwanzanimation
         float tailSwing = 0.0F;
@@ -255,13 +301,32 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         x = tailParts[0].x;
         neckBase = state.getHistoricalPos(11);
 
+        // Add tail swaying left-right when landed
+        float tailSway = 0.0F;
+        if (isLanded) {
+            // Tail sways side to side when standing or walking
+            tailSway = Mth.sin(state.ageInTicks * 0.08F) * 0.3F;
+        }
+
         for (int j = 0; j < TAIL_PART_COUNT; j++) {
             DragonFlightHistory.Sample sample = state.getHistoricalPos(12 + j);
             tailSwing += Mth.sin(j * 0.45F + flap) * 0.05F;
             ModelPart tail = tailParts[j];
-            tail.yRot = (Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * 1.5F + 180.0F) * ((float)Math.PI / 180F);
-            tail.xRot = tailSwing + (float)(sample.y() - neckBase.y()) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
-            tail.zRot = Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
+
+            if (isLanded) {
+                // When landed, use swaying animation instead of flight history
+                // Progressive sway - each segment sways more than the previous one
+                float segmentSway = tailSway * (j + 1) / (float)TAIL_PART_COUNT;
+                tail.yRot = segmentSway + 180.0F * ((float)Math.PI / 180F);
+                tail.xRot = tailSwing * 0.2F; // Minimal vertical movement
+                tail.zRot = 0.0F;
+            } else {
+                // Flying animation (original)
+                tail.yRot = (Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * 1.5F + 180.0F) * ((float)Math.PI / 180F);
+                tail.xRot = tailSwing + (float)(sample.y() - neckBase.y()) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
+                tail.zRot = Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
+            }
+
             tail.x = x;
             tail.y = y;
             tail.z = z;
@@ -275,18 +340,119 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         // (Hier könntest du die restlichen Animationen genau wie im Original übernehmen)
     }
 
-    private void poseLimbs(float flapAngle, ModelPart frontLeg, ModelPart frontLegTip, ModelPart frontFoot, ModelPart rearLeg, ModelPart rearLegTip, ModelPart rearFoot) {
-        // Beine beim Fliegen nach hinten anlegen, wie bei Vögeln/Drachen
-        // Beim Fliegen werden die Beine aerodynamisch nach hinten gestreckt
+    /**
+     * Animates the left side legs (left front and left rear)
+     * Uses diagonal gait: left front moves with right rear
+     */
+    private void poseLimbsLeft(EnderDragonRenderState state, float flapAngle, ModelPart frontLeg, ModelPart frontLegTip, ModelPart frontFoot, ModelPart rearLeg, ModelPart rearLegTip, ModelPart rearFoot) {
+        boolean isLanded = state.flapTime < 0.01F;
 
-        // Hinterbeine - komplett nach hinten gestreckt beim Fliegen
-        rearLeg.xRot = 1.0F;      // Stark nach hinten
-        rearLegTip.xRot = 0.9F;   // Gestreckt nach hinten
-        rearFoot.xRot = 0.7F;     // Fuß nach hinten gestreckt
+        if (isLanded) {
+            // Use the movement speed passed from renderer
+            // Only animate legs if actually moving (speed threshold of 0.005 blocks/tick)
+            if (this.movementSpeed > 0.005F) {
+                // Diagonal walking gait - left front moves with right rear
+                float walkCycle = state.ageInTicks * 0.5F; // Slightly faster cycle
 
-        // Vorderbeine - nach hinten angelegt beim Fliegen
-        frontLeg.xRot = 1.0F;     // Nach hinten
-        frontLegTip.xRot = 0.9F;  // Gestreckt nach hinten
-        frontFoot.xRot = 0.6F;    // Fuß nach hinten
+                // Scale animation by actual movement speed
+                float animationScale = Math.min(this.movementSpeed * 3.0F, 1.0F);
+
+                // Left front leg movement - increased swing amplitude
+                float leftFrontSwing = Mth.cos(walkCycle) * 1.2F * animationScale;
+                frontLeg.xRot = leftFrontSwing * 0.7F;
+                frontLegTip.xRot = Math.max(0.0F, leftFrontSwing * 0.7F);
+                frontFoot.xRot = Math.min(0.0F, -leftFrontSwing * 0.5F);
+
+                // Left rear leg movement (SAME phase as left front for diagonal gait) - increased amplitude
+                float leftRearSwing = Mth.cos(walkCycle) * 0.9F * animationScale;
+                rearLeg.xRot = -0.15F + leftRearSwing * 0.5F;
+                rearLegTip.xRot = 0.25F + Math.max(0.0F, leftRearSwing * 0.6F);
+                rearFoot.xRot = -0.1F + Math.min(0.0F, -leftRearSwing * 0.4F);
+
+                if (state.ageInTicks % 40 == 0) {
+                    System.out.println("[MODEL-CLIENT] LEFT SIDE walking - speed=" + String.format("%.3f", this.movementSpeed) +
+                        ", animScale=" + String.format("%.2f", animationScale));
+                }
+            } else {
+                // Standing still - neutral standing pose
+                frontLeg.xRot = 0.0F;
+                frontLegTip.xRot = 0.0F;
+                frontFoot.xRot = 0.0F;
+
+                rearLeg.xRot = -0.15F;
+                rearLegTip.xRot = 0.25F;
+                rearFoot.xRot = -0.1F;
+
+                if (state.ageInTicks % 40 == 0) {
+                    System.out.println("[MODEL-CLIENT] LEFT SIDE standing still - speed=" + String.format("%.3f", this.movementSpeed));
+                }
+            }
+        } else {
+            // Flying pose - legs tucked back
+            frontLeg.xRot = 1.0F;
+            frontLegTip.xRot = 0.9F;
+            frontFoot.xRot = 0.6F;
+            rearLeg.xRot = 1.0F;
+            rearLegTip.xRot = 0.9F;
+            rearFoot.xRot = 0.7F;
+        }
+    }
+
+    /**
+     * Animates the right side legs (right front and right rear)
+     * Uses diagonal gait: right front moves with left rear (opposite phase from left side)
+     */
+    private void poseLimbsRight(EnderDragonRenderState state, float flapAngle, ModelPart frontLeg, ModelPart frontLegTip, ModelPart frontFoot, ModelPart rearLeg, ModelPart rearLegTip, ModelPart rearFoot) {
+        boolean isLanded = state.flapTime < 0.01F;
+
+        if (isLanded) {
+            // Use the movement speed passed from renderer
+            // Only animate legs if actually moving (speed threshold of 0.005 blocks/tick)
+            if (this.movementSpeed > 0.005F) {
+                // Diagonal walking gait - right front moves with left rear
+                float walkCycle = state.ageInTicks * 0.5F; // Slightly faster cycle
+
+                // Scale animation by actual movement speed
+                float animationScale = Math.min(this.movementSpeed * 3.0F, 1.0F);
+
+                // Right front leg movement (OPPOSITE phase from left front) - increased amplitude
+                float rightFrontSwing = Mth.cos(walkCycle + (float)Math.PI) * 1.2F * animationScale;
+                frontLeg.xRot = rightFrontSwing * 0.7F;
+                frontLegTip.xRot = Math.max(0.0F, rightFrontSwing * 0.7F);
+                frontFoot.xRot = Math.min(0.0F, -rightFrontSwing * 0.5F);
+
+                // Right rear leg movement (OPPOSITE phase from left rear, SAME as right front) - increased amplitude
+                float rightRearSwing = Mth.cos(walkCycle + (float)Math.PI) * 0.9F * animationScale;
+                rearLeg.xRot = -0.15F + rightRearSwing * 0.5F;
+                rearLegTip.xRot = 0.25F + Math.max(0.0F, rightRearSwing * 0.6F);
+                rearFoot.xRot = -0.1F + Math.min(0.0F, -rightRearSwing * 0.4F);
+
+                if (state.ageInTicks % 40 == 0) {
+                    System.out.println("[MODEL-CLIENT] RIGHT SIDE walking - speed=" + String.format("%.3f", this.movementSpeed) +
+                        ", animScale=" + String.format("%.2f", animationScale));
+                }
+            } else {
+                // Standing still - neutral standing pose
+                frontLeg.xRot = 0.0F;
+                frontLegTip.xRot = 0.0F;
+                frontFoot.xRot = 0.0F;
+
+                rearLeg.xRot = -0.15F;
+                rearLegTip.xRot = 0.25F;
+                rearFoot.xRot = -0.1F;
+
+                if (state.ageInTicks % 40 == 0) {
+                    System.out.println("[MODEL-CLIENT] RIGHT SIDE standing still - speed=" + String.format("%.3f", this.movementSpeed));
+                }
+            }
+        } else {
+            // Flying pose - legs tucked back
+            frontLeg.xRot = 1.0F;
+            frontLegTip.xRot = 0.9F;
+            frontFoot.xRot = 0.6F;
+            rearLeg.xRot = 1.0F;
+            rearLegTip.xRot = 0.9F;
+            rearFoot.xRot = 0.7F;
+        }
     }
 }

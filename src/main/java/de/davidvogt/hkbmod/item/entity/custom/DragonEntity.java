@@ -2,6 +2,9 @@ package de.davidvogt.hkbmod.item.entity.custom;
 
 import de.davidvogt.hkbmod.item.entity.ai.DragonFlyingGoal;
 import de.davidvogt.hkbmod.item.entity.ai.DragonMoveControl;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -20,7 +23,15 @@ import net.minecraft.world.phys.Vec3;
  */
 public class DragonEntity extends Monster {
 
+    // Synced data accessors - these automatically sync to client
+    private static final EntityDataAccessor<Boolean> DATA_IS_LANDED =
+            SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_IS_LANDING_MODE =
+            SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
+
     private final DragonFlightHistory flightHistory = new DragonFlightHistory();
+    private int landedTimer = 0;
+    private int flyingTimer = 0;
 
     public DragonEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -28,6 +39,58 @@ public class DragonEntity extends Monster {
         this.setNoGravity(true);
         // Use custom move control that doesn't interfere with rotation
         this.moveControl = new DragonMoveControl(this);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_IS_LANDED, false);
+        builder.define(DATA_IS_LANDING_MODE, false);
+    }
+
+    public boolean isLanded() {
+        return this.entityData.get(DATA_IS_LANDED);
+    }
+
+    public void setLanded(boolean landed) {
+        boolean oldValue = this.entityData.get(DATA_IS_LANDED);
+        if (oldValue != landed && !this.level().isClientSide) {
+            System.out.println("[DRAGON] State change - isLanded: " + oldValue + " -> " + landed +
+                " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+        }
+        this.entityData.set(DATA_IS_LANDED, landed);
+    }
+
+    public boolean isLandingMode() {
+        return this.entityData.get(DATA_IS_LANDING_MODE);
+    }
+
+    public void setLandingMode(boolean landingMode) {
+        boolean oldValue = this.entityData.get(DATA_IS_LANDING_MODE);
+        if (oldValue != landingMode && !this.level().isClientSide) {
+            System.out.println("[DRAGON] State change - isLandingMode: " + oldValue + " -> " + landingMode +
+                " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+        }
+        this.entityData.set(DATA_IS_LANDING_MODE, landingMode);
+    }
+
+    public int getLandedTimer() {
+        return landedTimer;
+    }
+
+    public void setLandedTimer(int timer) {
+        if (!this.level().isClientSide && timer != this.landedTimer) {
+            System.out.println("[DRAGON] landedTimer set to: " + timer + " ticks (" + (timer / 20.0) + " seconds)");
+        }
+        this.landedTimer = timer;
+    }
+
+    public int getFlyingTimer() {
+        return flyingTimer;
+    }
+
+    public void setFlyingTimer(int timer) {
+        this.flyingTimer = timer;
     }
 
     @Override
@@ -58,7 +121,7 @@ public class DragonEntity extends Monster {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 100.0D)      // Less than Ender Dragon's 200
                 .add(Attributes.MOVEMENT_SPEED, 0.5D)    // Moderate speed
-                .add(Attributes.FLYING_SPEED, 0.6D)      // Fast flying speed
+                .add(Attributes.FLYING_SPEED, 4.5D)      // Fast flying speed
                 .add(Attributes.FOLLOW_RANGE, 64.0D)     // Can notice entities from far away
                 .add(Attributes.ATTACK_DAMAGE, 8.0D)     // Moderate damage if it attacks
                 .add(Attributes.ARMOR, 4.0D)             // Some protection
@@ -81,6 +144,23 @@ public class DragonEntity extends Monster {
     @Override
     public boolean fireImmune() {
         return true; // Dragons are immune to fire
+    }
+
+    /**
+     * Dragons don't take fall damage - they can land from any height
+     */
+    @Override
+    protected void checkFallDamage(double y, boolean onGround, net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos) {
+        // Don't call super - no fall damage for dragons
+        // Dragons can land from any height safely
+    }
+
+    /**
+     * Dragons can push through blocks when landing - prevents suffocation
+     */
+    @Override
+    public boolean isPushable() {
+        return false; // Can't be pushed by entities or blocks
     }
 
     /**
@@ -126,6 +206,19 @@ public class DragonEntity extends Monster {
         return 0.5F;
     }
 
+    /**
+     * Override die to log death for debugging
+     */
+    @Override
+    public void die(net.minecraft.world.damagesource.DamageSource source) {
+        if (!this.level().isClientSide) {
+            System.out.println("[DRAGON-DEATH] Dragon died from: " + source.getMsgId() +
+                " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()) +
+                ", State: isLanded=" + isLanded() + ", isLandingMode=" + isLandingMode());
+        }
+        super.die(source);
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -136,8 +229,11 @@ public class DragonEntity extends Monster {
 
         // Debug output every 20 ticks (once per second)
         if (this.tickCount % 20 == 0 && !this.level().isClientSide) {
-            System.out.println("Dragon Movement - X: " + deltaMovement.x + ", Z: " + deltaMovement.z + ", Speed: " + horizontalSpeed);
-            System.out.println("Dragon Rotation - Current Yaw: " + this.getYRot());
+            System.out.println("[DRAGON-TICK] State: isLanded=" + isLanded() + ", isLandingMode=" + isLandingMode() +
+                ", flyingTimer=" + flyingTimer + "/" + 400 + " (" + (flyingTimer / 20.0) + "s/" + (400 / 20.0) + "s)" +
+                ", landedTimer=" + landedTimer + "/" + 200 + " (" + (landedTimer / 20.0) + "s/" + (200 / 20.0) + "s)");
+            System.out.println("[DRAGON-TICK] Position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()) +
+                ", Speed: " + String.format("%.3f", horizontalSpeed) + ", NoGravity: " + this.isNoGravity());
         }
 
         if (horizontalSpeed > 0.001D) {

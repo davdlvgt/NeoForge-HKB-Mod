@@ -44,8 +44,38 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
         // The DragonFlightHistory tracks position history for smooth neck/tail animations
         renderState.flightHistory.copyFrom(entity.getFlightHistory());
 
+        // Pass movement speed to the model for walking animation
+        float movementSpeed = (float)Math.sqrt(entity.getDeltaMovement().x * entity.getDeltaMovement().x +
+            entity.getDeltaMovement().z * entity.getDeltaMovement().z);
+        this.model.setMovementSpeed(movementSpeed);
+
+        // Debug: Log movement speed every second when landed
+        if (entity.isLanded() && entity.tickCount % 20 == 0) {
+            System.out.println("[RENDERER] Setting movement speed: " + String.format("%.4f", movementSpeed) +
+                ", deltaX=" + String.format("%.4f", entity.getDeltaMovement().x) +
+                ", deltaZ=" + String.format("%.4f", entity.getDeltaMovement().z));
+        }
+
         // Set the flap time for wing animation based on entity age
-        renderState.flapTime = (entity.tickCount + partialTick) / 10.0F;
+        // Only fold wings when ACTUALLY LANDED, not during landing approach
+        if (entity.isLanded()) {
+            // Dragon is on the ground - fold wings
+            renderState.flapTime = 0.0F;
+            // Log every second (20 ticks) on client side
+            if (entity.tickCount % 20 == 0) {
+                System.out.println("[RENDERER-CLIENT] Dragon animation state: flapTime=0.0 (WINGS FOLDED), " +
+                    "isLanded=true, movementSpeed=" + String.format("%.3f", movementSpeed));
+            }
+        } else {
+            // Dragon is flying (includes landing approach) - keep wings flapping
+            renderState.flapTime = (entity.tickCount + partialTick) / 10.0F;
+            // Log every 5 seconds (100 ticks) during flight
+            if (entity.tickCount % 100 == 0) {
+                System.out.println("[RENDERER-CLIENT] Dragon animation state: flapTime=" +
+                    String.format("%.2f", renderState.flapTime) + " (WINGS FLAPPING), isLandingMode=" + entity.isLandingMode());
+            }
+        }
+
         this.dragonYaw = entity.getYRot();
     }
 
