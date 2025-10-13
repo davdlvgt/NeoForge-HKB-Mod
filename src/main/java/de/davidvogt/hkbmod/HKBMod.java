@@ -7,6 +7,7 @@ import de.davidvogt.hkbmod.block.entity.ModBlockEntities;
 import de.davidvogt.hkbmod.command.RecipeUnlockCommands;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
 import de.davidvogt.hkbmod.item.entity.custom.DeerEntity;
+import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.network.NetworkHandler;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
@@ -182,7 +183,8 @@ public class HKBMod {
      */
     private void registerEntityAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.DEER.get(), DeerEntity.createAttributes().build());
-        LOGGER.info("Registered deer entity attributes");
+        event.put(ModEntities.DRAGON.get(), DragonEntity.createAttributes().build());
+        LOGGER.info("Registered deer and dragon entity attributes");
     }
 
 }

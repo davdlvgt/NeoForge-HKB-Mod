@@ -2,6 +2,7 @@ package de.davidvogt.hkbmod.item.entity;
 
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.item.entity.custom.DeerEntity;
+import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import de.davidvogt.hkbmod.item.entity.custom.LongbowArrowEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -36,6 +37,18 @@ public class ModEntities {
                     .build(ResourceKey.create(
                             Registries.ENTITY_TYPE,
                             ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "deer"))
+                    ));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DragonEntity>> DRAGON =
+            ENTITY_TYPES.register("dragon", () -> EntityType.Builder.<DragonEntity>of(
+                            DragonEntity::new, MobCategory.MONSTER)
+                    .sized(2.5F, 1.5F)  // Width and height (scaled down from Ender Dragon's ~16x8)
+                    .clientTrackingRange(10)  // How far away clients can see this entity
+                    .updateInterval(3)  // How often to send updates to clients
+                    .fireImmune()  // Dragons are immune to fire damage
+                    .build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "dragon"))
                     ));
 
     public static void register(IEventBus eventBus) {

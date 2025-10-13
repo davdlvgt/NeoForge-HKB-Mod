@@ -3,7 +3,9 @@ package de.davidvogt.hkbmod;
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.client.ModKeyBindings;
 import de.davidvogt.hkbmod.client.model.DeerModel;
+import de.davidvogt.hkbmod.client.model.DragonModel;
 import de.davidvogt.hkbmod.client.renderer.entity.DeerRenderer;
+import de.davidvogt.hkbmod.client.renderer.entity.DragonRenderer;
 import de.davidvogt.hkbmod.client.screen.ResearchOverviewScreen;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
 import de.davidvogt.hkbmod.item.entity.renderer.LongbowArrowRenderer;
@@ -69,11 +71,13 @@ public class HKBModClient {
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.LONGBOW_ARROW.get(), LongbowArrowRenderer::new);
         event.registerEntityRenderer(ModEntities.DEER.get(), DeerRenderer::new);
+        event.registerEntityRenderer(ModEntities.DRAGON.get(), DragonRenderer::new);
     }
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(DeerModel.LAYER_LOCATION, DeerModel::createBodyLayer);
+        event.registerLayerDefinition(DragonModel.LAYER_LOCATION, DragonModel::createBodyLayer);
     }
 
     public static void onClientTick(ClientTickEvent.Post event) {
