@@ -23,6 +23,7 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
             ResourceLocation.withDefaultNamespace("textures/entity/enderdragon/dragon.png");
 
     private final DragonModel model;
+    private float dragonYaw;
 
     public DragonRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -45,6 +46,7 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
 
         // Set the flap time for wing animation based on entity age
         renderState.flapTime = (entity.tickCount + partialTick) / 10.0F;
+        this.dragonYaw = entity.getYRot();
     }
 
     @Override
@@ -60,6 +62,9 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
         // Scale down to 35% of the Ender Dragon's size
         float scale = 0.35F;
         poseStack.scale(scale, scale, scale);
+
+        // Drehe den Drachen um die aktuelle Yaw-Rotation
+        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(this.dragonYaw));
 
         // Setup the model animation
         this.model.setupAnim(renderState);

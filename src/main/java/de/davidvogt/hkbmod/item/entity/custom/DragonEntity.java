@@ -153,7 +153,8 @@ public class DragonEntity extends Monster {
 
             // Smooth rotation transition - use rotLerp to handle angle wrapping correctly
             float currentYaw = this.getYRot();
-            float newYaw = Mth.rotLerp(0.9F, currentYaw, targetYaw);
+            // Erhöhe den Interpolationsfaktor für schnellere Drehung
+            float newYaw = Mth.rotLerp(0.98F, currentYaw, targetYaw);
 
             // Set yaw rotation
             this.setYRot(newYaw);
