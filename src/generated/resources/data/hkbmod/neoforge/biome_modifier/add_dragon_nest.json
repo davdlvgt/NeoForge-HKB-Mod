@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "minecraft:stony_peaks",
+    "minecraft:frozen_peaks",
+    "minecraft:jagged_peaks"
+  ],
+  "features": "hkbmod:dragon_nest_placed",
+  "step": "surface_structures"
+}

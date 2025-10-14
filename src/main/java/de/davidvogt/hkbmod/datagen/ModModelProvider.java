@@ -15,8 +15,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.stream.Stream;
 
@@ -87,7 +85,10 @@ public class ModModelProvider extends ModelProvider {
 
     @Override
     protected Stream<? extends Holder<Block>> getKnownBlocks() {
-        return ModBlocks.BLOCKS.getEntries().stream().filter(x -> !x.is(ModBlocks.RESEARCH_TABLE) &&  !x.is(ModBlocks.RESEARCH_CRAFTING_TABLE));
+        return ModBlocks.BLOCKS.getEntries().stream().filter(
+                x -> !x.is(ModBlocks.RESEARCH_TABLE)
+                        && !x.is(ModBlocks.RESEARCH_CRAFTING_TABLE)
+                        && !x.is(ModBlocks.DRAGON_EGG));
     }
 
     @Override

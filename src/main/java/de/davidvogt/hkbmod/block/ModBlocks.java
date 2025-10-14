@@ -60,6 +60,11 @@ public class ModBlocks {
             Block::new
     );
 
+    public static final DeferredBlock<Block> DRAGON_EGG = registerBlock(
+            "dragon_egg",
+            (properties) -> new CustomDragonEggBlock(properties.noOcclusion())
+    );
+
     /*    public static final DeferredBlock<Block> ROBINIA_LOG = registerBlock("robinia_log",
                 (properties) -> new ModFlammableRotatedPillarBlock(
                         BlockBehaviour

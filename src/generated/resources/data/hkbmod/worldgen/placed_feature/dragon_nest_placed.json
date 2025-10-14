@@ -1,0 +1,12 @@
+{
+  "feature": "hkbmod:dragon_nest",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 2000
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

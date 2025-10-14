@@ -64,6 +64,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModBlocks.ELASTIC_WOOD.get(), "Elastic Wood");
 
         add(ModBlocks.DRAGON_NEST.get(), "Dragon Nest");
+        add(ModBlocks.DRAGON_EGG.get(), "Dragon Egg");
 
         // Advancements - Root
         add("advancements.hkbmod.root.title", "Research Classes");

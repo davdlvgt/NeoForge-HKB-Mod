@@ -2,6 +2,7 @@ package de.davidvogt.hkbmod.client.renderer.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.client.model.DragonModel;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRenderState> {
 
     private static final ResourceLocation ENDER_DRAGON_TEXTURE =
-            ResourceLocation.withDefaultNamespace("textures/entity/enderdragon/dragon.png");
+            ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "textures/entity/dragon.png");
 
     private final DragonModel model;
     private float dragonYaw;

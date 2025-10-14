@@ -117,6 +117,7 @@ public class HKBMod {
             event.accept(ModBlocks.TEST_LAMP.get());
             event.accept(ModBlocks.ELASTIC_WOOD.get());
             event.accept(ModBlocks.DRAGON_NEST.get());
+            event.accept(ModBlocks.DRAGON_EGG.get());
         } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(ModBlocks.RESEARCH_TABLE.get());
             event.accept(ModBlocks.RESEARCH_CRAFTING_TABLE.get());

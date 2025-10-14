@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-14T10:46:16.594482	Model Definitions - hkbmod
+// 1.21.8	2025-10-14T12:22:39.7114451	Model Definitions - hkbmod
 098162d3c53084529de99da150feb937cc6f06d1 assets/hkbmod/blockstates/custom_test_block.json
 7e4d1ea28b91fa33ba009f67bf41e33b4561e0d3 assets/hkbmod/blockstates/dragon_nest.json
 36c5d1a71329972be809a6b6d81bd92a5cc14576 assets/hkbmod/blockstates/elastic_wood.json
@@ -23,6 +23,7 @@ ee686ac4c0cb536ccfd29374afc863df03ac1ca4 assets/hkbmod/blockstates/test_lamp.jso
 3fd4829c7f1612a778dd43b101a096f2c858823c assets/hkbmod/items/custom_test_block.json
 6bffa850c63903b497b5c24f91e876bd39d6528a assets/hkbmod/items/deer_antlers.json
 831de1efb80be8f18e0297f0b60638832b9f76c2 assets/hkbmod/items/deer_beef.json
+0ee0be84856284cdfa53e2f214feaa41476d95f9 assets/hkbmod/items/dragon_egg.json
 5d4ef92a799d907b96e83b47b9876d132776b2a8 assets/hkbmod/items/dragon_nest.json
 dc745a78f41cd55c196213999cff6fc6a1456da4 assets/hkbmod/items/elastic_wood.json
 62a5437cf60ed977ee511eb1dcf0e6b54c94d89d assets/hkbmod/items/emerald_axe.json
