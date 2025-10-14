@@ -53,7 +53,11 @@ public class ModBlocks {
             (properties) -> new ResearchCraftingTableBlock(properties.noOcclusion().requiresCorrectToolForDrops()));
 
     public static final DeferredBlock<Block> DRAGON_NEST = registerBlock("dragon_nest",
-            (properties) -> new DragonNestBlock(properties.strength(5.0f).requiresCorrectToolForDrops().noOcclusion()));
+            (properties) -> new DragonNestBlock(properties
+                    .strength(50.0f, 1200.0f)  // Härte 50 (Obsidian hat 50), Explosionswiderstand 1200 (Obsidian hat 1200, Bedrock hat 3.6M)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()
+                    .sound(SoundType.STONE)));
 
     public static final DeferredBlock<Block> ELASTIC_WOOD = registerBlock(
             "elastic_wood",

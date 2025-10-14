@@ -1,5 +1,6 @@
 package de.davidvogt.hkbmod.item.entity.custom;
 
+import de.davidvogt.hkbmod.item.entity.ai.DefendNestGoal;
 import de.davidvogt.hkbmod.item.entity.ai.DragonFlyingGoal;
 import de.davidvogt.hkbmod.item.entity.ai.DragonMoveControl;
 import de.davidvogt.hkbmod.item.entity.ai.ReturnToNestGoal;
@@ -7,11 +8,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.boss.enderdragon.DragonFlightHistory;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
@@ -24,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * Custom Dragon entity that resembles a smaller version of the Ender Dragon.
  * This dragon spawns rarely on mountains and has neutral behavior by default.
  *
- * TODO: Implement fireball attack when the dragon is attacked by a player
+ * Dragons defend their nests by shooting explosive fireballs at players who approach within 30 blocks.
  */
 public class DragonEntity extends Monster {
 
@@ -132,8 +134,11 @@ public class DragonEntity extends Monster {
         // Priority 0: Return to nest when too far away or health is low (HIGHEST PRIORITY)
         this.goalSelector.addGoal(0, new ReturnToNestGoal(this));
 
-        // Priority 1: Custom flying behavior - handles all movement AND rotation
-        this.goalSelector.addGoal(1, new DragonFlyingGoal(this));
+        // Priority 1: Defend nest from nearby players
+        this.goalSelector.addGoal(1, new DefendNestGoal(this));
+
+        // Priority 2: Custom flying behavior - handles all movement AND rotation
+        this.goalSelector.addGoal(2, new DragonFlyingGoal(this));
 
         // Removed LookAtPlayerGoal - it was interfering with flight direction
         // The dragon should look where it's flying, not at players
@@ -141,6 +146,38 @@ public class DragonEntity extends Monster {
         // TODO: Add fireball attack goal when player attacks
         // this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         // Custom goal to shoot fireballs at attackers will be added here
+    }
+
+    /**
+     * Shoots an explosive fireball at the target
+     */
+    public void shootExplosiveFireball(LivingEntity target) {
+        if (this.level().isClientSide) {
+            return;
+        }
+
+        // Calculate direction to target
+        double dx = target.getX() - this.getX();
+        double dy = target.getY(0.5) - this.getY(0.5);
+        double dz = target.getZ() - this.getZ();
+
+        // Create a large fireball (like Ghast fireballs) with TNT-like explosion
+        ExplosiveFireballEntity fireball = new ExplosiveFireballEntity(this.level(), this, dx, dy, dz);
+
+        // Position the fireball in front of the dragon's mouth
+        Vec3 lookVec = this.getViewVector(1.0F);
+        double spawnDistance = 2.0;
+        fireball.setPos(
+            this.getX() + lookVec.x * spawnDistance,
+            this.getY(0.5) + 0.5,
+            this.getZ() + lookVec.z * spawnDistance
+        );
+
+        // Add the fireball to the world
+        this.level().addFreshEntity(fireball);
+
+        // Play fireball shooting sound
+        this.playSound(SoundEvents.GHAST_SHOOT, 1.0F, 1.0F);
     }
 
     /**
