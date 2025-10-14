@@ -15,7 +15,7 @@ import java.util.List;
  * When a player enters within 30 blocks of the nest, the dragon will shoot explosive fireballs.
  */
 public class DefendNestGoal extends Goal {
-    private static final double NEST_DEFENSE_RADIUS = 30.0D;
+    private static final double NEST_DEFENSE_RADIUS = 20.0D;
     private static final int FIREBALL_COOLDOWN = 40; // 2 seconds between fireballs
     private static final int CHECK_INTERVAL = 20; // Check for intruders every second
 
