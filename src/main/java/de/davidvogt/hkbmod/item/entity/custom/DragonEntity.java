@@ -2,6 +2,8 @@ package de.davidvogt.hkbmod.item.entity.custom;
 
 import de.davidvogt.hkbmod.item.entity.ai.DragonFlyingGoal;
 import de.davidvogt.hkbmod.item.entity.ai.DragonMoveControl;
+import de.davidvogt.hkbmod.item.entity.ai.ReturnToNestGoal;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -13,7 +15,10 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.boss.enderdragon.DragonFlightHistory;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Custom Dragon entity that resembles a smaller version of the Ender Dragon.
@@ -32,6 +37,10 @@ public class DragonEntity extends Monster {
     private final DragonFlightHistory flightHistory = new DragonFlightHistory();
     private int landedTimer = 0;
     private int flyingTimer = 0;
+
+    // Nest position tracking
+    @Nullable
+    private BlockPos nestPosition = null;
 
     public DragonEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -93,8 +102,36 @@ public class DragonEntity extends Monster {
         this.flyingTimer = timer;
     }
 
+    /**
+     * Sets the nest position for this dragon
+     */
+    public void setNestPosition(@Nullable BlockPos pos) {
+        this.nestPosition = pos;
+        if (!this.level().isClientSide && pos != null) {
+            System.out.println("[DRAGON] Nest position set to: " + pos.toShortString());
+        }
+    }
+
+    /**
+     * Gets the nest position for this dragon
+     */
+    @Nullable
+    public BlockPos getNestPosition() {
+        return this.nestPosition;
+    }
+
+    /**
+     * Checks if this dragon has a nest
+     */
+    public boolean hasNest() {
+        return this.nestPosition != null;
+    }
+
     @Override
     protected void registerGoals() {
+        // Priority 0: Return to nest when too far away or health is low (HIGHEST PRIORITY)
+        this.goalSelector.addGoal(0, new ReturnToNestGoal(this));
+
         // Priority 1: Custom flying behavior - handles all movement AND rotation
         this.goalSelector.addGoal(1, new DragonFlyingGoal(this));
 
@@ -266,5 +303,44 @@ public class DragonEntity extends Monster {
             float newPitch = Mth.rotLerp(0.9F, currentPitch, targetPitch);
             this.setXRot(newPitch);
         }
+    }
+
+    @Override
+    public void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+
+        // Save nest position
+        if (this.nestPosition != null) {
+            output.putInt("NestX", this.nestPosition.getX());
+            output.putInt("NestY", this.nestPosition.getY());
+            output.putInt("NestZ", this.nestPosition.getZ());
+            output.putBoolean("HasNest", true);
+        } else {
+            output.putBoolean("HasNest", false);
+        }
+
+        // Save timers
+        output.putInt("LandedTimer", this.landedTimer);
+        output.putInt("FlyingTimer", this.flyingTimer);
+    }
+
+    @Override
+    public void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+
+        // Load nest position
+        if (input.getBooleanOr("HasNest", false)) {
+            int x = input.getIntOr("NestX", 0);
+            int y = input.getIntOr("NestY", 0);
+            int z = input.getIntOr("NestZ", 0);
+            this.nestPosition = new BlockPos(x, y, z);
+            if (!this.level().isClientSide) {
+                System.out.println("[DRAGON] Loaded nest position: " + this.nestPosition.toShortString());
+            }
+        }
+
+        // Load timers
+        this.landedTimer = input.getIntOr("LandedTimer", 0);
+        this.flyingTimer = input.getIntOr("FlyingTimer", 0);
     }
 }

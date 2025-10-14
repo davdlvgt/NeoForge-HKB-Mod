@@ -56,6 +56,8 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
         this.dropSelf(ModBlocks.ELASTIC_WOOD.get());
 
+        this.dropSelf(ModBlocks.DRAGON_NEST.get());
+
         add(ModBlocks.ROBINIA_DOOR.get(),
                 block -> createDoorTable(ModBlocks.ROBINIA_DOOR.get()));
 

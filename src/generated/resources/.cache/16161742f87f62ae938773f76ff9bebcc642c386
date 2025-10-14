@@ -1,5 +1,6 @@
-// 1.21.8	2025-10-12T13:46:19.2258628	Model Definitions - hkbmod
+// 1.21.8	2025-10-14T10:46:16.594482	Model Definitions - hkbmod
 098162d3c53084529de99da150feb937cc6f06d1 assets/hkbmod/blockstates/custom_test_block.json
+7e4d1ea28b91fa33ba009f67bf41e33b4561e0d3 assets/hkbmod/blockstates/dragon_nest.json
 36c5d1a71329972be809a6b6d81bd92a5cc14576 assets/hkbmod/blockstates/elastic_wood.json
 92c0371b1d3e88a3d0afec49941ed8054a363697 assets/hkbmod/blockstates/robinia_button.json
 fb4f1073c1746f54f583e54b57f3631394d9bdcc assets/hkbmod/blockstates/robinia_door.json
@@ -22,6 +23,7 @@ ee686ac4c0cb536ccfd29374afc863df03ac1ca4 assets/hkbmod/blockstates/test_lamp.jso
 3fd4829c7f1612a778dd43b101a096f2c858823c assets/hkbmod/items/custom_test_block.json
 6bffa850c63903b497b5c24f91e876bd39d6528a assets/hkbmod/items/deer_antlers.json
 831de1efb80be8f18e0297f0b60638832b9f76c2 assets/hkbmod/items/deer_beef.json
+5d4ef92a799d907b96e83b47b9876d132776b2a8 assets/hkbmod/items/dragon_nest.json
 dc745a78f41cd55c196213999cff6fc6a1456da4 assets/hkbmod/items/elastic_wood.json
 62a5437cf60ed977ee511eb1dcf0e6b54c94d89d assets/hkbmod/items/emerald_axe.json
 8ca5ac8be867dc898aaee3ce3527b0c182f2ba15 assets/hkbmod/items/emerald_hoe.json
@@ -55,6 +57,7 @@ d896e85bd3eff5e30c32d607a692ae11e0e1fb0b assets/hkbmod/items/stripped_robinia_wo
 8e7873220eaa5e8c5629664a8e669debfc56f673 assets/hkbmod/items/test_lamp.json
 b55ed1343ff01e87d19e335146c22bdd2eb2e122 assets/hkbmod/items/time_setter.json
 2c351e768f7c02fc1ca66dd6e6d3bec33fe1af61 assets/hkbmod/models/block/custom_test_block.json
+5c87df8412c58123dcf0fc4a8aa20a0ed0a92716 assets/hkbmod/models/block/dragon_nest.json
 1b2d0c299d44d23d8ba305187adcfa2b906ce021 assets/hkbmod/models/block/elastic_wood.json
 10410b7021a6837c8e30f66ba509b6c99b84eaf7 assets/hkbmod/models/block/robinia_button.json
 0ab4e8a32c3bdf79d3ed77a60bb43e9e45343a65 assets/hkbmod/models/block/robinia_button_inventory.json

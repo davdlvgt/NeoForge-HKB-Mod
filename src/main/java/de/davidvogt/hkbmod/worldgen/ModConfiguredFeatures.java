@@ -2,6 +2,7 @@ package de.davidvogt.hkbmod.worldgen;
 
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.block.ModBlocks;
+import de.davidvogt.hkbmod.worldgen.ModFeatures;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
@@ -10,6 +11,7 @@ import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
@@ -21,8 +23,11 @@ public class ModConfiguredFeatures {
     // Configure Feature -> Placed Feature -> Biome Modifier
 
     public static final ResourceKey<ConfiguredFeature<?, ?>> ROBINIA_KEY = registerKey("robinia");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> DRAGON_NEST_KEY = registerKey("dragon_nest");
 
     public static void bootstrap(BootstrapContext<ConfiguredFeature<?, ?>> context) {
+
+        register(context, DRAGON_NEST_KEY, ModFeatures.DRAGON_NEST.get(), new NoneFeatureConfiguration());
 
         register(context, ROBINIA_KEY, Feature.TREE, new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider.simple(ModBlocks.ROBINIA_LOG.get()),

@@ -16,6 +16,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 public class ModBiomeModifiers {
 
     public static final ResourceKey<BiomeModifier> ADD_TREE_ROBINIA = registerKey("add_tree_robinia");
+    public static final ResourceKey<BiomeModifier> ADD_DRAGON_NEST = registerKey("add_dragon_nest");
 
     public static void bootstrap(BootstrapContext<BiomeModifier> context) {
         var placedFeatures = context.lookup(Registries.PLACED_FEATURE);
@@ -25,6 +26,16 @@ public class ModBiomeModifiers {
                 HolderSet.direct(biomes.getOrThrow(Biomes.PLAINS), biomes.getOrThrow(Biomes.FOREST)),
                 HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.ROBINIA_PLACED_KEY)),
                 GenerationStep.Decoration.VEGETAL_DECORATION));
+
+        // Dragon nests on mountain peaks
+        context.register(ADD_DRAGON_NEST, new BiomeModifiers.AddFeaturesBiomeModifier(
+                HolderSet.direct(
+                        biomes.getOrThrow(Biomes.STONY_PEAKS),
+                        biomes.getOrThrow(Biomes.FROZEN_PEAKS),
+                        biomes.getOrThrow(Biomes.JAGGED_PEAKS)
+                ),
+                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.DRAGON_NEST_PLACED_KEY)),
+                GenerationStep.Decoration.SURFACE_STRUCTURES));
     }
 
     private static ResourceKey<BiomeModifier> registerKey(String name) {

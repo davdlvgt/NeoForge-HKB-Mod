@@ -576,18 +576,69 @@ public class DragonFlyingGoal extends Goal {
     }
 
     private void pickNewTarget() {
-        // Pick a point in front of the dragon in a random direction
         double currentX = dragon.getX();
         double currentZ = dragon.getZ();
 
-        // Random angle for turning
+        // If dragon has a nest, bias targets towards nest area
+        if (dragon.hasNest()) {
+            BlockPos nestPos = dragon.getNestPosition();
+            if (nestPos != null) {
+                double distanceToNest = Math.sqrt(
+                    Math.pow(nestPos.getX() - currentX, 2) +
+                    Math.pow(nestPos.getZ() - currentZ, 2)
+                );
+
+                // If far from nest (>100 blocks), pick targets closer to nest
+                if (distanceToNest > 100.0D) {
+                    // Pick a point between current position and nest
+                    double towardsNestX = nestPos.getX() - currentX;
+                    double towardsNestZ = nestPos.getZ() - currentZ;
+                    double angle = Math.atan2(towardsNestZ, towardsNestX);
+
+                    // Add some randomness (±45 degrees)
+                    angle += (dragon.getRandom().nextDouble() - 0.5) * Math.PI / 2.0;
+
+                    double distance = 30.0D + dragon.getRandom().nextDouble() * 40.0D;
+                    targetX = currentX + Math.cos(angle) * distance;
+                    targetZ = currentZ + Math.sin(angle) * distance;
+
+                    if (!dragon.level().isClientSide) {
+                        System.out.println("[FLYING-GOAL] Far from nest, picking target towards nest");
+                    }
+                } else {
+                    // Normal random target, but keep it within nest area
+                    double angle = dragon.getRandom().nextDouble() * Math.PI * 2.0;
+                    double distance = 30.0D + dragon.getRandom().nextDouble() * 40.0D;
+
+                    targetX = currentX + Math.cos(angle) * distance;
+                    targetZ = currentZ + Math.sin(angle) * distance;
+
+                    // Clamp to nest radius (max 120 blocks from nest)
+                    double newDistToNest = Math.sqrt(
+                        Math.pow(nestPos.getX() - targetX, 2) +
+                        Math.pow(nestPos.getZ() - targetZ, 2)
+                    );
+
+                    if (newDistToNest > 120.0D) {
+                        // Pull target back towards nest
+                        double scale = 120.0D / newDistToNest;
+                        targetX = nestPos.getX() + (targetX - nestPos.getX()) * scale;
+                        targetZ = nestPos.getZ() + (targetZ - nestPos.getZ()) * scale;
+                    }
+                }
+
+                // Pick height between 140 and 180
+                targetY = 140.0D + dragon.getRandom().nextDouble() * 40.0D;
+                return;
+            }
+        }
+
+        // No nest or nest-less behavior: completely random
         double angle = dragon.getRandom().nextDouble() * Math.PI * 2.0;
-        double distance = 30.0D + dragon.getRandom().nextDouble() * 40.0D; // 30-70 blocks away
+        double distance = 30.0D + dragon.getRandom().nextDouble() * 40.0D;
 
         targetX = currentX + Math.cos(angle) * distance;
         targetZ = currentZ + Math.sin(angle) * distance;
-
-        // Pick height between 140 and 180
         targetY = 140.0D + dragon.getRandom().nextDouble() * 40.0D;
     }
 

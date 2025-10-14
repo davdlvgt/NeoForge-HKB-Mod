@@ -18,6 +18,7 @@ import de.davidvogt.hkbmod.registry.ModCreativeTabs;
 import de.davidvogt.hkbmod.research.PlayerResearchData;
 import de.davidvogt.hkbmod.research.ResearchManager;
 import de.davidvogt.hkbmod.screen.ModMenuTypes;
+import de.davidvogt.hkbmod.worldgen.ModFeatures;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -71,6 +72,7 @@ public class HKBMod {
         ModAttachments.register(modEventBus);
         ModEntities.register(modEventBus);
         ModRecipeTypes.register(modEventBus);
+        ModFeatures.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -114,6 +116,7 @@ public class HKBMod {
             event.accept(ModBlocks.CUSTOM_TEST_BLOCK.get());
             event.accept(ModBlocks.TEST_LAMP.get());
             event.accept(ModBlocks.ELASTIC_WOOD.get());
+            event.accept(ModBlocks.DRAGON_NEST.get());
         } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(ModBlocks.RESEARCH_TABLE.get());
             event.accept(ModBlocks.RESEARCH_CRAFTING_TABLE.get());

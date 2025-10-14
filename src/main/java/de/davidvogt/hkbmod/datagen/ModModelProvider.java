@@ -81,6 +81,8 @@ public class ModModelProvider extends ModelProvider {
                 .trapdoor(ModBlocks.ROBINIA_TRAPDOOR.get());
 
         blockModels.createTrivialCube(ModBlocks.ELASTIC_WOOD.get()); // One texture for all sides
+
+        blockModels.createTrivialCube(ModBlocks.DRAGON_NEST.get());
     }
 
     @Override

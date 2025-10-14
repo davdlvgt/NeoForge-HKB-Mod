@@ -52,6 +52,8 @@ public class ModBlocks {
     public static final DeferredBlock<Block> RESEARCH_CRAFTING_TABLE = registerBlock("research_crafting_table",
             (properties) -> new ResearchCraftingTableBlock(properties.noOcclusion().requiresCorrectToolForDrops()));
 
+    public static final DeferredBlock<Block> DRAGON_NEST = registerBlock("dragon_nest",
+            (properties) -> new DragonNestBlock(properties.strength(5.0f).requiresCorrectToolForDrops().noOcclusion()));
 
     public static final DeferredBlock<Block> ELASTIC_WOOD = registerBlock(
             "elastic_wood",

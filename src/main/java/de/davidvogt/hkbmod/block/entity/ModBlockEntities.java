@@ -29,6 +29,14 @@ public class ModBlockEntities {
                     )
             );
 
+    public static final Supplier<BlockEntityType<DragonNestBlockEntity>> DRAGON_NEST_BE =
+            BLOCK_ENTITIES.register("dragon_nest_be",
+                    () -> new BlockEntityType<>(
+                            DragonNestBlockEntity::new,
+                            ModBlocks.DRAGON_NEST.get()
+                    )
+            );
+
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);
     }
