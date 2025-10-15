@@ -36,9 +36,15 @@ public class ModPlacedFeatures {
 
         register(context, ROBINIA_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.ROBINIA_KEY), modifiers);
 
-        // Dragon Nest - Very rare on mountain peaks
+        // ========================================
+        // DRAGON NEST SPAWN-RATE / SELTENHEIT
+        // ========================================
+        // HIER WIRD DIE SELTENHEIT BESTIMMT!
+        // - RarityFilter.onAverageOnceEvery(2) = 1 Nest pro 2 Chunks (EXTREM HÄUFIG für Testing)
+        // - Für normale Spielwelt empfohlen: onAverageOnceEvery(500) bis onAverageOnceEvery(2000)
+        // ========================================
         List<PlacementModifier> dragonNestModifiers = new java.util.ArrayList<>();
-        dragonNestModifiers.add(RarityFilter.onAverageOnceEvery(2000)); // Very rare: 1 per 2000 chunks
+        dragonNestModifiers.add(RarityFilter.onAverageOnceEvery(64)); // <-- SELTENHEIT HIER ÄNDERN!
         dragonNestModifiers.add(BiomeFilter.biome());
 
         register(context, DRAGON_NEST_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.DRAGON_NEST_KEY), dragonNestModifiers);

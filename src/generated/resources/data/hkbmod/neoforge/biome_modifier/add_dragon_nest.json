@@ -3,7 +3,13 @@
   "biomes": [
     "minecraft:stony_peaks",
     "minecraft:frozen_peaks",
-    "minecraft:jagged_peaks"
+    "minecraft:jagged_peaks",
+    "minecraft:windswept_hills",
+    "minecraft:windswept_gravelly_hills",
+    "minecraft:windswept_forest",
+    "minecraft:meadow",
+    "minecraft:grove",
+    "minecraft:snowy_slopes"
   ],
   "features": "hkbmod:dragon_nest_placed",
   "step": "surface_structures"

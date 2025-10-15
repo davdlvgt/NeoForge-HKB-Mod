@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import de.davidvogt.hkbmod.attachment.ModAttachments;
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.block.entity.ModBlockEntities;
+import de.davidvogt.hkbmod.command.LocateDragonNestCommand;
 import de.davidvogt.hkbmod.command.RecipeUnlockCommands;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
 import de.davidvogt.hkbmod.item.entity.custom.DeerEntity;
@@ -179,7 +180,8 @@ public class HKBMod {
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         RecipeUnlockCommands.register(event.getDispatcher());
-        LOGGER.info("Registered HKB recipe unlock commands");
+        LocateDragonNestCommand.register(event.getDispatcher());
+        LOGGER.info("Registered HKB recipe unlock commands and locate dragon nest command");
     }
 
     /**

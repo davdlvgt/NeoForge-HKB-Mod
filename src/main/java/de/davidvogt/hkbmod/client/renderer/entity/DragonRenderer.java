@@ -50,11 +50,15 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
             entity.getDeltaMovement().z * entity.getDeltaMovement().z);
         this.model.setMovementSpeed(movementSpeed);
 
+        // Pass resting state to the model
+        this.model.setResting(entity.isResting());
+
         // Debug: Log movement speed every second when landed
         if (entity.isLanded() && entity.tickCount % 20 == 0) {
             System.out.println("[RENDERER] Setting movement speed: " + String.format("%.4f", movementSpeed) +
                 ", deltaX=" + String.format("%.4f", entity.getDeltaMovement().x) +
-                ", deltaZ=" + String.format("%.4f", entity.getDeltaMovement().z));
+                ", deltaZ=" + String.format("%.4f", entity.getDeltaMovement().z) +
+                ", isResting=" + entity.isResting());
         }
 
         // Set the flap time for wing animation based on entity age

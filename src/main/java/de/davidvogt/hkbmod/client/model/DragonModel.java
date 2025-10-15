@@ -44,12 +44,21 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
 
     // Track movement speed for walking animation
     private float movementSpeed = 0.0F;
+    // Track resting state from entity
+    private boolean isResting = false;
 
     /**
      * Sets the movement speed for the dragon, used to control walking animation
      */
     public void setMovementSpeed(float speed) {
         this.movementSpeed = speed;
+    }
+
+    /**
+     * Sets the resting state for the dragon, used to control sleeping animation
+     */
+    public void setResting(boolean resting) {
+        this.isResting = resting;
     }
 
     public DragonModel(ModelPart root) {
@@ -213,7 +222,111 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         // Check if dragon is landed (flapTime is 0 or very small when landed)
         boolean isLanded = state.flapTime < 0.01F;
 
-        if (isLanded) {
+        // Use the actual resting state passed from the entity
+        // Dragon only rests when on a DRAGON_NEST block (enforced by DragonRestGoal)
+        boolean isRestingNow = this.isResting;
+
+        if (isRestingNow) {
+            // ===== RESTING/SLEEPING ANIMATION =====
+            // Only triggered when dragon is actually resting on nest
+            // Flügel wie beim Laufen (gefaltet an der Seite)
+            this.leftWing.xRot = 0.2F;
+            this.leftWing.yRot = -0.5F;
+            this.leftWing.zRot = 0.6F;      // Gefaltet
+
+            this.leftWingTip.xRot = 0.0F;
+            this.leftWingTip.yRot = -0.5F;
+            this.leftWingTip.zRot = 0.8F;
+
+            this.rightWing.xRot = 0.2F;
+            this.rightWing.yRot = 0.5F;
+            this.rightWing.zRot = -0.6F;
+
+            this.rightWingTip.xRot = 0.0F;
+            this.rightWingTip.yRot = 0.5F;
+            this.rightWingTip.zRot = -0.8F;
+
+            // Beine wie beim Fliegen (eingeklappt)
+            // Vorderbeine
+            this.leftFrontLeg.xRot = 1.0F;
+            this.leftFrontLegTip.xRot = 0.9F;
+            this.leftFrontFoot.xRot = 0.6F;
+
+            this.rightFrontLeg.xRot = 1.0F;
+            this.rightFrontLegTip.xRot = 0.9F;
+            this.rightFrontFoot.xRot = 0.6F;
+
+            // Hinterbeine
+            this.leftRearLeg.xRot = 1.0F;
+            this.leftRearLegTip.xRot = 0.9F;
+            this.leftRearFoot.xRot = 0.7F;
+
+            this.rightRearLeg.xRot = 1.0F;
+            this.rightRearLegTip.xRot = 0.9F;
+            this.rightRearFoot.xRot = 0.7F;
+
+            // Körper leicht nach unten geneigt
+            this.body.xRot = 0.1F;
+            this.body.yRot = 0.0F;
+            this.body.zRot = 0.0F;
+
+            // Kiefer leicht geöffnet (entspannt)
+            this.jaw.xRot = 0.05F;
+
+            // Schwanz gekrümmt um den Körper beim Schlafen
+            float tailBaseY = tailParts[0].y;
+            float tailBaseZ = tailParts[0].z;
+            float tailBaseX = tailParts[0].x;
+
+            for (int i = 0; i < TAIL_PART_COUNT; i++) {
+                ModelPart tailSegment = tailParts[i];
+                float curveFactor = (i + 1) / (float)TAIL_PART_COUNT;
+
+                tailSegment.yRot = (180.0F + curveFactor * 120.0F) * ((float)Math.PI / 180F);
+                tailSegment.xRot = 0.05F + curveFactor * 0.25F;  // Nach unten gekrümmt (positiv)
+                tailSegment.zRot = curveFactor * 0.2F;
+
+                tailSegment.x = tailBaseX;
+                tailSegment.y = tailBaseY;
+                tailSegment.z = tailBaseZ;
+
+                tailBaseY += Mth.sin(tailSegment.xRot) * 10.0F;
+                tailBaseZ -= Mth.cos(tailSegment.yRot) * Mth.cos(tailSegment.xRot) * 10.0F;
+                tailBaseX -= Mth.sin(tailSegment.yRot) * Mth.cos(tailSegment.xRot) * 10.0F;
+            }
+
+            // Hals und Kopf gekrümmt nach unten beim Schlafen
+            float neckBaseX = neckParts[0].x;
+            float neckBaseY = neckParts[0].y;
+            float neckBaseZ = neckParts[0].z;
+
+            for (int i = 0; i < NECK_PART_COUNT; i++) {
+                ModelPart neckSegment = neckParts[i];
+                float neckCurveFactor = (i + 1) / (float)NECK_PART_COUNT;
+
+                // Hals krümmt sich zur Seite mit leichter Abwärtsneigung
+                neckSegment.xRot = 0.05F + neckCurveFactor * 0.1F;  // Minimale vertikale Neigung
+                neckSegment.yRot = -neckCurveFactor * 0.8F;  // Stark zur Seite geneigt
+                neckSegment.zRot = 0.0F;
+
+                neckSegment.x = neckBaseX;
+                neckSegment.y = neckBaseY;
+                neckSegment.z = neckBaseZ;
+
+                neckBaseX -= Mth.sin(neckSegment.yRot) * Mth.cos(neckSegment.xRot) * 10.0F;
+                neckBaseY += Mth.sin(neckSegment.xRot) * 10.0F;
+                neckBaseZ -= Mth.cos(neckSegment.yRot) * Mth.cos(neckSegment.xRot) * 10.0F;
+            }
+
+            // Kopf liegt entspannt zur Seite geneigt
+            this.head.x = neckBaseX;
+            this.head.y = neckBaseY;
+            this.head.z = neckBaseZ;
+            this.head.xRot = 0.15F;  // Minimale Abwärtsneigung
+            this.head.yRot = -0.8F;  // Stark zur Seite gedreht
+            this.head.zRot = 0.0F;
+
+        } else if (isLanded) {
             // Wings folded tightly against body when landed
             // The wings should fold back along the dragon's sides
             this.leftWing.xRot = 0.2F;      // Slight upward tilt
@@ -246,98 +359,99 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
             this.rightWing.zRot = -leftWing.zRot;
             this.rightWingTip.zRot = -leftWingTip.zRot;
         }
-// Positionierung und Animation von Hals
-        DragonFlightHistory.Sample neckBase = state.getHistoricalPos(6);
-        float headYawOffset = Mth.wrapDegrees(state.getHistoricalPos(5).yRot() - state.getHistoricalPos(10).yRot());
-        float headYawAvg = Mth.wrapDegrees(state.getHistoricalPos(5).yRot() + headYawOffset / 2.0F);
 
-        float x = neckParts[0].x;
-        float y = neckParts[0].y;
-        float z = neckParts[0].z;
-        float flapOffset;
+        // Nur Hals/Kopf/Schwanz animieren wenn NICHT resting
+        if (!isRestingNow) {
+            // Positionierung und Animation von Hals
+            DragonFlightHistory.Sample neckBase = state.getHistoricalPos(6);
+            float headYawOffset = Mth.wrapDegrees(state.getHistoricalPos(5).yRot() - state.getHistoricalPos(10).yRot());
+            float headYawAvg = Mth.wrapDegrees(state.getHistoricalPos(5).yRot() + headYawOffset / 2.0F);
 
-        // Add head bobbing when landed and walking
-        float headBob = 0.0F;
-        if (isLanded && this.movementSpeed > 0.005F) {
-            // Head bobs up and down while walking
-            headBob = Mth.sin(state.ageInTicks * 0.2F) * 0.15F;
-        }
+            float x = neckParts[0].x;
+            float y = neckParts[0].y;
+            float z = neckParts[0].z;
+            float flapOffset;
 
-        for (int i = 0; i < NECK_PART_COUNT; i++) {
-            ModelPart neck = neckParts[i];
-            DragonFlightHistory.Sample sample = state.getHistoricalPos(5 - i);
-            flapOffset = Mth.cos(i * 0.45F + flap) * 0.15F;
-            neck.yRot = Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * ((float)Math.PI / 180F) * 1.5F;
-            neck.xRot = flapOffset + headBob + state.getHeadPartYOffset(i, neckBase, sample) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
-            neck.zRot = -Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
-            neck.x = x;
-            neck.y = y;
-            neck.z = z;
-
-            x -= Mth.sin(neck.yRot) * Mth.cos(neck.xRot) * 10.0F;
-            y += Mth.sin(neck.xRot) * 10.0F;
-            z -= Mth.cos(neck.yRot) * Mth.cos(neck.xRot) * 10.0F;
-        }
-
-        head.x = x;
-        head.y = y;
-        head.z = z;
-        DragonFlightHistory.Sample headSample = state.getHistoricalPos(0);
-        head.yRot = Mth.wrapDegrees(headSample.yRot() - neckBase.yRot()) * ((float)Math.PI / 180F);
-        head.xRot = headBob + Mth.wrapDegrees(state.getHeadPartYOffset(6, neckBase, headSample)) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
-        head.zRot = -Mth.wrapDegrees(headSample.yRot() - headYawAvg) * ((float)Math.PI / 180F);
-
-// Drehung des Körpers
-        body.zRot = -headYawOffset * 1.5F * ((float)Math.PI / 180F);
-
-// Beine posieren - each side needs separate animation
-        poseLimbsLeft(state, flap, leftFrontLeg, leftFrontLegTip, leftFrontFoot, leftRearLeg, leftRearLegTip, leftRearFoot);
-        poseLimbsRight(state, flap, rightFrontLeg, rightFrontLegTip, rightFrontFoot, rightRearLeg, rightRearLegTip, rightRearFoot);
-
-// Schwanzanimation
-        float tailSwing = 0.0F;
-        y = tailParts[0].y;
-        z = tailParts[0].z;
-        x = tailParts[0].x;
-        neckBase = state.getHistoricalPos(11);
-
-        // Add tail swaying left-right when landed
-        float tailSway = 0.0F;
-        if (isLanded) {
-            // Tail sways side to side when standing or walking
-            tailSway = Mth.sin(state.ageInTicks * 0.08F) * 0.3F;
-        }
-
-        for (int j = 0; j < TAIL_PART_COUNT; j++) {
-            DragonFlightHistory.Sample sample = state.getHistoricalPos(12 + j);
-            tailSwing += Mth.sin(j * 0.45F + flap) * 0.05F;
-            ModelPart tail = tailParts[j];
-
-            if (isLanded) {
-                // When landed, use swaying animation instead of flight history
-                // Progressive sway - each segment sways more than the previous one
-                float segmentSway = tailSway * (j + 1) / (float)TAIL_PART_COUNT;
-                tail.yRot = segmentSway + 180.0F * ((float)Math.PI / 180F);
-                tail.xRot = tailSwing * 0.2F; // Minimal vertical movement
-                tail.zRot = 0.0F;
-            } else {
-                // Flying animation (original)
-                tail.yRot = (Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * 1.5F + 180.0F) * ((float)Math.PI / 180F);
-                tail.xRot = tailSwing + (float)(sample.y() - neckBase.y()) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
-                tail.zRot = Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
+            // Add head bobbing when landed and walking
+            float headBob = 0.0F;
+            if (isLanded && this.movementSpeed > 0.005F) {
+                // Head bobs up and down while walking
+                headBob = Mth.sin(state.ageInTicks * 0.2F) * 0.15F;
             }
 
-            tail.x = x;
-            tail.y = y;
-            tail.z = z;
+            for (int i = 0; i < NECK_PART_COUNT; i++) {
+                ModelPart neck = neckParts[i];
+                DragonFlightHistory.Sample sample = state.getHistoricalPos(5 - i);
+                flapOffset = Mth.cos(i * 0.45F + flap) * 0.15F;
+                neck.yRot = Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * ((float)Math.PI / 180F) * 1.5F;
+                neck.xRot = flapOffset + headBob + state.getHeadPartYOffset(i, neckBase, sample) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
+                neck.zRot = -Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
+                neck.x = x;
+                neck.y = y;
+                neck.z = z;
 
-            y += Mth.sin(tail.xRot) * 10.0F;
-            z -= Mth.cos(tail.yRot) * Mth.cos(tail.xRot) * 10.0F;
-            x -= Mth.sin(tail.yRot) * Mth.cos(tail.xRot) * 10.0F;
+                x -= Mth.sin(neck.yRot) * Mth.cos(neck.xRot) * 10.0F;
+                y += Mth.sin(neck.xRot) * 10.0F;
+                z -= Mth.cos(neck.yRot) * Mth.cos(neck.xRot) * 10.0F;
+            }
+
+            head.x = x;
+            head.y = y;
+            head.z = z;
+            DragonFlightHistory.Sample headSample = state.getHistoricalPos(0);
+            head.yRot = Mth.wrapDegrees(headSample.yRot() - neckBase.yRot()) * ((float)Math.PI / 180F);
+            head.xRot = headBob + Mth.wrapDegrees(state.getHeadPartYOffset(6, neckBase, headSample)) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
+            head.zRot = -Mth.wrapDegrees(headSample.yRot() - headYawAvg) * ((float)Math.PI / 180F);
+
+            // Drehung des Körpers
+            body.zRot = -headYawOffset * 1.5F * ((float)Math.PI / 180F);
+
+            // Beine posieren - each side needs separate animation
+            poseLimbsLeft(state, flap, leftFrontLeg, leftFrontLegTip, leftFrontFoot, leftRearLeg, leftRearLegTip, leftRearFoot);
+            poseLimbsRight(state, flap, rightFrontLeg, rightFrontLegTip, rightFrontFoot, rightRearLeg, rightRearLegTip, rightRearFoot);
+
+            // Schwanzanimation
+            float tailSwing = 0.0F;
+            y = tailParts[0].y;
+            z = tailParts[0].z;
+            x = tailParts[0].x;
+            neckBase = state.getHistoricalPos(11);
+
+            // Add tail swaying left-right when landed
+            float tailSway = 0.0F;
+            if (isLanded) {
+                // Tail sways side to side when standing or walking
+                tailSway = Mth.sin(state.ageInTicks * 0.08F) * 0.3F;
+            }
+
+            for (int j = 0; j < TAIL_PART_COUNT; j++) {
+                DragonFlightHistory.Sample sample = state.getHistoricalPos(12 + j);
+                tailSwing += Mth.sin(j * 0.45F + flap) * 0.05F;
+                ModelPart tail = tailParts[j];
+
+                if (isLanded) {
+                    // When landed, use swaying animation instead of flight history
+                    // Progressive sway - each segment sways more than the previous one
+                    float segmentSway = tailSway * (j + 1) / (float)TAIL_PART_COUNT;
+                    tail.yRot = segmentSway + 180.0F * ((float)Math.PI / 180F);
+                    tail.xRot = tailSwing * 0.2F; // Minimal vertical movement
+                    tail.zRot = 0.0F;
+                } else {
+                    // Flying animation (original)
+                    tail.yRot = (Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * 1.5F + 180.0F) * ((float)Math.PI / 180F);
+                    tail.xRot = tailSwing + (float)(sample.y() - neckBase.y()) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
+                    tail.zRot = Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
+                }
+
+                tail.x = x;
+                tail.y = y;
+                tail.z = z;
+
+                y += Mth.sin(tail.xRot) * 10.0F;
+                z -= Mth.cos(tail.yRot) * Mth.cos(tail.xRot) * 10.0F;
+                x -= Mth.sin(tail.yRot) * Mth.cos(tail.xRot) * 10.0F;
+            }
         }
-
-        // Hals- und Schwanzbewegung nach EnderDragonLogik
-        // (Hier könntest du die restlichen Animationen genau wie im Original übernehmen)
     }
 
     /**

@@ -3,6 +3,7 @@ package de.davidvogt.hkbmod.item.entity.custom;
 import de.davidvogt.hkbmod.item.entity.ai.DefendNestGoal;
 import de.davidvogt.hkbmod.item.entity.ai.DragonFlyingGoal;
 import de.davidvogt.hkbmod.item.entity.ai.DragonMoveControl;
+import de.davidvogt.hkbmod.item.entity.ai.DragonRestGoal;
 import de.davidvogt.hkbmod.item.entity.ai.ReturnToNestGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -35,10 +36,13 @@ public class DragonEntity extends Monster {
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_LANDING_MODE =
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_IS_RESTING =
+            SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
 
     private final DragonFlightHistory flightHistory = new DragonFlightHistory();
     private int landedTimer = 0;
     private int flyingTimer = 0;
+    private int restingTimer = 0;
 
     // Nest position tracking
     @Nullable
@@ -57,6 +61,7 @@ public class DragonEntity extends Monster {
         super.defineSynchedData(builder);
         builder.define(DATA_IS_LANDED, false);
         builder.define(DATA_IS_LANDING_MODE, false);
+        builder.define(DATA_IS_RESTING, false);
     }
 
     public boolean isLanded() {
@@ -83,6 +88,32 @@ public class DragonEntity extends Monster {
                 " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
         }
         this.entityData.set(DATA_IS_LANDING_MODE, landingMode);
+    }
+
+    /**
+     * Checks if the dragon is resting (curled up like a polar fox)
+     */
+    public boolean isResting() {
+        return this.entityData.get(DATA_IS_RESTING);
+    }
+
+    /**
+     * Sets the resting state for the dragon
+     */
+    public void setResting(boolean resting) {
+        boolean oldValue = this.entityData.get(DATA_IS_RESTING);
+        if (oldValue != resting && !this.level().isClientSide) {
+            System.out.println("[DRAGON] State change - isResting: " + oldValue + " -> " + resting +
+                " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+        }
+        this.entityData.set(DATA_IS_RESTING, resting);
+
+        // Set the pose to SLEEPING when resting (like polar fox curling up)
+        if (resting) {
+            this.setPose(net.minecraft.world.entity.Pose.SLEEPING);
+        } else {
+            this.setPose(net.minecraft.world.entity.Pose.STANDING);
+        }
     }
 
     public int getLandedTimer() {
@@ -137,8 +168,11 @@ public class DragonEntity extends Monster {
         // Priority 1: Defend nest from nearby players
         this.goalSelector.addGoal(1, new DefendNestGoal(this));
 
-        // Priority 2: Custom flying behavior - handles all movement AND rotation
-        this.goalSelector.addGoal(2, new DragonFlyingGoal(this));
+        // Priority 2: Rest occasionally (lie down and curl up like polar fox)
+        this.goalSelector.addGoal(2, new DragonRestGoal(this));
+
+        // Priority 3: Custom flying behavior - handles all movement AND rotation
+        this.goalSelector.addGoal(3, new DragonFlyingGoal(this));
 
         // Removed LookAtPlayerGoal - it was interfering with flight direction
         // The dragon should look where it's flying, not at players
@@ -246,6 +280,24 @@ public class DragonEntity extends Monster {
         flyingpathnavigation.setCanOpenDoors(false);
         flyingpathnavigation.setCanFloat(true);
         return flyingpathnavigation;
+    }
+
+    /**
+     * Override to prevent dragons from despawning when far from players.
+     * Dragons should persist in the world like other important entities.
+     */
+    @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+        return false; // Dragons never despawn due to distance
+    }
+
+    /**
+     * Override to make dragons persistent like named mobs or villagers.
+     * This prevents them from being removed by the game's entity cleanup.
+     */
+    @Override
+    public boolean requiresCustomPersistence() {
+        return true; // Dragons always require custom persistence - never despawn
     }
 
     /**

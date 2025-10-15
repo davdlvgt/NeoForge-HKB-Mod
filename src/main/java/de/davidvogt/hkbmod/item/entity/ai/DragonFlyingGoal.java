@@ -23,10 +23,21 @@ public class DragonFlyingGoal extends Goal {
     private boolean isPaused = false;
 
     // Landing system
-    private static final int FLYING_DURATION = 100; // 20 seconds (20 ticks per second)
-    private static final int LANDING_DURATION = 200; // 10 seconds
+    private static final int FLYING_DURATION = 2200; // 1 Minute (60 Sekunden) - FÜR TESTING
+    private static final int LANDING_DURATION = 1100; // 30 Sekunden - FÜR TESTING
     private BlockPos landingSpot = null;
     private boolean isLandingMode = false;
+
+    // Kollisionserkennung - Tracking für Hängenbleiben
+    private Vec3 lastPosition = Vec3.ZERO;
+    private int stuckCounter = 0;
+    private static final int STUCK_THRESHOLD = 40; // 2 Sekunden ohne Bewegung = steckengeblieben
+    private static final double MIN_MOVEMENT = 0.05; // Minimale Bewegung pro Tick
+
+    // Notfall-Ausweichmanöver
+    private boolean isPerformingEmergencyManeuver = false;
+    private int emergencyManeuverTimer = 0;
+    private Vec3 emergencyDirection = Vec3.ZERO;
 
     public DragonFlyingGoal(DragonEntity dragon) {
         this.dragon = dragon;
@@ -46,6 +57,7 @@ public class DragonFlyingGoal extends Goal {
     @Override
     public void start() {
         pickNewTarget();
+        lastPosition = dragon.position(); // Startposition für Kollisionserkennung speichern
     }
 
     @Override
@@ -72,25 +84,26 @@ public class DragonFlyingGoal extends Goal {
                 (FLYING_DURATION / 20) + "s until landing");
         }
 
-        // Check if it's time to land (after 20 seconds of flying AND at minimum altitude)
+        // Check if it's time to land - GEÄNDERT: Auf 180 Blöcke hochfliegen vor Landeanflug
         if (dragon.getFlyingTimer() >= FLYING_DURATION) {
             double currentY = dragon.getY();
 
-            // Only land if dragon is at or above minimum altitude of 140 blocks
-            if (currentY >= 140.0D) {
+            // Landeanflug beginnen - zuerst auf 180 Blöcke hochfliegen
+            if (currentY >= 180.0D) {
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[FLYING-GOAL] *** INITIATING LANDING SEQUENCE *** (altitude: " +
+                    System.out.println("[FLYING-GOAL] *** INITIATING LANDING SEQUENCE at 180+ altitude *** (altitude: " +
                         String.format("%.1f", currentY) + " blocks)");
                 }
                 startLandingSequence();
                 return;
             } else {
-                // Not high enough yet, keep flying and climbing
+                // Noch nicht hoch genug, weiter steigen auf 180 Blöcke
                 if (!dragon.level().isClientSide && dragon.getFlyingTimer() % 20 == 0) {
-                    System.out.println("[FLYING-GOAL] Ready to land but altitude too low (" +
-                        String.format("%.1f", currentY) + " < 140), continuing to climb...");
+                    System.out.println("[FLYING-GOAL] Ready to land but climbing to 180 blocks first (current: " +
+                        String.format("%.1f", currentY) + ")");
                 }
-                // Don't reset timer - let it keep counting so we land as soon as we reach 140
+                // Setze Ziel auf 180 Blöcke Höhe
+                targetY = 180.0D;
             }
         }
 
@@ -159,6 +172,9 @@ public class DragonFlyingGoal extends Goal {
         dragon.setDeltaMovement(newVelX, newVelY, newVelZ);
 
         // Rotation is now handled in DragonEntity.tick() method
+
+        // Kollisionserkennung - Überprüfen ob der Drache stecken bleibt
+        checkForStuck();
     }
 
     /**
@@ -375,15 +391,17 @@ public class DragonFlyingGoal extends Goal {
 
         // Log remaining time every second
         if (timer % 20 == 0 && !dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] Landed - remaining time: " + (timer / 20) + "s / 10s, walking around");
+            System.out.println("[FLYING-GOAL] Landed - remaining time: " + (timer / 20) + "s / " + (LANDING_DURATION / 20) + "s, walking around");
         }
 
-        // Check if it's time to take off again (after 10 seconds)
+        // Check if it's time to take off again (after walking duration)
         if (timer <= 0) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] *** TAKING OFF ***");
+                System.out.println("[FLYING-GOAL] *** WALKING TIME FINISHED - Dragon should now go to nest to rest ***");
             }
-            takeOff();
+            // Don't take off directly - let DragonRestGoal take over
+            // Just stop movement and wait for rest goal to activate
+            dragon.setDeltaMovement(0, dragon.getDeltaMovement().y, 0);
             return;
         }
 
@@ -627,8 +645,8 @@ public class DragonFlyingGoal extends Goal {
                     }
                 }
 
-                // Pick height between 140 and 180
-                targetY = 140.0D + dragon.getRandom().nextDouble() * 40.0D;
+                // ERHÖHTE MINDESTFLUGHÖHE: 180-210 Blöcke (vorher 170-200)
+                targetY = 180.0D + dragon.getRandom().nextDouble() * 30.0D;
                 return;
             }
         }
@@ -639,19 +657,20 @@ public class DragonFlyingGoal extends Goal {
 
         targetX = currentX + Math.cos(angle) * distance;
         targetZ = currentZ + Math.sin(angle) * distance;
-        targetY = 140.0D + dragon.getRandom().nextDouble() * 40.0D;
+        // ERHÖHTE MINDESTFLUGHÖHE: 180-210 Blöcke (vorher 170-200)
+        targetY = 180.0D + dragon.getRandom().nextDouble() * 30.0D;
     }
 
     private void maintainAltitude() {
-        // This method helps keep the dragon between 140-180
-        // Called to ensure emergency corrections
+        // ERHÖHTE GRENZWERTE für Mindestflughöhe
+        // Dieser Code stellt sicher dass der Drache IMMER über Bäumen fliegt
         double currentY = dragon.getY();
 
-        if (currentY < 135.0D) {
-            // Emergency: too low, force upward faster
+        if (currentY < 175.0D) {
+            // Emergency: too low (unter 175 statt 165), force upward faster
             dragon.setDeltaMovement(dragon.getDeltaMovement().x, 0.3D, dragon.getDeltaMovement().z);
-        } else if (currentY > 185.0D) {
-            // Emergency: too high, force downward faster
+        } else if (currentY > 215.0D) {
+            // Emergency: too high (über 215 statt 205), force downward faster
             dragon.setDeltaMovement(dragon.getDeltaMovement().x, -0.3D, dragon.getDeltaMovement().z);
         }
     }
@@ -662,5 +681,111 @@ public class DragonFlyingGoal extends Goal {
 
         // Faster vertical movement - increased from 0.02 to 0.04, and doubled max speeds
         return Mth.clamp(heightDiff * 0.04D, -0.16D, 0.16D);
+    }
+
+    /**
+     * Überprüft ob der Drache stecken bleibt und führt ggf. ein Ausweichmanöver durch
+     */
+    private void checkForStuck() {
+        Vec3 currentPosition = dragon.position();
+        double movementDistance = currentPosition.distanceTo(lastPosition);
+
+        // Prüfe ob Drache sich ausreichend bewegt hat
+        if (movementDistance < MIN_MOVEMENT) {
+            stuckCounter++;
+
+            // Debug-Ausgabe alle halbe Sekunde während Steckenbleiben
+            if (stuckCounter % 10 == 0 && !dragon.level().isClientSide) {
+                System.out.println("[FLYING-GOAL] ⚠️ Dragon seems stuck! Counter: " + stuckCounter + "/" + STUCK_THRESHOLD +
+                    " (movement: " + String.format("%.4f", movementDistance) + ")");
+            }
+
+            // Wenn Drache zu lange steckt, Notfallmanöver einleiten
+            if (stuckCounter >= STUCK_THRESHOLD) {
+                initiateEmergencyManeuver();
+                stuckCounter = 0; // Reset counter
+            }
+        } else {
+            // Drache bewegt sich normal, Counter zurücksetzen
+            if (stuckCounter > 0) {
+                stuckCounter = 0;
+            }
+        }
+
+        lastPosition = currentPosition;
+    }
+
+    /**
+     * Initiiert ein Notfall-Ausweichmanöver wenn der Drache steckengeblieben ist
+     */
+    private void initiateEmergencyManeuver() {
+        if (!dragon.level().isClientSide) {
+            System.out.println("[FLYING-GOAL] 🚨 EMERGENCY MANEUVER INITIATED - Dragon is stuck!");
+        }
+
+        isPerformingEmergencyManeuver = true;
+        emergencyManeuverTimer = 60; // 3 Sekunden Ausweichmanöver
+
+        // Strategie: Zuerst Richtungswechsel versuchen, dann nach oben fliegen
+        // Wähle zufällige neue Richtung (180° gedreht + Zufall)
+        float currentYaw = dragon.getYRot();
+        float newYaw = currentYaw + 150.0F + dragon.getRandom().nextFloat() * 60.0F; // 150-210° Drehung
+
+        double angle = Math.toRadians(newYaw);
+        double distance = 20.0D;
+
+        // Neue Richtung mit leichtem Steigflug
+        emergencyDirection = new Vec3(
+            Math.sin(angle) * distance,
+            5.0D, // Leicht nach oben
+            Math.cos(angle) * distance
+        ).normalize();
+
+        if (!dragon.level().isClientSide) {
+            System.out.println("[FLYING-GOAL] Emergency direction: " +
+                String.format("X=%.2f, Y=%.2f, Z=%.2f", emergencyDirection.x, emergencyDirection.y, emergencyDirection.z));
+        }
+    }
+
+    /**
+     * Führt ein Notfall-Ausweichmanöver durch, wenn der Drache stecken bleibt
+     */
+    private void performEmergencyManeuver() {
+        emergencyManeuverTimer--;
+
+        if (emergencyManeuverTimer <= 0) {
+            // Manöver beendet
+            isPerformingEmergencyManeuver = false;
+            pickNewTarget(); // Neues Ziel wählen
+            if (!dragon.level().isClientSide) {
+                System.out.println("[FLYING-GOAL] ✅ Emergency maneuver completed, resuming normal flight");
+            }
+            return;
+        }
+
+        // Prüfe ob immer noch Hindernis im Weg ist
+        if (checkForObstacleAhead() && emergencyManeuverTimer > 20) {
+            // Immer noch blockiert nach 1 Sekunde - Plan B: Nach oben fliegen!
+            if (!dragon.level().isClientSide) {
+                System.out.println("[FLYING-GOAL] 🚁 Still blocked - ASCENDING as last resort!");
+            }
+
+            // Stark nach oben fliegen
+            Vec3 currentVel = dragon.getDeltaMovement();
+            dragon.setDeltaMovement(currentVel.x * 0.5, 0.5D, currentVel.z * 0.5); // Starker Aufstieg
+            emergencyManeuverTimer = 20; // Noch 1 Sekunde weitermachen
+            return;
+        }
+
+        // Ausweichmanöver: In neue Richtung fliegen
+        double speed = 0.8D;
+        Vec3 currentVel = dragon.getDeltaMovement();
+
+        // Sanfter Übergang zur Notfallrichtung
+        double newVelX = Mth.lerp(0.2D, currentVel.x, emergencyDirection.x * speed);
+        double newVelY = Mth.lerp(0.2D, currentVel.y, emergencyDirection.y * speed);
+        double newVelZ = Mth.lerp(0.2D, currentVel.z, emergencyDirection.z * speed);
+
+        dragon.setDeltaMovement(newVelX, newVelY, newVelZ);
     }
 }
