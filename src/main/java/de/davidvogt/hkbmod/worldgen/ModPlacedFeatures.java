@@ -44,7 +44,7 @@ public class ModPlacedFeatures {
         // - Für normale Spielwelt empfohlen: onAverageOnceEvery(500) bis onAverageOnceEvery(2000)
         // ========================================
         List<PlacementModifier> dragonNestModifiers = new java.util.ArrayList<>();
-        dragonNestModifiers.add(RarityFilter.onAverageOnceEvery(64)); // <-- SELTENHEIT HIER ÄNDERN!
+        dragonNestModifiers.add(RarityFilter.onAverageOnceEvery(12)); // <-- SELTENHEIT HIER ÄNDERN!
         dragonNestModifiers.add(BiomeFilter.biome());
 
         register(context, DRAGON_NEST_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.DRAGON_NEST_KEY), dragonNestModifiers);

@@ -22,9 +22,13 @@ public class DragonFlyingGoal extends Goal {
     private int pauseTimer = 0;
     private boolean isPaused = false;
 
-    // Landing system
-    private static final int FLYING_DURATION = 2200; // 1 Minute (60 Sekunden) - FÜR TESTING
-    private static final int LANDING_DURATION = 1100; // 30 Sekunden - FÜR TESTING
+    // Landing system - NOW WITH RANDOM DURATIONS
+    private int currentFlyingDuration = 0; // Will be set randomly
+    private int currentLandingDuration = 0; // Will be set randomly
+    private static final int MIN_FLYING_DURATION = 200; // 30 seconds minimum
+    private static final int MAX_FLYING_DURATION = 1000; // 120 seconds maximum
+    private static final int MIN_LANDING_DURATION = 100; // 20 seconds minimum
+    private static final int MAX_LANDING_DURATION = 800; // 90 seconds maximum
     private BlockPos landingSpot = null;
     private boolean isLandingMode = false;
 
@@ -58,6 +62,8 @@ public class DragonFlyingGoal extends Goal {
     public void start() {
         pickNewTarget();
         lastPosition = dragon.position(); // Startposition für Kollisionserkennung speichern
+        // Set random flying duration on start
+        setRandomFlyingDuration();
     }
 
     @Override
@@ -78,27 +84,42 @@ public class DragonFlyingGoal extends Goal {
         flyingTimer++;
         dragon.setFlyingTimer(dragon.getFlyingTimer() + 1);
 
-        // Log flying progress every second
-        if (dragon.getFlyingTimer() % 20 == 0 && !dragon.level().isClientSide) {
+        // Log flying progress every 10 seconds
+        if (dragon.getFlyingTimer() % 200 == 0 && !dragon.level().isClientSide) {
             System.out.println("[FLYING-GOAL] Flying for " + (dragon.getFlyingTimer() / 20) + "s / " +
-                (FLYING_DURATION / 20) + "s until landing");
+                (currentFlyingDuration / 20) + "s until considering landing");
         }
 
-        // Check if it's time to land - GEÄNDERT: Auf 180 Blöcke hochfliegen vor Landeanflug
-        if (dragon.getFlyingTimer() >= FLYING_DURATION) {
+        // Random chance to land early (1% chance per second after minimum flight time)
+        int minFlightTime = MIN_FLYING_DURATION / 2; // Can land after half minimum time
+        if (dragon.getFlyingTimer() > minFlightTime && dragon.getFlyingTimer() % 20 == 0) {
+            float landingChance = 0.01F; // 1% chance per second
+            if (dragon.getRandom().nextFloat() < landingChance) {
+                if (!dragon.level().isClientSide) {
+                    System.out.println("[FLYING-GOAL] *** RANDOM DECISION TO LAND *** (after " +
+                        (dragon.getFlyingTimer() / 20) + "s flying)");
+                }
+                // Start landing sequence
+                initiateRandomLanding();
+                return;
+            }
+        }
+
+        // Check if scheduled landing time reached
+        if (dragon.getFlyingTimer() >= currentFlyingDuration) {
             double currentY = dragon.getY();
 
             // Landeanflug beginnen - zuerst auf 180 Blöcke hochfliegen
             if (currentY >= 180.0D) {
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[FLYING-GOAL] *** INITIATING LANDING SEQUENCE at 180+ altitude *** (altitude: " +
-                        String.format("%.1f", currentY) + " blocks)");
+                    System.out.println("[FLYING-GOAL] *** SCHEDULED LANDING at 180+ altitude *** (flew for " +
+                        (dragon.getFlyingTimer() / 20) + "s, altitude: " + String.format("%.1f", currentY) + " blocks)");
                 }
                 startLandingSequence();
                 return;
             } else {
                 // Noch nicht hoch genug, weiter steigen auf 180 Blöcke
-                if (!dragon.level().isClientSide && dragon.getFlyingTimer() % 20 == 0) {
+                if (!dragon.level().isClientSide && dragon.getFlyingTimer() % 40 == 0) {
                     System.out.println("[FLYING-GOAL] Ready to land but climbing to 180 blocks first (current: " +
                         String.format("%.1f", currentY) + ")");
                 }
@@ -374,7 +395,11 @@ public class DragonFlyingGoal extends Goal {
     private void completeLanding() {
         dragon.setLanded(true);
         dragon.setLandingMode(false); // No longer in landing mode
-        dragon.setLandedTimer(LANDING_DURATION);
+
+        // Set random landing duration
+        setRandomLandingDuration();
+        dragon.setLandedTimer(currentLandingDuration);
+
         dragon.setDeltaMovement(0, 0, 0);
         dragon.setNoGravity(false); // Enable gravity while landed
         isLandingMode = false;
@@ -389,15 +414,16 @@ public class DragonFlyingGoal extends Goal {
         int timer = dragon.getLandedTimer() - 1;
         dragon.setLandedTimer(timer);
 
-        // Log remaining time every second
-        if (timer % 20 == 0 && !dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] Landed - remaining time: " + (timer / 20) + "s / " + (LANDING_DURATION / 20) + "s, walking around");
+        // Log remaining time every 10 seconds
+        if (timer % 200 == 0 && !dragon.level().isClientSide) {
+            System.out.println("[FLYING-GOAL] Landed - remaining time: " + (timer / 20) + "s / " +
+                (currentLandingDuration / 20) + "s, walking around");
         }
 
         // Check if it's time to take off again (after walking duration)
         if (timer <= 0) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] *** WALKING TIME FINISHED - Dragon should now go to nest to rest ***");
+                System.out.println("[FLYING-GOAL] *** WALKING TIME FINISHED - Dragon deciding next action ***");
             }
             // Don't take off directly - let DragonRestGoal take over
             // Just stop movement and wait for rest goal to activate
@@ -575,6 +601,9 @@ public class DragonFlyingGoal extends Goal {
         dragon.setLanded(false);
         dragon.setFlyingTimer(0);
         dragon.setNoGravity(true);
+
+        // Set new random flying duration
+        setRandomFlyingDuration();
 
         // Pick a target high in the sky (150-180 blocks) for initial climb
         double currentX = dragon.getX();
@@ -787,5 +816,50 @@ public class DragonFlyingGoal extends Goal {
         double newVelZ = Mth.lerp(0.2D, currentVel.z, emergencyDirection.z * speed);
 
         dragon.setDeltaMovement(newVelX, newVelY, newVelZ);
+    }
+
+    /**
+     * Sets a random flying duration for variety
+     */
+    private void setRandomFlyingDuration() {
+        currentFlyingDuration = MIN_FLYING_DURATION +
+            dragon.getRandom().nextInt(MAX_FLYING_DURATION - MIN_FLYING_DURATION + 1);
+        if (!dragon.level().isClientSide) {
+            System.out.println("[FLYING-GOAL] New random flying duration: " +
+                (currentFlyingDuration / 20) + " seconds (" +
+                (currentFlyingDuration / 20 / 60) + " min " +
+                ((currentFlyingDuration / 20) % 60) + " sec)");
+        }
+    }
+
+    /**
+     * Sets a random landing duration for variety
+     */
+    private void setRandomLandingDuration() {
+        currentLandingDuration = MIN_LANDING_DURATION +
+            dragon.getRandom().nextInt(MAX_LANDING_DURATION - MIN_LANDING_DURATION + 1);
+        if (!dragon.level().isClientSide) {
+            System.out.println("[FLYING-GOAL] New random landing duration: " +
+                (currentLandingDuration / 20) + " seconds (" +
+                (currentLandingDuration / 20 / 60) + " min " +
+                ((currentLandingDuration / 20) % 60) + " sec)");
+        }
+    }
+
+    /**
+     * Initiates landing at current position (random decision)
+     */
+    private void initiateRandomLanding() {
+        double currentY = dragon.getY();
+
+        // If already high enough, start landing immediately
+        if (currentY >= 180.0D) {
+            startLandingSequence();
+        } else {
+            // Climb to 180 first
+            targetY = 180.0D;
+            // Will trigger landing on next tick when high enough
+            dragon.setFlyingTimer(currentFlyingDuration);
+        }
     }
 }

@@ -15,7 +15,7 @@ import java.util.EnumSet;
  * Dragons fly relaxed to their nest before resting.
  */
 public class DragonRestGoal extends Goal {
-    private static final int REST_DURATION = 4200; // 2 Minuten (120 Sekunden) - FÜR TESTING
+    private static final int REST_DURATION = 2000; // 2 Minuten (120 Sekunden) - FÜR TESTING
     private static final int MIN_TIME_BETWEEN_RESTS = 0; // Keine Wartezeit - Drache ruht direkt nach dem Landen
     private static final int CHECK_INTERVAL = 20; // Check every second
     private static final double NEST_POSITION_THRESHOLD = 3.0; // Must be within 3 blocks of nest center
@@ -73,19 +73,28 @@ public class DragonRestGoal extends Goal {
         if (nestPos == null) {
             // Debug log when timer expired
             if (landedTimerExpired && !dragon.level().isClientSide) {
-                System.out.println("[DRAGON-REST-DEBUG] *** PROBLEM: No nest block found nearby! Dragon position: " + dragon.blockPosition().toShortString() + " ***");
+                System.out.println("[DRAGON-REST-DEBUG] *** No nest block found nearby! Dragon will take off instead. Position: " + dragon.blockPosition().toShortString() + " ***");
             }
             return false;
         }
 
-        // Nach dem Landen (wenn LandedTimer abgelaufen ist), sofort zum Nest gehen und ruhen
-        // 100% Chance wenn der Drache gelandet ist und Zeit zum Ruhen hat
+        // Nach dem Landen (wenn LandedTimer abgelaufen ist), ZUFÄLLIG entscheiden ob rasten oder abheben
+        // 50% Chance zu rasten, 50% Chance direkt wieder abzuheben (wird von FlyingGoal übernommen)
         if (landedTimerExpired) {
-            if (!dragon.level().isClientSide) {
-                System.out.println("[DRAGON-REST-DEBUG] ★★★ Walking time finished! Dragon will now fly relaxed to nest at " + nestPos.toShortString() + " ★★★");
+            // Random decision: 50% chance to rest
+            if (dragon.getRandom().nextFloat() < 0.5F) {
+                if (!dragon.level().isClientSide) {
+                    System.out.println("[DRAGON-REST-DEBUG] ★★★ RANDOM DECISION: Dragon will fly to nest and rest at " + nestPos.toShortString() + " ★★★");
+                }
+                targetNestPos = nestPos;
+                return true;
+            } else {
+                if (!dragon.level().isClientSide) {
+                    System.out.println("[DRAGON-REST-DEBUG] ★★★ RANDOM DECISION: Dragon skips resting and will take off again! ★★★");
+                }
+                // Don't rest, let the dragon take off instead (handled by FlyingGoal)
+                return false;
             }
-            targetNestPos = nestPos;
-            return true;
         }
 
         return false;

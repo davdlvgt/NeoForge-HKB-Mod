@@ -20,8 +20,11 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Custom Dragon entity that resembles a smaller version of the Ender Dragon.
@@ -212,6 +215,84 @@ public class DragonEntity extends Monster {
 
         // Play fireball shooting sound
         this.playSound(SoundEvents.GHAST_SHOOT, 1.0F, 1.0F);
+    }
+
+    /**
+     * Breathes fire at close range, creating a cone of fire particles and damaging entities
+     * Used when dragon is close to the target (< 10 blocks)
+     */
+    public void breatheFire(LivingEntity target) {
+        if (this.level().isClientSide) {
+            return;
+        }
+
+        // Calculate direction to target
+        Vec3 lookVec = this.getViewVector(1.0F);
+        Vec3 startPos = new Vec3(this.getX(), this.getY(0.5) + 0.5, this.getZ());
+
+        // Create a cone of fire in front of the dragon
+        // Fire breath extends 8 blocks forward
+        double breathRange = 8.0D;
+
+        // Check multiple points in a cone shape for entities to damage
+        for (double distance = 1.0D; distance <= breathRange; distance += 0.5D) {
+            // Create a cone by checking slightly offset positions
+            for (double offset = -0.5D; offset <= 0.5D; offset += 0.25D) {
+                Vec3 perpendicular = new Vec3(-lookVec.z, 0, lookVec.x).normalize();
+                Vec3 checkPos = startPos.add(
+                    lookVec.x * distance + perpendicular.x * offset * distance * 0.3,
+                    lookVec.y * distance,
+                    lookVec.z * distance + perpendicular.z * offset * distance * 0.3
+                );
+
+                // Spawn fire particles on client side via packet
+                if (!this.level().isClientSide) {
+                    // Server: Send particle packet to clients
+                    ((net.minecraft.server.level.ServerLevel)this.level()).sendParticles(
+                        net.minecraft.core.particles.ParticleTypes.FLAME,
+                        checkPos.x, checkPos.y, checkPos.z,
+                        2, // particle count
+                        0.1, 0.1, 0.1, // random offset
+                        0.01 // speed
+                    );
+
+                    // Also add some smoke
+                    if (distance > 2.0D && this.random.nextFloat() < 0.3F) {
+                        ((net.minecraft.server.level.ServerLevel)this.level()).sendParticles(
+                            net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
+                            checkPos.x, checkPos.y, checkPos.z,
+                            1,
+                            0.15, 0.15, 0.15,
+                            0.01
+                        );
+                    }
+                }
+
+                // Check for entities to damage in a small radius around each point
+                AABB damageBox = new AABB(checkPos.x - 0.5, checkPos.y - 0.5, checkPos.z - 0.5,
+                                          checkPos.x + 0.5, checkPos.y + 0.5, checkPos.z + 0.5);
+
+                List<LivingEntity> entities = this.level().getEntitiesOfClass(
+                    LivingEntity.class,
+                    damageBox,
+                    entity -> entity != this && entity.isAlive()
+                );
+
+                for (LivingEntity entity : entities) {
+                    // Deal fire damage
+                    entity.hurt(this.damageSources().mobAttack(this), 3.0F);
+                    // Set entity on fire for 5 seconds (100 ticks)
+                    entity.setRemainingFireTicks(100);
+                }
+            }
+        }
+
+        // Play dragon fire sound
+        this.playSound(SoundEvents.ENDER_DRAGON_SHOOT, 1.0F, 0.8F);
+
+        if (!this.level().isClientSide) {
+            System.out.println("[DRAGON-FIRE-BREATH] Dragon breathing fire at close range!");
+        }
     }
 
     /**
