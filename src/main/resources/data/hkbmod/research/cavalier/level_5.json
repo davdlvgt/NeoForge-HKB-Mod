@@ -14,7 +14,9 @@
       "count": 1
     }
   ],
-  "unlocks": [],
+  "unlocks": [
+    "dragon_saddle"
+  ],
     "advancement": {
         "title": "Cavalier: Legendary",
         "description": "Become a legendary cavalier"

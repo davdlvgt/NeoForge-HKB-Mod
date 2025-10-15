@@ -3,7 +3,6 @@ package de.davidvogt.hkbmod.datagen;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.item.ModItems;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
@@ -35,6 +34,8 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModItems.EMERALD_HOE.get(), "Emerald Hoe");
         add(ModItems.MAGIC_PICKAXE.get(), "Magic Pickaxe");
         add(ModItems.TIME_SETTER.get(), "Time Setter");
+        add(ModItems.DRAGON_MATERIAL.get(), "Dragon Material");
+        add(ModItems.DRAGON_SADDLE.get(), "Dragon Saddle");
 
         // Blocks
         add(ModBlocks.TEST_BLOCK.get(), "Test Block");

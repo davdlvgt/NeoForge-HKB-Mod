@@ -47,6 +47,10 @@ public class ModModelProvider extends ModelProvider {
         itemModels.generateFlatItem(ModItems.COOKED_DEER_BEEF.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(ModItems.DEER_ANTLERS.get(), ModelTemplates.FLAT_ITEM);
 
+        itemModels.generateFlatItem(ModItems.DRAGON_SKIN.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(ModItems.DRAGON_MATERIAL.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(ModItems.DRAGON_SADDLE.asItem(), ModelTemplates.FLAT_ITEM);
+
         itemModels.generateFlatItem(ModItems.LONGBOW_ARROW.get(), ModelTemplates.FLAT_ITEM);
 
         // Block Models

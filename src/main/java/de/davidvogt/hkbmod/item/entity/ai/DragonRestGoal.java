@@ -35,6 +35,11 @@ public class DragonRestGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        // Only active for wild dragons, not tamed ones
+        if (dragon.isTamed()) {
+            return false;
+        }
+
         // Increment timer every tick
         timeSinceLastRest++;
 

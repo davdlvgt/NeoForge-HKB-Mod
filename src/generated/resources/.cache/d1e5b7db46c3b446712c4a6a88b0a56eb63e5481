@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-11T16:32:11.7367178	My Recipes
+// 1.21.8	2025-10-15T13:48:54.1052524	My Recipes
 604c4c7c6c064b16ee2bb6e9a4e3cfade266a8b3 data/hkbmod/advancement/recipes/building_blocks/robinia_planks.json
 48159894de840b98453008c3690e87aff0c83314 data/hkbmod/advancement/recipes/building_blocks/robinia_slab.json
 c3e67ab7209596974b8a71ea5c0ca292205dc838 data/hkbmod/advancement/recipes/building_blocks/robinia_stairs.json
@@ -16,6 +16,8 @@ e5911d5e70d15afd5b6e4a102801a98b02f9ae17 data/hkbmod/advancement/recipes/decorat
 1e48c52ae36b9d1d2e28f022348129053f469d09 data/hkbmod/advancement/recipes/redstone/robinia_fence_gate.json
 62629f4f896e1509078e8017ce8c4aa18a4dc941 data/hkbmod/advancement/recipes/redstone/robinia_pressure_plate.json
 8913485e920f09cb014ced8de260414154febd02 data/hkbmod/advancement/recipes/redstone/robinia_trapdoor.json
+179ed4f13a6a00391f4a979959845e059298487d data/hkbmod/advancement/recipes/tools/dragon_material.json
+184daa7b5b80ed82451bed88511a21b653167c87 data/hkbmod/advancement/recipes/tools/dragon_saddle.json
 b8db2f655eed78712b219d48284ec5a2cfdf0be9 data/hkbmod/advancement/recipes/tools/elastic_wood.json
 ecd5a2876c984c1f1f38b3009b5e4452c421cef9 data/hkbmod/advancement/recipes/tools/emerald_axe.json
 33d6b3d280515c6ddc536c9fcdfcf1119615ef29 data/hkbmod/advancement/recipes/tools/emerald_hoe.json
@@ -25,6 +27,8 @@ be1ea95690e69ab80520a66ba30f5dd5732a9f0e data/hkbmod/advancement/recipes/tools/l
 8b47651a6a17f560bb42fb6ce556fcc255c84fef data/hkbmod/advancement/recipes/tools/magic_pickaxe.json
 cddab82250a7a851c1bcd4f3726fd0c12799a0de data/hkbmod/advancement/recipes/tools/time_setter.json
 713c73264c276bc101ff1a07754825bd73f6aa45 data/hkbmod/recipe/custom_test_block.json
+27d17cc514933d7433587fe81fa6cd346fc6bb47 data/hkbmod/recipe/dragon_material.json
+25538f3a7ff9521da8e0af4409b6d0be4ed1c199 data/hkbmod/recipe/dragon_saddle.json
 1e1fb4232da37a7a23d8baceba23bcd9b3494300 data/hkbmod/recipe/elastic_wood.json
 619ec8948003dfd901e3738f766a893ff3fc253b data/hkbmod/recipe/emerald_axe.json
 79dc93f515544b628c12b907ddba67fe93ca4af1 data/hkbmod/recipe/emerald_hoe.json

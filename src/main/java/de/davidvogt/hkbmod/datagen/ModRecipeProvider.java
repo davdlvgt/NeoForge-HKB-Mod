@@ -1,9 +1,7 @@
 package de.davidvogt.hkbmod.datagen;
 
-import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.item.ModItems;
-import de.davidvogt.hkbmod.recipe.ModRecipeTypes;
 import de.davidvogt.hkbmod.recipe.ResearchCraftingRecipe;
 import de.davidvogt.hkbmod.util.ModTags;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
@@ -12,15 +10,10 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.item.crafting.ShapedRecipePattern;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class ModRecipeProvider extends RecipeProvider {
@@ -190,6 +183,22 @@ public class ModRecipeProvider extends RecipeProvider {
                 .pattern("S")
                 .pattern("S")
                 .define('S', Items.STRING)
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(researchRecipeOutput());
+
+        // Research recipe - only works in Research Crafting Table
+        this.shaped(RecipeCategory.TOOLS, ModItems.DRAGON_MATERIAL.get())
+                .pattern("DD")
+                .pattern("DD")
+                .define('D', ModItems.DRAGON_SKIN.get())
+                .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
+                .save(researchRecipeOutput());
+
+        // Research recipe - only works in Research Crafting Table
+        this.shaped(RecipeCategory.TOOLS, ModItems.DRAGON_SADDLE.get())
+                .pattern("DDD")
+                .pattern("D D")
+                .define('D', ModItems.DRAGON_MATERIAL.get())
                 .unlockedBy("never", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BARRIER))
                 .save(researchRecipeOutput());
 

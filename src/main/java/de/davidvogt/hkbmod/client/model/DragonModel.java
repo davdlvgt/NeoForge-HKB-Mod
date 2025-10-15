@@ -5,7 +5,10 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.entity.state.EnderDragonRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -46,6 +49,8 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
     private float movementSpeed = 0.0F;
     // Track resting state from entity
     private boolean isResting = false;
+    // Track sitting state from entity (for tamed dragons)
+    private boolean isSitting = false;
 
     /**
      * Sets the movement speed for the dragon, used to control walking animation
@@ -59,6 +64,13 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
      */
     public void setResting(boolean resting) {
         this.isResting = resting;
+    }
+
+    /**
+     * Sets the sitting state for the dragon, used to control sleeping animation for tamed dragons
+     */
+    public void setSitting(boolean sitting) {
+        this.isSitting = sitting;
     }
 
     public DragonModel(ModelPart root) {
@@ -222,13 +234,13 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         // Check if dragon is landed (flapTime is 0 or very small when landed)
         boolean isLanded = state.flapTime < 0.01F;
 
-        // Use the actual resting state passed from the entity
-        // Dragon only rests when on a DRAGON_NEST block (enforced by DragonRestGoal)
-        boolean isRestingNow = this.isResting;
+        // Use the actual resting or sitting state passed from the entity
+        // Dragon rests when on a DRAGON_NEST block OR when sitting (commanded by owner)
+        boolean isSleeping = this.isResting || this.isSitting;
 
-        if (isRestingNow) {
+        if (isSleeping) {
             // ===== RESTING/SLEEPING ANIMATION =====
-            // Only triggered when dragon is actually resting on nest
+            // Triggered when dragon is resting on nest OR sitting on command
             // Flügel wie beim Laufen (gefaltet an der Seite)
             this.leftWing.xRot = 0.2F;
             this.leftWing.yRot = -0.5F;
@@ -361,7 +373,7 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         }
 
         // Nur Hals/Kopf/Schwanz animieren wenn NICHT resting
-        if (!isRestingNow) {
+        if (!isSleeping) {
             // Positionierung und Animation von Hals
             DragonFlightHistory.Sample neckBase = state.getHistoricalPos(6);
             float headYawOffset = Mth.wrapDegrees(state.getHistoricalPos(5).yRot() - state.getHistoricalPos(10).yRot());

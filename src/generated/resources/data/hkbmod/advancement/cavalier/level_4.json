@@ -1,8 +1,15 @@
 {
   "parent": "hkbmod:cavalier/level_3",
   "criteria": {
-    "research_completed": {
-      "trigger": "minecraft:impossible"
+    "has_hkbmod_dragon_material": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hkbmod:dragon_material"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
     }
   },
   "display": {
@@ -12,7 +19,7 @@
     "frame": "goal",
     "icon": {
       "count": 1,
-      "id": "minecraft:black_banner"
+      "id": "hkbmod:dragon_material"
     },
     "title": {
       "translate": "advancements.hkbmod.cavalier.level_4.title"
@@ -20,8 +27,13 @@
   },
   "requirements": [
     [
-      "research_completed"
+      "has_hkbmod_dragon_material"
     ]
   ],
+  "rewards": {
+    "recipes": [
+      "hkbmod:dragon_material"
+    ]
+  },
   "sends_telemetry_event": true
 }

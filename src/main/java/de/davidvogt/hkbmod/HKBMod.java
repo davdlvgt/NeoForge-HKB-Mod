@@ -6,10 +6,10 @@ import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.block.entity.ModBlockEntities;
 import de.davidvogt.hkbmod.command.LocateDragonNestCommand;
 import de.davidvogt.hkbmod.command.RecipeUnlockCommands;
+import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
 import de.davidvogt.hkbmod.item.entity.custom.DeerEntity;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
-import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.network.NetworkHandler;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
 import de.davidvogt.hkbmod.network.SyncResearchDataPacket;
@@ -20,8 +20,8 @@ import de.davidvogt.hkbmod.research.PlayerResearchData;
 import de.davidvogt.hkbmod.research.ResearchManager;
 import de.davidvogt.hkbmod.screen.ModMenuTypes;
 import de.davidvogt.hkbmod.worldgen.ModFeatures;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.IEventBus;
@@ -108,6 +108,10 @@ public class HKBMod {
             event.accept(ModItems.LONGBOW_STICK.get());
             event.accept(ModItems.LONG_STICK.get());
             event.accept(ModItems.LONG_STRING.get());
+
+            event.accept(ModItems.DRAGON_SKIN.get());
+            event.accept(ModItems.DRAGON_MATERIAL.get());
+            event.accept(ModItems.DRAGON_SADDLE.get());
         } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItems.EMERALD_SWORD.get());
             event.accept(ModItems.LONGBOW.get());

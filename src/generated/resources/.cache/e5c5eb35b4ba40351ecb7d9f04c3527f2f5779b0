@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-10T12:26:05.7734445	Advancements
+// 1.21.8	2025-10-15T13:48:54.1072664	Advancements
 4081d8d226aa25f3d06f1d8714aafed496b641a3 data/hkbmod/advancement/archer/level_0.json
 1212cdd13002f8617cb09b9f15cd614d0d90bd66 data/hkbmod/advancement/archer/level_1.json
 f493924900bb1d245dc342fb82c6e6474ed68b2b data/hkbmod/advancement/archer/level_2.json
@@ -9,8 +9,8 @@ f493924900bb1d245dc342fb82c6e6474ed68b2b data/hkbmod/advancement/archer/level_2.
 36657a713d1d9ab54200614aacb5a3454897bc89 data/hkbmod/advancement/cavalier/level_1.json
 266bb0658e5f4f966a3a2060c5ac804f8287bd3c data/hkbmod/advancement/cavalier/level_2.json
 8c54db981c937f726cd8dbc9ad8523e4a9cfe57c data/hkbmod/advancement/cavalier/level_3.json
-210d917bc66fa5ee7f2adc3bc51389a1c0093c8d data/hkbmod/advancement/cavalier/level_4.json
-6a5044e9c99c21419f03d1760083bcccd6e8a751 data/hkbmod/advancement/cavalier/level_5.json
+4e23f4eedd49392ecb2b7bb5e932b756c432d0ec data/hkbmod/advancement/cavalier/level_4.json
+6384d70883d1455d2a0bf1c7a912b89c55d52dfc data/hkbmod/advancement/cavalier/level_5.json
 7328f80e28bc26c1f4bf723d87ca61a12b97f8df data/hkbmod/advancement/knight/level_0.json
 a9df98de32b41b09d92b5b97fb22a5a219d9f005 data/hkbmod/advancement/knight/level_1.json
 b201e3de92d0286e50da36d85bc40c9ec1e72757 data/hkbmod/advancement/knight/level_2.json

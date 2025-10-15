@@ -50,15 +50,19 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
             entity.getDeltaMovement().z * entity.getDeltaMovement().z);
         this.model.setMovementSpeed(movementSpeed);
 
-        // Pass resting state to the model
+        // Pass resting state to the model (for wild dragons resting on nests)
         this.model.setResting(entity.isResting());
+
+        // Pass sitting state to the model (for tamed dragons that are commanded to sit)
+        this.model.setSitting(entity.isSitting());
 
         // Debug: Log movement speed every second when landed
         if (entity.isLanded() && entity.tickCount % 20 == 0) {
             System.out.println("[RENDERER] Setting movement speed: " + String.format("%.4f", movementSpeed) +
                 ", deltaX=" + String.format("%.4f", entity.getDeltaMovement().x) +
                 ", deltaZ=" + String.format("%.4f", entity.getDeltaMovement().z) +
-                ", isResting=" + entity.isResting());
+                    ", isResting=" + entity.isResting() +
+                    ", isSitting=" + entity.isSitting());
         }
 
         // Set the flap time for wing animation based on entity age
@@ -68,16 +72,16 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
             renderState.flapTime = 0.0F;
             // Log every second (20 ticks) on client side
             if (entity.tickCount % 20 == 0) {
-                System.out.println("[RENDERER-CLIENT] Dragon animation state: flapTime=0.0 (WINGS FOLDED), " +
-                    "isLanded=true, movementSpeed=" + String.format("%.3f", movementSpeed));
+                /*System.out.println("[RENDERER-CLIENT] Dragon animation state: flapTime=0.0 (WINGS FOLDED), " +
+                    "isLanded=true, movementSpeed=" + String.format("%.3f", movementSpeed));*/
             }
         } else {
             // Dragon is flying (includes landing approach) - keep wings flapping
             renderState.flapTime = (entity.tickCount + partialTick) / 10.0F;
             // Log every 5 seconds (100 ticks) during flight
             if (entity.tickCount % 100 == 0) {
-                System.out.println("[RENDERER-CLIENT] Dragon animation state: flapTime=" +
-                    String.format("%.2f", renderState.flapTime) + " (WINGS FLAPPING), isLandingMode=" + entity.isLandingMode());
+                /*System.out.println("[RENDERER-CLIENT] Dragon animation state: flapTime=" +
+                    String.format("%.2f", renderState.flapTime) + " (WINGS FLAPPING), isLandingMode=" + entity.isLandingMode());*/
             }
         }
 

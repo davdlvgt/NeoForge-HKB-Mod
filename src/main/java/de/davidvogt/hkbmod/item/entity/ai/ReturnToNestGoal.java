@@ -30,6 +30,11 @@ public class ReturnToNestGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        // Only active for wild dragons, not tamed ones
+        if (dragon.isTamed()) {
+            return false;
+        }
+
         // Only run if dragon has a nest
         if (!dragon.hasNest()) {
             return false;

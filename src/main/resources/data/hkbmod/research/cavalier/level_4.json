@@ -14,7 +14,9 @@
       "count": 3
     }
   ],
-  "unlocks": [],
+  "unlocks": [
+    "dragon_material"
+  ],
     "advancement": {
         "title": "Cavalier: Master",
         "description": "Achieve cavalry mastery"

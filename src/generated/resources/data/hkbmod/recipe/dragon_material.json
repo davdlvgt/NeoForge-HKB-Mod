@@ -1,0 +1,15 @@
+{
+  "type": "hkbmod:research_crafting",
+  "category": "equipment",
+  "key": {
+    "D": "hkbmod:dragon_skin"
+  },
+  "pattern": [
+    "DD",
+    "DD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hkbmod:dragon_material"
+  }
+}

@@ -2,9 +2,7 @@ package de.davidvogt.hkbmod.util;
 
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.recipe.ResearchCraftingRecipe;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
@@ -47,7 +45,10 @@ public class RecipeHelper {
                 "time_setter",
                 // Miner recipes
                 "emerald_pickaxe",
-                "magic_pickaxe"
+                "magic_pickaxe",
+                // Cavalier recipes
+                "dragon_material",
+                "dragon_saddle"
         );
     }
 

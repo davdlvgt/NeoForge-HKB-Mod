@@ -50,8 +50,8 @@ public class ModAdvancementProvider implements AdvancementSubProvider {
         addImpossibleAdvancement(saver, "cavalier/level_1", "cavalier/level_0", Items.IRON_HORSE_ARMOR, AdvancementType.TASK);
         addImpossibleAdvancement(saver, "cavalier/level_2", "cavalier/level_1", Items.DIAMOND_HORSE_ARMOR, AdvancementType.TASK);
         addImpossibleAdvancement(saver, "cavalier/level_3", "cavalier/level_2", Items.GOLDEN_HORSE_ARMOR, AdvancementType.TASK);
-        addImpossibleAdvancement(saver, "cavalier/level_4", "cavalier/level_3", Items.BLACK_BANNER, AdvancementType.GOAL);
-        addImpossibleAdvancement(saver, "cavalier/level_5", "cavalier/level_4", Items.TOTEM_OF_UNDYING, AdvancementType.CHALLENGE);
+        addCraftingAdvancement(saver, "cavalier/level_4", "cavalier/level_3", ModItems.DRAGON_MATERIAL, "dragon_material");
+        addCraftingAdvancement(saver, "cavalier/level_5", "cavalier/level_4", ModItems.DRAGON_SADDLE, "dragon_saddle");
 
         // KNIGHT
         addImpossibleAdvancement(saver, "knight/level_0", "research/root", Items.IRON_SWORD, AdvancementType.TASK);

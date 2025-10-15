@@ -2,8 +2,8 @@ package de.davidvogt.hkbmod.item.entity.ai;
 
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -50,12 +50,20 @@ public class DragonFlyingGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return true; // Always active
+        // Only active for wild dragons, not tamed ones
+        if (dragon.isTamed()) {
+            return false;
+        }
+        return true; // Always active for wild dragons
     }
 
     @Override
     public boolean canContinueToUse() {
-        return true; // Always active
+        // Stop if dragon gets tamed
+        if (dragon.isTamed()) {
+            return false;
+        }
+        return true; // Always active for wild dragons
     }
 
     @Override

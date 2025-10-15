@@ -5,10 +5,7 @@ import de.davidvogt.hkbmod.item.custom.LongbowArrowItem;
 import de.davidvogt.hkbmod.item.custom.LongbowItem;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
 import de.davidvogt.hkbmod.item.custom.TimeSetterItem;
-import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ToolMaterial;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -129,6 +126,22 @@ public class ModItems {
 
     public static final DeferredItem<Item> DEER_ANTLERS = ITEMS.registerSimpleItem(
             "deer_antlers",
+            new Item.Properties()
+    );
+
+    // Dragon drops
+    public static final DeferredItem<Item> DRAGON_SKIN = ITEMS.registerSimpleItem(
+            "dragon_skin",
+            new Item.Properties()
+    );
+
+    public static final DeferredItem<Item> DRAGON_MATERIAL = ITEMS.registerSimpleItem(
+            "dragon_material",
+            new Item.Properties()
+    );
+
+    public static final DeferredItem<Item> DRAGON_SADDLE = ITEMS.registerSimpleItem(
+            "dragon_saddle",
             new Item.Properties()
     );
 

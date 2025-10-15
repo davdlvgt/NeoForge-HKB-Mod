@@ -52,8 +52,25 @@ public class DefendNestGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        // Only active for wild dragons, not tamed ones
+        if (dragon.isTamed()) {
+            return false;
+        }
+
+        // Check periodically
+        checkTimer++;
+        if (checkTimer < CHECK_INTERVAL) {
+            return false;
+        }
+        checkTimer = 0;
+
         // Only defend if dragon has a nest
         if (!dragon.hasNest()) {
+            return false;
+        }
+
+        // Tamed dragons don't defend their nest aggressively
+        if (dragon.isTamed()) {
             return false;
         }
 
@@ -78,6 +95,7 @@ public class DefendNestGoal extends Goal {
             Player.class,
             searchArea,
             player -> !player.isSpectator() && !player.isCreative() && player.isAlive()
+                    && !dragon.isPlayerHoldingEnchantedGoldenApple(player) // Don't attack players holding enchanted golden apples
         );
 
         if (!nearbyPlayers.isEmpty()) {

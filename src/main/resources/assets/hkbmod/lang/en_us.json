@@ -7,7 +7,8 @@
     "item.hkbmod.deer_beef": "Raw Venison",
     "item.hkbmod.cooked_deer_beef": "Cooked Venison",
     "item.hkbmod.deer_antlers": "Deer Antlers",
-
+    "entity.hkbmod.dragon": "Dragon",
+    "item.hkbmod.dragon_skin": "Dragon Skin",
     "gui.hkbmod.recipe_book.ingredients": "Required Ingredients:",
 
     "advancements.hkbmod.root.title": "HKB Mod",
