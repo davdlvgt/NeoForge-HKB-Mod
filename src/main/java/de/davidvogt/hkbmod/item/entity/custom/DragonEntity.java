@@ -13,6 +13,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -56,11 +57,25 @@ public class DragonEntity extends Monster {
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Boolean> DATA_IS_SITTING =
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_IS_FLYING_MODE =
+            SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
 
     private final DragonFlightHistory flightHistory = new DragonFlightHistory();
     private int landedTimer = 0;
     private int flyingTimer = 0;
     private int tamingTimer = 0; // Timer für die 3-Sekunden-Zeitspanne nach dem Essen des goldenen Apfels
+    private int lastJumpTime = 0; // Timer für Doppelklick-Erkennung (Leertaste)
+    private int fireballCooldown = 0; // Cooldown für Feuerball-Attacken (30 ticks = 1.5 Sekunden)
+    private int fireBreathDuration = 0; // Wie lange der Drache bereits Feuer speit (max 60 ticks = 3 Sekunden)
+    private int fireBreathCooldown = 0; // Cooldown nach 3 Sekunden Feuer speien (40 ticks = 2 Sekunden)
+
+    // Stabile Boden-Erkennung mit Hysterese
+    private int onGroundTimer = 0; // Zählt Ticks, in denen der Drache auf dem Boden ist
+    private int inAirTimer = 0; // Zählt Ticks, in denen der Drache in der Luft ist
+    private static final int GROUND_STABILITY_THRESHOLD = 10; // 0.5 Sekunden stabil auf Boden
+    private static final int AIR_STABILITY_THRESHOLD = 10; // 0.5 Sekunden stabil in der Luft
+
+    private boolean isBreathingFire = false; // Ob der Drache gerade aktiv Feuer speit
 
     // Nest position tracking
     @Nullable
@@ -84,6 +99,7 @@ public class DragonEntity extends Monster {
         builder.define(DATA_ATE_GOLDEN_APPLE, false);
         builder.define(DATA_OWNER_UUID, "");
         builder.define(DATA_IS_SITTING, false);
+        builder.define(DATA_IS_FLYING_MODE, false);
     }
 
     public boolean isLanded() {
@@ -198,6 +214,25 @@ public class DragonEntity extends Monster {
                     " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
         }
         this.entityData.set(DATA_ATE_GOLDEN_APPLE, ateGoldenApple);
+    }
+
+    /**
+     * Checks if the dragon is in flying mode (when being ridden)
+     */
+    public boolean isFlyingMode() {
+        return this.entityData.get(DATA_IS_FLYING_MODE);
+    }
+
+    /**
+     * Sets the flying mode for the dragon (when being ridden)
+     */
+    public void setFlyingMode(boolean flyingMode) {
+        boolean oldValue = this.entityData.get(DATA_IS_FLYING_MODE);
+        if (oldValue != flyingMode && !this.level().isClientSide) {
+            System.out.println("[DRAGON] State change - isFlyingMode: " + oldValue + " -> " + flyingMode +
+                    " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+        }
+        this.entityData.set(DATA_IS_FLYING_MODE, flyingMode);
     }
 
     /**
@@ -324,6 +359,105 @@ public class DragonEntity extends Monster {
     }
 
     /**
+     * Shoots a fireball in the direction the rider is looking (used when player commands the dragon in the air)
+     * Can be called when player is riding the dragon in the air and presses the fire key
+     */
+    public void shootFireballInDirection(Vec3 direction) {
+        if (this.level().isClientSide) {
+            System.out.println("[DRAGON-FIREBALL] shootFireballInDirection called on CLIENT - returning!");
+            return;
+        }
+
+        System.out.println("[DRAGON-FIREBALL] shootFireballInDirection executing on SERVER!");
+
+        // Normalize direction
+        Vec3 normalizedDir = direction.normalize();
+
+        // Create a large fireball (like Ghast fireballs) with TNT-like explosion
+        ExplosiveFireballEntity fireball = new ExplosiveFireballEntity(
+            this.level(),
+            this,
+            normalizedDir.x,
+            normalizedDir.y,
+            normalizedDir.z
+        );
+
+        // Position the fireball in front of the dragon's mouth
+        Vec3 lookVec = this.getViewVector(1.0F);
+        double spawnDistance = 2.0;
+        fireball.setPos(
+            this.getX() + lookVec.x * spawnDistance,
+            this.getY(0.5) + 0.5,
+            this.getZ() + lookVec.z * spawnDistance
+        );
+
+        // Add the fireball to the world
+        this.level().addFreshEntity(fireball);
+
+        // Play fireball shooting sound
+        this.playSound(SoundEvents.GHAST_SHOOT, 1.0F, 1.0F);
+
+        System.out.println("[DRAGON-FIREBALL] Fireball shot in direction: " + normalizedDir);
+    }
+
+    /**
+     * Checks if the dragon can shoot a fireball (cooldown check)
+     */
+    public boolean canShootFireball() {
+        return this.fireballCooldown <= 0;
+    }
+
+    /**
+     * Gets the current fireball cooldown in ticks
+     */
+    public int getFireballCooldown() {
+        return this.fireballCooldown;
+    }
+
+    /**
+     * Sets the fireball cooldown to a specific value
+     */
+    public void setFireballCooldown(int ticks) {
+        this.fireballCooldown = ticks;
+    }
+
+    /**
+     * Checks if the dragon can breathe fire on ground (cooldown check)
+     */
+    public boolean canBreatheFireOnGround() {
+        return this.fireBreathCooldown <= 0;
+    }
+
+    /**
+     * Gets the current fire breath cooldown in ticks
+     */
+    public int getFireBreathCooldown() {
+        return this.fireBreathCooldown;
+    }
+
+    /**
+     * Gets the current fire breath duration in ticks
+     */
+    public int getFireBreathDuration() {
+        return this.fireBreathDuration;
+    }
+
+    /**
+     * Increments the fire breath duration by 1 tick
+     */
+    public void incrementFireBreathDuration() {
+        this.fireBreathDuration++;
+    }
+
+    /**
+     * Starts the fire breath cooldown (2 seconds = 40 ticks) and resets duration
+     */
+    public void startFireBreathCooldown() {
+        this.fireBreathCooldown = 40; // 2 seconds
+        this.fireBreathDuration = 0;
+    }
+
+    /**
      * Breathes fire at close range, creating a cone of fire particles and damaging entities
      * Used when dragon is close to the target (< 10 blocks)
      */
@@ -402,6 +536,95 @@ public class DragonEntity extends Monster {
     }
 
     /**
+     * Breathes fire in a specific direction (used when player commands the dragon)
+     * Can be called when player is riding the dragon and right-clicks with empty main hand
+     */
+    public void breatheFireInDirection(Vec3 direction) {
+        if (this.level().isClientSide) {
+            System.out.println("[DRAGON-BREATH] breatheFireInDirection called on CLIENT - returning!");
+            return;
+        }
+
+        System.out.println("[DRAGON-BREATH] breatheFireInDirection executing on SERVER!");
+        System.out.println("[DRAGON-BREATH] Dragon position: " + this.getX() + ", " + this.getY() + ", " + this.getZ());
+        System.out.println("[DRAGON-BREATH] Direction: " + direction);
+
+        Vec3 normalizedDir = direction.normalize();
+        Vec3 startPos = new Vec3(this.getX() + 2, this.getY(0.5) + 0.5, this.getZ());
+
+        System.out.println("[DRAGON-BREATH] Start position: " + startPos);
+        System.out.println("[DRAGON-BREATH] Normalized direction: " + normalizedDir);
+
+        // Create a cone of fire in front of the dragon
+        // Fire breath extends 10 blocks forward (slightly longer than auto-breath)
+        double breathRange = 8.0D;
+
+        int particleCount = 0;
+        int entityHitCount = 0;
+
+        // Check multiple points in a cone shape for entities to damage
+        for (double distance = 1.0D; distance <= breathRange; distance += 0.5D) {
+            // Create a cone by checking slightly offset positions
+            for (double offset = -0.5D; offset <= 0.5D; offset += 0.25D) {
+                Vec3 perpendicular = new Vec3(-normalizedDir.z, 0, normalizedDir.x).normalize();
+                Vec3 checkPos = startPos.add(
+                    normalizedDir.x * distance + perpendicular.x * offset * distance * 0.3,
+                    normalizedDir.y * distance,
+                    normalizedDir.z * distance + perpendicular.z * offset * distance * 0.3
+                );
+
+                // Spawn fire particles - NUR FEUER!
+                ((ServerLevel)this.level()).sendParticles(
+                    net.minecraft.core.particles.ParticleTypes.FLAME,
+                    checkPos.x, checkPos.y, checkPos.z,
+                    5, // More particles for visibility
+                    0.2, 0.2, 0.2,
+                    0.03
+                );
+                particleCount++;
+
+                // Add smoke
+                if (distance > 2.0D && this.random.nextFloat() < 0.5F) {
+                    ((ServerLevel)this.level()).sendParticles(
+                        net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
+                        checkPos.x, checkPos.y, checkPos.z,
+                        3,
+                        0.25, 0.25, 0.25,
+                        0.02
+                    );
+                }
+
+
+                // Check for entities to damage
+                AABB damageBox = new AABB(checkPos.x - 0.6, checkPos.y - 0.6, checkPos.z - 0.6,
+                                          checkPos.x + 0.6, checkPos.y + 0.6, checkPos.z + 0.6);
+
+                List<LivingEntity> entities = this.level().getEntitiesOfClass(
+                    LivingEntity.class,
+                    damageBox,
+                    entity -> entity != this && entity.isAlive() && !entity.equals(this.getControllingPassenger())
+                );
+
+                for (LivingEntity entity : entities) {
+                    // Deal fire damage (slightly more damage than auto-breath)
+                    entity.hurt(this.damageSources().mobAttack(this), 4.0F);
+                    // Set entity on fire for 6 seconds (120 ticks)
+                    entity.setRemainingFireTicks(120);
+                    entityHitCount++;
+                    System.out.println("[DRAGON-BREATH] Hit entity: " + entity.getName().getString());
+                }
+            }
+        }
+
+        // Play dragon fire sound
+        this.playSound(SoundEvents.ENDER_DRAGON_SHOOT, 1.5F, 0.8F);
+
+        System.out.println("[DRAGON-BREATH] Spawned " + particleCount + " particle groups");
+        System.out.println("[DRAGON-BREATH] Hit " + entityHitCount + " entities");
+        System.out.println("[DRAGON-BREATH] Dragon breathing fire in commanded direction - COMPLETE!");
+    }
+
+    /**
      * Get the flight history for rendering animations
      */
     public DragonFlightHistory getFlightHistory() {
@@ -465,6 +688,231 @@ public class DragonEntity extends Monster {
     @Override
     public boolean isPickable() {
         return true; // Always allow interactions with the dragon
+    }
+
+    /**
+     * Allow players to ride the dragon if it's tamed
+     */
+    @Override
+    protected boolean canAddPassenger(net.minecraft.world.entity.Entity passenger) {
+        // Only allow one passenger (the owner)
+        return this.getPassengers().isEmpty() && this.isTamed();
+    }
+
+    /**
+     * Position the rider on the dragon's back
+     */
+    @Override
+    protected void positionRider(net.minecraft.world.entity.Entity passenger, net.minecraft.world.entity.Entity.MoveFunction moveFunction) {
+        if (this.hasPassenger(passenger)) {
+            // Position the rider on the dragon's back, scaled appropriately
+            float scale = this.getDragonScale();
+            double xOffset = 0.0D;
+            double yOffset = 1.2D * scale; // Adjust height based on dragon scale
+            double zOffset = scale; // Slightly forward of center
+
+            // Apply rotation to offset
+            float yaw = this.getYRot() * ((float)Math.PI / 180F);
+            double rotatedX = xOffset * Math.cos(yaw) - zOffset * Math.sin(yaw);
+            double rotatedZ = xOffset * Math.sin(yaw) + zOffset * Math.cos(yaw);
+
+            moveFunction.accept(passenger, this.getX() + rotatedX, this.getY() + yOffset, this.getZ() + rotatedZ);
+        }
+    }
+
+    /**
+     * Get the Y offset for passengers riding this dragon
+     */
+    public double getPassengersRidingOffset() {
+        return this.getBbHeight() * 0.75D;
+    }
+
+    /**
+     * Get the entity that is controlling this dragon (the rider)
+     */
+    @Nullable
+    @Override
+    public LivingEntity getControllingPassenger() {
+        Entity firstPassenger = this.getFirstPassenger();
+        if (firstPassenger instanceof Player player) {
+            // Only the owner can control the dragon
+            if (this.getOwnerUUID().isPresent() && this.getOwnerUUID().get().equals(player.getUUID())) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Handle movement when a player is riding the dragon
+     */
+    @Override
+    public void travel(Vec3 travelVector) {
+        if (this.isAlive()) {
+            LivingEntity rider = this.getControllingPassenger();
+
+            if (rider != null && this.isVehicle()) {
+                // The dragon is being ridden - use player's input
+
+                // Set rotation to match rider's look direction
+                this.setYRot(rider.getYRot());
+                this.yRotO = this.getYRot();
+                this.setXRot(rider.getXRot() * 0.5F); // Reduce pitch influence for smoother flight
+                this.setRot(this.getYRot(), this.getXRot());
+                this.yBodyRot = this.getYRot();
+                this.yHeadRot = this.getYRot();
+
+                // Get player's movement input
+                float strafe = rider.xxa * 0.5F; // A/D keys (left/right)
+                float forward = rider.zza; // W/S keys (forward/backward)
+
+                // Flugsteuerung: Nur fliegen, wenn Leertaste gedrückt gehalten wird
+                boolean isJumping = rider.isJumping();
+
+                if (isJumping) {
+                    // FLUGMODUS - Leertaste wird gedrückt gehalten
+
+                    float movementSpeed = (float)this.getAttributeValue(Attributes.FLYING_SPEED) * 0.15F;
+
+                    // W-Taste erhöht die Geschwindigkeit (Boost-Effekt)
+                    float speedMultiplier = 1.0F;
+                    if (forward > 0) {
+                        // W gedrückt = schneller fliegen (1.5x bis 2.0x Geschwindigkeit)
+                        speedMultiplier = 1.0F + (forward * 1.0F); // Bei vollem W-Druck: 2.0x Geschwindigkeit
+                    } else if (forward < 0) {
+                        // S gedrückt = langsamer / rückwärts (0.5x Geschwindigkeit)
+                        speedMultiplier = 0.5F;
+                    }
+
+                    // Enable flying
+                    this.setNoGravity(true);
+                    this.setLanded(false); // Nur im aktiven Flugmodus auf false setzen
+                    this.setFlyingMode(true);
+
+                    // Maus steuert die Flugrichtung (Look-Vektor)
+                    Vec3 lookVec = rider.getLookAngle();
+
+                    // Bewegung in Blickrichtung mit Geschwindigkeitsmultiplikator
+                    Vec3 forwardMovement = new Vec3(
+                        lookVec.x * movementSpeed * speedMultiplier,
+                        lookVec.y * movementSpeed * speedMultiplier, // Volle vertikale Kontrolle durch Maus
+                        lookVec.z * movementSpeed * speedMultiplier
+                    );
+
+                    // Strafe movement (A/D für seitliche Bewegung)
+                    Vec3 rightVec = lookVec.cross(new Vec3(0, 1, 0)).normalize();
+                    Vec3 strafeMovement = new Vec3(
+                        rightVec.x * strafe * movementSpeed * 0.8F,
+                        0,
+                        rightVec.z * strafe * movementSpeed * 0.8F
+                    );
+
+                    // Optional: Shift für gezieltes Sinken (unabhängig von der Maus-Blickrichtung)
+                    Vec3 verticalAdjustment = Vec3.ZERO;
+                    if (rider.isShiftKeyDown()) {
+                        verticalAdjustment = new Vec3(0, -movementSpeed * 0.6D, 0);
+                    }
+
+                    // Kombiniere alle Bewegungen
+                    Vec3 totalMovement = forwardMovement.add(strafeMovement).add(verticalAdjustment);
+
+                    // Apply movement
+                    this.setDeltaMovement(
+                        totalMovement.x,
+                        totalMovement.y,
+                        totalMovement.z
+                    );
+
+                    // Play flying sound occasionally
+                    if (this.tickCount % 20 == 0) {
+                        this.playSound(SoundEvents.ENDER_DRAGON_FLAP, 0.5F, 1.0F);
+                    }
+
+                    // Move the entity
+                    this.move(net.minecraft.world.entity.MoverType.SELF, this.getDeltaMovement());
+                } else {
+                    // LANDUNGSMODUS - Leertaste nicht gedrückt, Drache schwebt zurück zum Boden
+                    this.setFlyingMode(false);
+
+                    // Prüfe, ob der Drache den Boden berührt
+                    boolean isOnGround = this.onGround();
+
+                    // DEBUG: Zeige aktuellen Status an
+                    if (!this.level().isClientSide && this.tickCount % 5 == 0) {
+                        System.out.println("[DRAGON-TRAVEL] onGround: " + isOnGround + ", isLanded: " + this.isLanded() + ", flyingMode: " + this.isFlyingMode());
+                    }
+
+                    if (!isOnGround) {
+                        // Drache ist noch in der Luft - sanftes Gleiten zum Boden
+                        this.setNoGravity(false); // Gravity aktivieren für sanftes Sinken
+
+                        float movementSpeed = (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.5F;
+
+                        // Horizontale Bewegung ist weiterhin möglich während des Gleitens
+                        Vec3 lookVec = rider.getLookAngle();
+                        Vec3 forwardMovement = new Vec3(
+                            lookVec.x * forward * movementSpeed,
+                            0,
+                            lookVec.z * forward * movementSpeed
+                        );
+
+                        Vec3 rightVec = lookVec.cross(new Vec3(0, 1, 0)).normalize();
+                        Vec3 strafeMovement = new Vec3(
+                            rightVec.x * strafe * movementSpeed,
+                            0,
+                            rightVec.z * strafe * movementSpeed
+                        );
+
+                        // Sanftes Sinken - Gravitation + kleine Bremsung
+                        Vec3 currentMovement = this.getDeltaMovement();
+                        Vec3 totalMovement = forwardMovement.add(strafeMovement);
+
+                        this.setDeltaMovement(
+                            totalMovement.x,
+                            currentMovement.y * 0.95D - 0.05D, // Sanftes Sinken
+                            totalMovement.z
+                        );
+
+                        // Move the entity
+                        this.move(net.minecraft.world.entity.MoverType.SELF, this.getDeltaMovement());
+
+                        // Prüfe erneut, ob der Drache jetzt gelandet ist
+                        if (this.onGround()) {
+                            if (!this.isLanded()) {
+                                this.playSound(SoundEvents.HORSE_LAND, 1.0F, 1.0F);
+                                System.out.println("[DRAGON-RIDING] Dragon landed on ground - setting isLanded to TRUE");
+                            }
+                            this.setLanded(true);
+                        }
+                    } else {
+                        // LAUFMODUS - Drache ist am Boden und läuft
+                        this.setNoGravity(false);
+
+                        // DEBUG: Zeige wenn wir isLanded setzen
+                        if (!this.level().isClientSide && !this.isLanded()) {
+                            System.out.println("[DRAGON-TRAVEL] Dragon is on ground in walk mode - setting isLanded to TRUE");
+                        }
+                        this.setLanded(true); // WICHTIG: Setze landed auf true!
+
+                        // Use normal ground movement speed
+                        float movementSpeed = (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+
+                        // Set the movement vector for normal walking
+                        this.setSpeed(movementSpeed);
+
+                        // Let the default travel logic handle ground movement
+                        super.travel(new Vec3(strafe * 2.0F, travelVector.y, forward * 2.0F));
+                        return;
+                    }
+                }
+
+                // Don't call super.travel() for flying/gliding modes
+                return;
+            }
+        }
+
+        // Default movement when not being ridden
+        super.travel(travelVector);
     }
 
     /**
@@ -545,6 +993,68 @@ public class DragonEntity extends Monster {
     public void tick() {
         super.tick();
 
+        // NEUE STABILE BODEN-ERKENNUNG MIT HYSTERESE UND TOLERANZ
+        if (!this.level().isClientSide) {
+            // Wenn der Drache einen Reiter hat
+            if (this.isVehicle() && this.getControllingPassenger() != null) {
+                // Wenn Flugmodus aktiv ist (Leertaste gedrückt), setze isLanded sofort auf false
+                if (this.isFlyingMode()) {
+                    this.onGroundTimer = 0;
+                    this.inAirTimer = 0;
+                    if (this.isLanded()) {
+                        this.setLanded(false);
+                    }
+                } else {
+                    // NICHT im Flugmodus: Verwende Hysterese-Logik mit Toleranz-Prüfung
+                    boolean currentlyOnGround = this.onGround();
+
+                    // ZUSÄTZLICHE PRÜFUNG: Ist der Drache innerhalb von 0.1 Blöcken über dem Boden?
+                    boolean isNearGround = false;
+                    if (!currentlyOnGround) {
+                        // Prüfe die vertikale Distanz zum Boden
+                        BlockPos posBelow = this.blockPosition().below();
+                        double distanceToGround = this.getY() - posBelow.getY() - 1.0; // -1.0 weil posBelow bereits 1 Block unter dem Drachen ist
+
+                        // Wenn der Drache weniger als 0.1 Blöcke über dem Boden schwebt, gilt er als "auf dem Boden"
+                        if (distanceToGround <= 0.1) {
+                            isNearGround = true;
+                        }
+                    }
+
+                    // Der Drache gilt als "auf dem Boden" wenn onGround() true ist ODER er sehr nahe am Boden ist
+                    boolean effectivelyOnGround = currentlyOnGround || isNearGround;
+
+                    if (effectivelyOnGround) {
+                        // Drache berührt den Boden oder ist sehr nahe dran
+                        this.onGroundTimer++;
+                        this.inAirTimer = 0;
+
+                        // Nur wenn er STABIL auf dem Boden ist (10+ Ticks), setze isLanded auf true
+                        if (this.onGroundTimer >= GROUND_STABILITY_THRESHOLD && !this.isLanded()) {
+                            this.setLanded(true);
+                            System.out.println("[DRAGON-TICK-STABLE] Dragon stable on ground for " +
+                                this.onGroundTimer + " ticks (tolerance check: " + isNearGround + ") - setting isLanded to TRUE");
+                        }
+                    } else {
+                        // Drache ist in der Luft
+                        this.inAirTimer++;
+                        this.onGroundTimer = 0;
+
+                        // Nur wenn er STABIL in der Luft ist (10+ Ticks), setze isLanded auf false
+                        if (this.inAirTimer >= AIR_STABILITY_THRESHOLD && this.isLanded()) {
+                            this.setLanded(false);
+                            System.out.println("[DRAGON-TICK-STABLE] Dragon stable in air for " +
+                                this.inAirTimer + " ticks - setting isLanded to FALSE");
+                        }
+                    }
+                }
+            } else {
+                // Kein Reiter: Reset Timer
+                this.onGroundTimer = 0;
+                this.inAirTimer = 0;
+            }
+        }
+
         // Handle taming timer countdown
         if (!this.level().isClientSide && this.tamingTimer > 0) {
             this.tamingTimer--;
@@ -553,6 +1063,16 @@ public class DragonEntity extends Monster {
                 this.setAteGoldenApple(false);
                 System.out.println("[DRAGON-TAMING] Taming timer expired, resetting golden apple state");
             }
+        }
+
+        // Handle fireball cooldown countdown
+        if (!this.level().isClientSide && this.fireballCooldown > 0) {
+            this.fireballCooldown--;
+        }
+
+        // Handle fire breath cooldown countdown
+        if (!this.level().isClientSide && this.fireBreathCooldown > 0) {
+            this.fireBreathCooldown--;
         }
 
         // Update rotation to match movement direction every tick
@@ -620,6 +1140,22 @@ public class DragonEntity extends Monster {
         // Check if player is already the owner (for sitting/standing commands)
         if (this.isTamed() && this.getOwnerUUID().isPresent() && this.getOwnerUUID().get().equals(player.getUUID())) {
             System.out.println("[DRAGON-INTERACT] Is tamed! Checking interaction...");
+
+            // Check if player has a lead in offhand and dragon is not sitting
+            boolean hasLeadInOffhand = offHandItem.is(Items.LEAD);
+
+            if (hasLeadInOffhand && !this.isSitting()) {
+                // Player wants to ride the dragon
+                if (player.startRiding(this)) {
+                    System.out.println("[DRAGON-RIDING] Player " + player.getName().getString() + " is now riding the dragon!");
+                    this.playSound(SoundEvents.HORSE_SADDLE.value(), 1.0F, 1.0F);
+                    return InteractionResult.SUCCESS;
+                } else {
+                    System.out.println("[DRAGON-RIDING] Failed to mount dragon!");
+                    return InteractionResult.FAIL;
+                }
+            }
+
             // Toggle sitting/following with BOTH HANDS EMPTY
             // This prevents accidental toggling when holding items
             boolean hasBothHandsEmpty = mainHandItem.isEmpty() && offHandItem.isEmpty();
@@ -628,7 +1164,7 @@ public class DragonEntity extends Monster {
             System.out.println("[DRAGON-INTERACT] Both hands empty: " + hasBothHandsEmpty);
 
             if (hasBothHandsEmpty) {
-                boolean wasSitting = this.isSitting();
+                boolean wasSitting = this.entityData.get(DATA_IS_SITTING);
 
                 System.out.println("[DRAGON-INTERACT] Player clicked dragon with empty hands - wasSitting=" + wasSitting);
                 System.out.println("[DRAGON-INTERACT] About to toggle sitting to: " + !wasSitting);

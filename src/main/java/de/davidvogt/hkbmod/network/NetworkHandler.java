@@ -48,6 +48,12 @@ public class NetworkHandler {
             PlaceRecipePacket::handle
         );
 
+        registrar.playToServer(
+            DragonBreathFirePacket.TYPE,
+            DragonBreathFirePacket.STREAM_CODEC,
+            DragonBreathFirePacket::handle
+        );
+
         registrar.playToClient(
             SyncPlayerResearchPacket.TYPE,
             SyncPlayerResearchPacket.STREAM_CODEC,

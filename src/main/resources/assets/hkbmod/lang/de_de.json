@@ -8,6 +8,10 @@
     "item.hkbmod.deer_antlers": "Hirschgeweih",
     "entity.hkbmod.dragon": "Drache",
     "item.hkbmod.dragon_skin": "Drachenhaut",
+
+    "key.category.hkbmod": "HKB Mod",
+    "key.hkbmod.dragon_fire": "Drachen-Feueratem",
+
     "advancements.hkbmod.root.title": "HKB Mod",
     "advancements.hkbmod.root.description": "Beginne deine Reise mit den Heldenklassen",
 
