@@ -33,11 +33,10 @@ public class ModBiomeModifiers {
                         biomes.getOrThrow(Biomes.FROZEN_PEAKS),
                         biomes.getOrThrow(Biomes.JAGGED_PEAKS),
                         biomes.getOrThrow(Biomes.WINDSWEPT_HILLS),
-                        biomes.getOrThrow(Biomes.WINDSWEPT_GRAVELLY_HILLS),
                         biomes.getOrThrow(Biomes.WINDSWEPT_FOREST),
-                        biomes.getOrThrow(Biomes.MEADOW),
-                        biomes.getOrThrow(Biomes.GROVE),
-                        biomes.getOrThrow(Biomes.SNOWY_SLOPES)
+                        biomes.getOrThrow(Biomes.WINDSWEPT_SAVANNA),
+                        biomes.getOrThrow(Biomes.ERODED_BADLANDS),
+                        biomes.getOrThrow(Biomes.MEADOW)
                 ),
                 HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.DRAGON_NEST_PLACED_KEY)),
                 GenerationStep.Decoration.SURFACE_STRUCTURES));

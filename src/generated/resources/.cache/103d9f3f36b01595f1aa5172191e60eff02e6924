@@ -1,7 +1,7 @@
-// 1.21.8	2025-10-15T12:50:00.2254998	Registries
+// 1.21.8	2025-10-18T13:34:51.4651503	Registries
 42173777d43d393575075dabba420bb1d23f9ae9 data/hkbmod/neoforge/biome_modifier/add_dragon_nest.json
 de1993d2865b366c62d8abb3d8ec1c503dc3661e data/hkbmod/neoforge/biome_modifier/add_tree_robinia.json
 e80e5376e16f32e39707bbf39788ae0b302b6a21 data/hkbmod/worldgen/configured_feature/dragon_nest.json
 e74c96ce56c10da35be1d7bf471dfafbd5aadc81 data/hkbmod/worldgen/configured_feature/robinia.json
-979051eb1d374dc9aa92494d8d445226aa0651b2 data/hkbmod/worldgen/placed_feature/dragon_nest_placed.json
+ffc3cd466c6685d3e8dcd0550340a8afb7cb480f data/hkbmod/worldgen/placed_feature/dragon_nest_placed.json
 32c8129a80a63c5c2105866bac93715559814307 data/hkbmod/worldgen/placed_feature/robinia_placed.json

@@ -210,11 +210,8 @@ public class DragonNestFeature extends Feature<NoneFeatureConfiguration> {
      */
     private void placeDoubleSlabWithEgg(WorldGenLevel level, BlockPos baseSlabPos) {
         // Place second slab on top of the existing one
-        BlockPos topSlabPos = baseSlabPos.below();
-        level.setBlock(topSlabPos, Blocks.MOSSY_COBBLESTONE_SLAB.defaultBlockState(), 3);
-
-        // Place dragon egg on top of the double slab
-        BlockPos eggPos = topSlabPos.below();
+        level.setBlock(baseSlabPos, Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 3);
+        BlockPos eggPos = baseSlabPos.above();
         level.setBlock(eggPos, ModBlocks.DRAGON_EGG.get().defaultBlockState(), 3);
     }
 }
