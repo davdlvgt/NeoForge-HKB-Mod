@@ -1,10 +1,13 @@
 package de.davidvogt.hkbmod.item.entity.ai;
 
+import de.davidvogt.hkbmod.item.entity.custom.DragonConstants;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
 import java.util.Optional;
@@ -15,6 +18,8 @@ import java.util.UUID;
  * The dragon will walk towards the owner when they are too far away, and stop when close enough.
  */
 public class FollowOwnerGoal extends Goal {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FollowOwnerGoal.class);
+
     private final DragonEntity dragon;
     private final double speedModifier;
     private final float maxDistance;
@@ -65,7 +70,8 @@ public class FollowOwnerGoal extends Goal {
         this.owner = owner;
 
         if (!this.dragon.level().isClientSide) {
-            System.out.println("[FOLLOW-GOAL] Can follow - distance=" + String.format("%.2f", Math.sqrt(distanceSq)) + " blocks");
+            LOGGER.debug("Dragon {} can follow owner - distance: {:.2f} blocks",
+                this.dragon.getId(), Math.sqrt(distanceSq));
         }
 
         return true;
@@ -95,7 +101,7 @@ public class FollowOwnerGoal extends Goal {
         this.dragon.setLandingMode(false);
 
         if (!this.dragon.level().isClientSide) {
-            System.out.println("[DRAGON-FOLLOW] Started following owner - dragon set to landed state for walking");
+            LOGGER.debug("Dragon {} started following owner (walking mode)", this.dragon.getId());
         }
     }
 
@@ -105,7 +111,7 @@ public class FollowOwnerGoal extends Goal {
         this.dragon.getNavigation().stop();
 
         if (!this.dragon.level().isClientSide) {
-            System.out.println("[DRAGON-FOLLOW] Stopped following owner");
+            LOGGER.debug("Dragon {} stopped following owner", this.dragon.getId());
         }
     }
 
@@ -121,7 +127,7 @@ public class FollowOwnerGoal extends Goal {
 
         // Recalculate path every 10 ticks (0.5 seconds)
         if (--this.timeToRecalcPath <= 0) {
-            this.timeToRecalcPath = 10;
+            this.timeToRecalcPath = DragonConstants.PATH_RECALC_INTERVAL_TICKS;
 
             // Check distance to owner
             double distanceSq = this.dragon.distanceToSqr(this.owner);
@@ -154,7 +160,7 @@ public class FollowOwnerGoal extends Goal {
                     (int) ownerPos.z + z
             )) {
                 if (!this.dragon.level().isClientSide) {
-                    System.out.println("[DRAGON-FOLLOW] Teleported to owner");
+                    LOGGER.debug("Dragon {} teleported to owner", this.dragon.getId());
                 }
                 return;
             }

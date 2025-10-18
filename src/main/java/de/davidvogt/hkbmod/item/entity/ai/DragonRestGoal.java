@@ -1,25 +1,24 @@
 package de.davidvogt.hkbmod.item.entity.ai;
 
 import de.davidvogt.hkbmod.block.ModBlocks;
+import de.davidvogt.hkbmod.item.entity.custom.DragonConstants;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
 
 /**
  * Goal that makes dragons occasionally rest by lying down and curling up, similar to polar foxes.
- * The dragon will rest for 10 minutes when this goal activates.
+ * The dragon will rest for a configured duration when this goal activates.
  * Dragons fly relaxed to their nest before resting.
  */
 public class DragonRestGoal extends Goal {
-    private static final int REST_DURATION = 2000; // 2 Minuten (120 Sekunden) - FÜR TESTING
-    private static final int MIN_TIME_BETWEEN_RESTS = 0; // Keine Wartezeit - Drache ruht direkt nach dem Landen
-    private static final int CHECK_INTERVAL = 20; // Check every second
-    private static final double NEST_POSITION_THRESHOLD = 3.0; // Must be within 3 blocks of nest center
-    private static final double RELAXED_FLIGHT_SPEED = 0.6D; // Langsame, entspannte Fluggeschwindigkeit
+    private static final Logger LOGGER = LoggerFactory.getLogger(DragonRestGoal.class);
 
     private final DragonEntity dragon;
     private int restTimeLeft = 0;
@@ -43,24 +42,24 @@ public class DragonRestGoal extends Goal {
         // Increment timer every tick
         timeSinceLastRest++;
 
-        // WICHTIG: Wenn LandedTimer abgelaufen ist, prüfe JEDES Tick!
+        // Check every tick if landed timer expired, otherwise use intervals
         boolean landedTimerExpired = dragon.isLanded() && dragon.getLandedTimer() <= 0;
 
         if (!landedTimerExpired) {
-            // Nur wenn Timer nicht abgelaufen, verwende normale Prüf-Intervalle
             checkTimer++;
-            if (checkTimer < CHECK_INTERVAL) {
+            if (checkTimer < DragonConstants.CHECK_INTERVAL_TICKS) {
                 return false;
             }
             checkTimer = 0;
         } else {
-            // Timer ist abgelaufen - prüfe jedes Tick!
             checkTimer = 0;
         }
 
         // Debug log every 10 seconds or when timer expired
         if ((timeSinceLastRest % 200 == 0 || landedTimerExpired) && !dragon.level().isClientSide) {
-            System.out.println("[DRAGON-REST-DEBUG] Time since last rest: " + (timeSinceLastRest / 20.0) + "s, isLanded: " + dragon.isLanded() + ", landedTimer: " + dragon.getLandedTimer() + ", hasTarget: " + (dragon.getTarget() != null));
+            LOGGER.debug("Dragon {} rest check - time since last: {:.1f}s, landed: {}, timer: {}, has target: {}",
+                dragon.getId(), timeSinceLastRest / 20.0, dragon.isLanded(),
+                dragon.getLandedTimer(), dragon.getTarget() != null);
         }
 
         // Can't rest if already resting
@@ -76,28 +75,28 @@ public class DragonRestGoal extends Goal {
         // Find a nearby DRAGON_NEST block to rest on
         BlockPos nestPos = findNearbyNest();
         if (nestPos == null) {
-            // Debug log when timer expired
             if (landedTimerExpired && !dragon.level().isClientSide) {
-                System.out.println("[DRAGON-REST-DEBUG] *** No nest block found nearby! Dragon will take off instead. Position: " + dragon.blockPosition().toShortString() + " ***");
+                LOGGER.debug("Dragon {} - no nest found at {}, will take off instead",
+                    dragon.getId(), dragon.blockPosition());
             }
             return false;
         }
 
-        // Nach dem Landen (wenn LandedTimer abgelaufen ist), ZUFÄLLIG entscheiden ob rasten oder abheben
-        // 50% Chance zu rasten, 50% Chance direkt wieder abzuheben (wird von FlyingGoal übernommen)
+        // After landing (timer expired), randomly decide: 50% rest, 50% take off
         if (landedTimerExpired) {
             // Random decision: 50% chance to rest
             if (dragon.getRandom().nextFloat() < 0.5F) {
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[DRAGON-REST-DEBUG] ★★★ RANDOM DECISION: Dragon will fly to nest and rest at " + nestPos.toShortString() + " ★★★");
+                    LOGGER.info("Dragon {} decided to fly to nest and rest at {}",
+                        dragon.getId(), nestPos);
                 }
                 targetNestPos = nestPos;
                 return true;
             } else {
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[DRAGON-REST-DEBUG] ★★★ RANDOM DECISION: Dragon skips resting and will take off again! ★★★");
+                    LOGGER.debug("Dragon {} skipped resting, will take off",
+                        dragon.getId());
                 }
-                // Don't rest, let the dragon take off instead (handled by FlyingGoal)
                 return false;
             }
         }
@@ -109,40 +108,42 @@ public class DragonRestGoal extends Goal {
      * Finds a nearby DRAGON_NEST block within reasonable range
      */
     private BlockPos findNearbyNest() {
-        // ERSTE PRIORITÄT: Nutze die gespeicherte Nest-Position des Drachen
+        // First priority: Use saved nest position
         if (dragon.hasNest()) {
             BlockPos savedNestPos = dragon.getNestPosition();
             if (savedNestPos != null) {
-                // Prüfe ob das gespeicherte Nest noch existiert
                 BlockState state = dragon.level().getBlockState(savedNestPos);
                 if (state.is(ModBlocks.DRAGON_NEST.get())) {
                     if (!dragon.level().isClientSide) {
-                        // Berechne Distanz zwischen den beiden BlockPos
                         double distance = Math.sqrt(dragon.blockPosition().distSqr(savedNestPos));
-                        System.out.println("[DRAGON-REST-DEBUG] Using saved nest position at " + savedNestPos.toShortString() + " (distance: " + String.format("%.1f", distance) + " blocks)");
+                        LOGGER.debug("Dragon {} using saved nest at {} (distance: {:.1f} blocks)",
+                            dragon.getId(), savedNestPos, distance);
                     }
                     return savedNestPos;
                 }
             }
         }
 
-        // ZWEITE PRIORITÄT: Suche in größerem Bereich (30x30x10)
+        // Second priority: Search in area around dragon
         BlockPos dragonPos = dragon.blockPosition();
+        int searchRadius = DragonConstants.NEST_SEARCH_RADIUS;
 
         if (!dragon.level().isClientSide) {
-            System.out.println("[DRAGON-REST-DEBUG] Searching for nest in 30x30x10 area around " + dragonPos.toShortString());
+            LOGGER.debug("Dragon {} searching for nest in {}x{}x10 area",
+                dragon.getId(), searchRadius * 2, searchRadius * 2);
         }
 
-        // Check in a 30x30x10 area around the dragon (erweitert von 10x10x5)
-        for (int x = -15; x <= 15; x++) {
-            for (int z = -15; z <= 15; z++) {
+        // Check in configured area around the dragon
+        for (int x = -searchRadius; x <= searchRadius; x++) {
+            for (int z = -searchRadius; z <= searchRadius; z++) {
                 for (int y = -5; y <= 5; y++) {
                     BlockPos checkPos = dragonPos.offset(x, y, z);
                     BlockState state = dragon.level().getBlockState(checkPos);
                     if (state.is(ModBlocks.DRAGON_NEST.get())) {
                         if (!dragon.level().isClientSide) {
                             double distance = Math.sqrt(x*x + y*y + z*z);
-                            System.out.println("[DRAGON-REST-DEBUG] Found nest at " + checkPos.toShortString() + " (distance: " + String.format("%.1f", distance) + " blocks)");
+                            LOGGER.debug("Dragon {} found nest at {} (distance: {:.1f} blocks)",
+                                dragon.getId(), checkPos, distance);
                         }
                         return checkPos;
                     }
@@ -151,7 +152,7 @@ public class DragonRestGoal extends Goal {
         }
 
         if (!dragon.level().isClientSide) {
-            System.out.println("[DRAGON-REST-DEBUG] *** NO NEST FOUND in 30x30x10 area! ***");
+            LOGGER.warn("Dragon {} found no nest in search area", dragon.getId());
         }
 
         return null;
@@ -162,7 +163,7 @@ public class DragonRestGoal extends Goal {
         // Stop if we have a target (being attacked or defending)
         if (dragon.getTarget() != null) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[DRAGON-REST] Interrupted by target!");
+                LOGGER.info("Dragon {} rest interrupted by target", dragon.getId());
             }
             return false;
         }
@@ -198,7 +199,8 @@ public class DragonRestGoal extends Goal {
                     targetNestPos.getZ() + 0.5
                 )
             );
-            System.out.println("[DRAGON-REST] Dragon will fly relaxed to nest at " + targetNestPos.toShortString() + " (current distance: " + String.format("%.2f", distanceToNest) + ")");
+            LOGGER.debug("Dragon {} flying to nest at {} (distance: {:.2f} blocks)",
+                dragon.getId(), targetNestPos, distanceToNest);
         }
     }
 
@@ -206,12 +208,13 @@ public class DragonRestGoal extends Goal {
         // Only set resting to true when dragon is actually on the nest
         dragon.setResting(true);
         dragon.setLanded(true);
-        restTimeLeft = REST_DURATION;
+        restTimeLeft = DragonConstants.REST_DURATION_TICKS;
         dragon.getNavigation().stop();
         movingToNest = false;
 
         if (!dragon.level().isClientSide) {
-            System.out.println("[DRAGON-REST] ★★★ Dragon is now ON NEST and started resting for " + (REST_DURATION / 20.0) + " seconds ★★★");
+            LOGGER.info("Dragon {} started resting on nest for {:.1f} seconds",
+                dragon.getId(), DragonConstants.REST_DURATION_TICKS / 20.0);
         }
     }
 
@@ -224,11 +227,10 @@ public class DragonRestGoal extends Goal {
         movingToNest = false;
 
         if (!dragon.level().isClientSide) {
-            System.out.println("[DRAGON-REST] ★★★ Dragon finished resting - preparing to take off ★★★");
+            LOGGER.info("Dragon {} finished resting, preparing to take off", dragon.getId());
         }
 
-        // Nach dem Ruhen soll der Drache wieder fliegen
-        // Setze isLanded auf false, damit DragonFlyingGoal den Drachen wieder abheben lässt
+        // After resting, dragon should fly again
         dragon.setLanded(false);
         dragon.setFlyingTimer(0);
         dragon.setNoGravity(true);
@@ -245,10 +247,11 @@ public class DragonRestGoal extends Goal {
 
             // Log progress every 2 seconds
             if (dragon.tickCount % 40 == 0 && !dragon.level().isClientSide) {
-                System.out.println("[DRAGON-REST] Flying relaxed to nest, distance: " + String.format("%.1f", distanceToNest) + " blocks");
+                LOGGER.debug("Dragon {} flying to nest, distance: {:.1f} blocks",
+                    dragon.getId(), distanceToNest);
             }
 
-            if (distanceToNest <= NEST_POSITION_THRESHOLD) {
+            if (distanceToNest <= DragonConstants.NEST_POSITION_THRESHOLD) {
                 // Reached the nest, position dragon directly on it
                 Vec3 targetVec = new Vec3(
                     targetNestPos.getX() + 0.5,
@@ -259,7 +262,7 @@ public class DragonRestGoal extends Goal {
                 dragon.setDeltaMovement(Vec3.ZERO);
 
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[DRAGON-REST] Reached nest position, starting rest");
+                    LOGGER.debug("Dragon {} reached nest, starting rest", dragon.getId());
                 }
 
                 startResting();
@@ -268,7 +271,7 @@ public class DragonRestGoal extends Goal {
                 Vec3 normalizedDirection = directionToNest.normalize();
 
                 // Relaxed flight speed (slower than normal flying)
-                double speed = RELAXED_FLIGHT_SPEED;
+                double speed = DragonConstants.RELAXED_FLIGHT_SPEED;
 
                 // Calculate desired velocity
                 double desiredVelX = normalizedDirection.x * speed;
@@ -312,7 +315,8 @@ public class DragonRestGoal extends Goal {
 
             // Debug output every 2 seconds
             if (!dragon.level().isClientSide && restTimeLeft % 40 == 0) {
-                System.out.println("[DRAGON-REST] Resting... " + (restTimeLeft / 20.0) + " seconds remaining");
+                LOGGER.debug("Dragon {} resting... {:.1f} seconds remaining",
+                    dragon.getId(), restTimeLeft / 20.0);
             }
         }
     }

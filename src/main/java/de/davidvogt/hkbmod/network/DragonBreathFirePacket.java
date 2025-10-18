@@ -1,6 +1,7 @@
 package de.davidvogt.hkbmod.network;
 
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.item.entity.custom.DragonConstants;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -43,37 +44,24 @@ public record DragonBreathFirePacket() implements CustomPacketPayload {
             }
 
             // Determine attack type based on dragon state
-            // Simple check: isLanded() && !isFlyingMode() = on ground
             boolean isOnGround = dragon.isLanded() && !dragon.isFlyingMode();
 
             if (isOnGround) {
                 // === GROUND ATTACK: Fire Breath ===
-                // Check if we can breathe fire (not on cooldown)
                 if (dragon.canBreatheFireOnGround()) {
-                    // Breathe fire in the direction player is looking
                     dragon.breatheFireInDirection(serverPlayer.getLookAngle());
-
-                    // Update fire breath duration
                     dragon.incrementFireBreathDuration();
 
-                    // Check if we've reached max duration (3 seconds = 60 ticks)
-                    if (dragon.getFireBreathDuration() >= 60) {
-                        // Start cooldown (2 seconds = 40 ticks)
+                    if (dragon.getFireBreathDuration() >= DragonConstants.FIRE_BREATH_MAX_DURATION_TICKS) {
                         dragon.startFireBreathCooldown();
                     }
                 }
-                // If on cooldown, do nothing (cooldown is handled in tick())
             } else {
                 // === AIR ATTACK: Fireball ===
-                // Check if we can shoot fireball (not on cooldown)
                 if (dragon.canShootFireball()) {
-                    // Shoot fireball in the direction player is looking
                     dragon.shootFireballInDirection(serverPlayer.getLookAngle());
-
-                    // Set cooldown (1.5 seconds = 30 ticks)
-                    dragon.setFireballCooldown(30);
+                    dragon.setFireballCooldown(DragonConstants.FIREBALL_COOLDOWN_TICKS);
                 }
-                // If on cooldown, do nothing (cooldown is handled in tick())
             }
         });
     }

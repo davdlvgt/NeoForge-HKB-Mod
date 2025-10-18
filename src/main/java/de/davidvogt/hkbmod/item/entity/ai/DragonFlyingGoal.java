@@ -1,11 +1,14 @@
 package de.davidvogt.hkbmod.item.entity.ai;
 
+import de.davidvogt.hkbmod.item.entity.custom.DragonConstants;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
 
@@ -14,6 +17,8 @@ import java.util.EnumSet;
  * with proper turning and height management. Also handles landing behavior.
  */
 public class DragonFlyingGoal extends Goal {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DragonFlyingGoal.class);
+
     private final DragonEntity dragon;
     private double targetX;
     private double targetY;
@@ -25,20 +30,14 @@ public class DragonFlyingGoal extends Goal {
     // Landing system - NOW WITH RANDOM DURATIONS
     private int currentFlyingDuration = 0; // Will be set randomly
     private int currentLandingDuration = 0; // Will be set randomly
-    private static final int MIN_FLYING_DURATION = 200; // 30 seconds minimum
-    private static final int MAX_FLYING_DURATION = 1000; // 120 seconds maximum
-    private static final int MIN_LANDING_DURATION = 100; // 20 seconds minimum
-    private static final int MAX_LANDING_DURATION = 800; // 90 seconds maximum
     private BlockPos landingSpot = null;
     private boolean isLandingMode = false;
 
-    // Kollisionserkennung - Tracking für Hängenbleiben
+    // Collision detection - tracking for stuck detection
     private Vec3 lastPosition = Vec3.ZERO;
     private int stuckCounter = 0;
-    private static final int STUCK_THRESHOLD = 40; // 2 Sekunden ohne Bewegung = steckengeblieben
-    private static final double MIN_MOVEMENT = 0.05; // Minimale Bewegung pro Tick
 
-    // Notfall-Ausweichmanöver
+    // Emergency evasive maneuver
     private boolean isPerformingEmergencyManeuver = false;
     private int emergencyManeuverTimer = 0;
     private Vec3 emergencyDirection = Vec3.ZERO;
@@ -69,7 +68,7 @@ public class DragonFlyingGoal extends Goal {
     @Override
     public void start() {
         pickNewTarget();
-        lastPosition = dragon.position(); // Startposition für Kollisionserkennung speichern
+        lastPosition = dragon.position(); // Save start position for collision detection
         // Set random flying duration on start
         setRandomFlyingDuration();
     }
@@ -94,18 +93,18 @@ public class DragonFlyingGoal extends Goal {
 
         // Log flying progress every 10 seconds
         if (dragon.getFlyingTimer() % 200 == 0 && !dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] Flying for " + (dragon.getFlyingTimer() / 20) + "s / " +
-                (currentFlyingDuration / 20) + "s until considering landing");
+            LOGGER.debug("Dragon {} flying for {}s / {}s until considering landing",
+                dragon.getId(), dragon.getFlyingTimer() / 20, currentFlyingDuration / 20);
         }
 
         // Random chance to land early (1% chance per second after minimum flight time)
-        int minFlightTime = MIN_FLYING_DURATION / 2; // Can land after half minimum time
+        int minFlightTime = DragonConstants.MIN_FLYING_DURATION_TICKS / 2; // Can land after half minimum time
         if (dragon.getFlyingTimer() > minFlightTime && dragon.getFlyingTimer() % 20 == 0) {
             float landingChance = 0.01F; // 1% chance per second
             if (dragon.getRandom().nextFloat() < landingChance) {
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[FLYING-GOAL] *** RANDOM DECISION TO LAND *** (after " +
-                        (dragon.getFlyingTimer() / 20) + "s flying)");
+                    LOGGER.info("Dragon {} random decision to land after {}s flying",
+                        dragon.getId(), dragon.getFlyingTimer() / 20);
                 }
                 // Start landing sequence
                 initiateRandomLanding();
@@ -117,22 +116,22 @@ public class DragonFlyingGoal extends Goal {
         if (dragon.getFlyingTimer() >= currentFlyingDuration) {
             double currentY = dragon.getY();
 
-            // Landeanflug beginnen - zuerst auf 180 Blöcke hochfliegen
-            if (currentY >= 180.0D) {
+            // Start landing approach - first climb to minimum altitude
+            if (currentY >= DragonConstants.MIN_FLIGHT_ALTITUDE) {
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[FLYING-GOAL] *** SCHEDULED LANDING at 180+ altitude *** (flew for " +
-                        (dragon.getFlyingTimer() / 20) + "s, altitude: " + String.format("%.1f", currentY) + " blocks)");
+                    LOGGER.info("Dragon {} scheduled landing at altitude {} (flew for {}s)",
+                        dragon.getId(), String.format("%.1f", currentY), dragon.getFlyingTimer() / 20);
                 }
                 startLandingSequence();
                 return;
             } else {
-                // Noch nicht hoch genug, weiter steigen auf 180 Blöcke
+                // Not high enough yet, continue climbing to minimum altitude
                 if (!dragon.level().isClientSide && dragon.getFlyingTimer() % 40 == 0) {
-                    System.out.println("[FLYING-GOAL] Ready to land but climbing to 180 blocks first (current: " +
-                        String.format("%.1f", currentY) + ")");
+                    LOGGER.debug("Dragon {} ready to land but climbing to {} blocks first (current: {})",
+                        dragon.getId(), DragonConstants.MIN_FLIGHT_ALTITUDE, String.format("%.1f", currentY));
                 }
-                // Setze Ziel auf 180 Blöcke Höhe
-                targetY = 180.0D;
+                // Set target to minimum flight altitude
+                targetY = DragonConstants.MIN_FLIGHT_ALTITUDE;
             }
         }
 
@@ -179,7 +178,7 @@ public class DragonFlyingGoal extends Goal {
         Vec3 normalizedDirection = directionToTarget.normalize();
 
         // Calculate desired velocity - move TOWARDS THE TARGET
-        double speed = 1.0D; // Fast flying speed (doubled from 0.5)
+        double speed = DragonConstants.NORMAL_FLIGHT_SPEED; // Fast flying speed
 
         // Move directly towards target (horizontal only, Y handled separately)
         double desiredVelX = normalizedDirection.x * speed;
@@ -202,7 +201,7 @@ public class DragonFlyingGoal extends Goal {
 
         // Rotation is now handled in DragonEntity.tick() method
 
-        // Kollisionserkennung - Überprüfen ob der Drache stecken bleibt
+        // Collision detection - check if dragon gets stuck
         checkForStuck();
     }
 
@@ -223,7 +222,7 @@ public class DragonFlyingGoal extends Goal {
                 (int) dragon.getZ()
             );
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] No solid block found, using fallback: " + landingSpot);
+                LOGGER.warn("Dragon {} no solid block found, using fallback: {}", dragon.getId(), landingSpot);
             }
         } else {
             if (!dragon.level().isClientSide) {
@@ -231,22 +230,23 @@ public class DragonFlyingGoal extends Goal {
                     Math.pow(landingSpot.getX() - dragon.getX(), 2) +
                     Math.pow(landingSpot.getZ() - dragon.getZ(), 2)
                 );
-                System.out.println("[FLYING-GOAL] Landing spot found at: " + landingSpot +
-                    " (horizontal distance: " + String.format("%.2f", horizontalDistance) +
-                    " blocks, vertical: " + String.format("%.2f", landingSpot.getY() - dragon.getY()) + " blocks)");
+                LOGGER.debug("Dragon {} landing spot found at {} (horizontal: {} blocks, vertical: {} blocks)",
+                    dragon.getId(), landingSpot, String.format("%.2f", horizontalDistance),
+                    String.format("%.2f", landingSpot.getY() - dragon.getY()));
             }
         }
     }
 
     /**
-     * Finds a landing spot 80-150 blocks ahead of the dragon's current position
+     * Finds a landing spot ahead of the dragon's current position
      * Searches in a cone in front of the dragon's facing direction
      */
     private BlockPos findLandingSpotAhead() {
         Vec3 dragonPos = dragon.position();
 
-        // Pick a random distance between 80-150 blocks away
-        double targetDistance = 80.0D + dragon.getRandom().nextDouble() * 70.0D;
+        // Pick a random distance within configured range
+        double targetDistance = DragonConstants.LANDING_SPOT_MIN_DISTANCE +
+            dragon.getRandom().nextDouble() * (DragonConstants.LANDING_SPOT_MAX_DISTANCE - DragonConstants.LANDING_SPOT_MIN_DISTANCE);
 
         // Get dragon's current yaw (facing direction)
         float yaw = dragon.getYRot();
@@ -260,9 +260,9 @@ public class DragonFlyingGoal extends Goal {
         int targetZ = (int)(dragonPos.z + Math.cos(targetAngle) * targetDistance);
 
         if (!dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] Searching for landing spot at X=" + targetX + ", Z=" + targetZ +
-                " (angle=" + String.format("%.1f", Math.toDegrees(targetAngle)) + "°, distance=" +
-                String.format("%.1f", targetDistance) + " blocks)");
+            LOGGER.debug("Dragon {} searching for landing spot at X={}, Z={} (angle={}°, distance={} blocks)",
+                dragon.getId(), targetX, targetZ, String.format("%.1f", Math.toDegrees(targetAngle)),
+                String.format("%.1f", targetDistance));
         }
 
         // Search downward from dragon's current height for a solid block
@@ -275,14 +275,15 @@ public class DragonFlyingGoal extends Goal {
                 // Found a solid block, return position one block above it
                 BlockPos landingPos = checkPos.above();
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[FLYING-GOAL] Found solid ground at Y=" + y + ", landing at Y=" + landingPos.getY());
+                    LOGGER.debug("Dragon {} found solid ground at Y={}, landing at Y={}",
+                        dragon.getId(), y, landingPos.getY());
                 }
                 return landingPos;
             }
         }
 
         if (!dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] No solid ground found in search column");
+            LOGGER.debug("Dragon {} no solid ground found in search column", dragon.getId());
         }
         return null;
     }
@@ -296,7 +297,7 @@ public class DragonFlyingGoal extends Goal {
             isLandingMode = false;
             dragon.setLandingMode(false);
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] Landing cancelled - no landing spot");
+                LOGGER.warn("Dragon {} landing cancelled - no landing spot", dragon.getId());
             }
             return;
         }
@@ -304,7 +305,7 @@ public class DragonFlyingGoal extends Goal {
         // Check if dragon has touched the ground during approach
         if (dragon.onGround()) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] *** EARLY GROUND CONTACT *** - Landing immediately");
+                LOGGER.info("Dragon {} early ground contact - landing immediately", dragon.getId());
             }
             completeLanding();
             return;
@@ -313,7 +314,7 @@ public class DragonFlyingGoal extends Goal {
         // Check if there are obstacles in the flight path ahead
         if (checkForObstacleAhead()) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] *** OBSTACLE DETECTED IN FLIGHT PATH *** - Landing at current position");
+                LOGGER.info("Dragon {} obstacle detected in flight path - landing at current position", dragon.getId());
             }
             // Find ground below current position and land there
             landingSpot = findGroundBelow();
@@ -340,15 +341,14 @@ public class DragonFlyingGoal extends Goal {
 
         // Log landing progress every 10 ticks (0.5 seconds)
         if (dragon.tickCount % 10 == 0 && !dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] Landing approach - Horizontal dist: " +
-                String.format("%.2f", horizontalDistance) + " blocks, Vertical dist: " +
-                String.format("%.2f", verticalDistance) + " blocks");
+            LOGGER.debug("Dragon {} landing approach - horizontal: {} blocks, vertical: {} blocks",
+                dragon.getId(), String.format("%.2f", horizontalDistance), String.format("%.2f", verticalDistance));
         }
 
-        // Check if close enough to land (within 2 blocks horizontally and 1 block vertically)
-        if (horizontalDistance < 2.0D && Math.abs(verticalDistance) < 1.5D) {
+        // Check if close enough to land (within configured arrival distance)
+        if (horizontalDistance < DragonConstants.LANDING_ARRIVAL_DISTANCE && Math.abs(verticalDistance) < 1.5D) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] *** LANDING COMPLETE ***");
+                LOGGER.info("Dragon {} landing complete", dragon.getId());
             }
             completeLanding();
             return;
@@ -424,14 +424,14 @@ public class DragonFlyingGoal extends Goal {
 
         // Log remaining time every 10 seconds
         if (timer % 200 == 0 && !dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] Landed - remaining time: " + (timer / 20) + "s / " +
-                (currentLandingDuration / 20) + "s, walking around");
+            LOGGER.debug("Dragon {} landed - remaining time: {}s / {}s, walking around",
+                dragon.getId(), timer / 20, currentLandingDuration / 20);
         }
 
         // Check if it's time to take off again (after walking duration)
         if (timer <= 0) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] *** WALKING TIME FINISHED - Dragon deciding next action ***");
+                LOGGER.info("Dragon {} walking time finished - deciding next action", dragon.getId());
             }
             // Don't take off directly - let DragonRestGoal take over
             // Just stop movement and wait for rest goal to activate
@@ -463,7 +463,7 @@ public class DragonFlyingGoal extends Goal {
                         dragon.getDeltaMovement().z
                     );
                     if (!dragon.level().isClientSide && dragon.tickCount % 20 == 0) {
-                        System.out.println("[FLYING-GOAL] Dragon jumping over obstacle!");
+                        LOGGER.debug("Dragon {} jumping over obstacle", dragon.getId());
                     }
                 } else {
                     // Normalize and walk
@@ -592,7 +592,7 @@ public class DragonFlyingGoal extends Goal {
             if (!state.isAir() && state.isSolid()) {
                 landingSpot = checkPos.above();
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[FLYING-GOAL] New walking target: " + landingSpot);
+                    LOGGER.debug("Dragon {} new walking target: {}", dragon.getId(), landingSpot);
                 }
                 return;
             }
@@ -613,7 +613,7 @@ public class DragonFlyingGoal extends Goal {
         // Set new random flying duration
         setRandomFlyingDuration();
 
-        // Pick a target high in the sky (150-180 blocks) for initial climb
+        // Pick a target high in the sky for initial climb
         double currentX = dragon.getX();
         double currentZ = dragon.getZ();
         double angle = dragon.getRandom().nextDouble() * Math.PI * 2.0;
@@ -621,12 +621,13 @@ public class DragonFlyingGoal extends Goal {
 
         targetX = currentX + Math.cos(angle) * distance;
         targetZ = currentZ + Math.sin(angle) * distance;
-        targetY = 150.0D + dragon.getRandom().nextDouble() * 30.0D; // 150-180 blocks high
+        targetY = DragonConstants.TARGET_FLIGHT_ALTITUDE_MIN +
+            dragon.getRandom().nextDouble() * (DragonConstants.TARGET_FLIGHT_ALTITUDE_MAX - DragonConstants.TARGET_FLIGHT_ALTITUDE_MIN);
 
         flyingTimer = 0;
         if (!dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] *** TAKING OFF *** - Climbing to altitude " +
-                String.format("%.1f", targetY) + " blocks");
+            LOGGER.info("Dragon {} taking off - climbing to altitude {} blocks",
+                dragon.getId(), String.format("%.1f", targetY));
         }
     }
 
@@ -658,7 +659,7 @@ public class DragonFlyingGoal extends Goal {
                     targetZ = currentZ + Math.sin(angle) * distance;
 
                     if (!dragon.level().isClientSide) {
-                        System.out.println("[FLYING-GOAL] Far from nest, picking target towards nest");
+                        LOGGER.debug("Dragon {} far from nest, picking target towards nest", dragon.getId());
                     }
                 } else {
                     // Normal random target, but keep it within nest area
@@ -682,8 +683,9 @@ public class DragonFlyingGoal extends Goal {
                     }
                 }
 
-                // ERHÖHTE MINDESTFLUGHÖHE: 180-210 Blöcke (vorher 170-200)
-                targetY = 180.0D + dragon.getRandom().nextDouble() * 30.0D;
+                // Set target altitude within configured range
+                targetY = DragonConstants.TARGET_FLIGHT_ALTITUDE_MIN +
+                    dragon.getRandom().nextDouble() * (DragonConstants.TARGET_FLIGHT_ALTITUDE_MAX - DragonConstants.TARGET_FLIGHT_ALTITUDE_MIN);
                 return;
             }
         }
@@ -694,20 +696,21 @@ public class DragonFlyingGoal extends Goal {
 
         targetX = currentX + Math.cos(angle) * distance;
         targetZ = currentZ + Math.sin(angle) * distance;
-        // ERHÖHTE MINDESTFLUGHÖHE: 180-210 Blöcke (vorher 170-200)
-        targetY = 180.0D + dragon.getRandom().nextDouble() * 30.0D;
+        // Set target altitude within configured range
+        targetY = DragonConstants.TARGET_FLIGHT_ALTITUDE_MIN +
+            dragon.getRandom().nextDouble() * (DragonConstants.TARGET_FLIGHT_ALTITUDE_MAX - DragonConstants.TARGET_FLIGHT_ALTITUDE_MIN);
     }
 
     private void maintainAltitude() {
-        // ERHÖHTE GRENZWERTE für Mindestflughöhe
-        // Dieser Code stellt sicher dass der Drache IMMER über Bäumen fliegt
+        // Ensure dragon stays within configured altitude range
+        // This ensures the dragon always flies above trees
         double currentY = dragon.getY();
 
-        if (currentY < 175.0D) {
-            // Emergency: too low (unter 175 statt 165), force upward faster
+        if (currentY < DragonConstants.MIN_FLIGHT_ALTITUDE) {
+            // Emergency: too low, force upward faster
             dragon.setDeltaMovement(dragon.getDeltaMovement().x, 0.3D, dragon.getDeltaMovement().z);
-        } else if (currentY > 215.0D) {
-            // Emergency: too high (über 215 statt 205), force downward faster
+        } else if (currentY > DragonConstants.MAX_FLIGHT_ALTITUDE) {
+            // Emergency: too high, force downward faster
             dragon.setDeltaMovement(dragon.getDeltaMovement().x, -0.3D, dragon.getDeltaMovement().z);
         }
     }
@@ -721,29 +724,30 @@ public class DragonFlyingGoal extends Goal {
     }
 
     /**
-     * Überprüft ob der Drache stecken bleibt und führt ggf. ein Ausweichmanöver durch
+     * Checks if dragon gets stuck and initiates evasive maneuver if needed
      */
     private void checkForStuck() {
         Vec3 currentPosition = dragon.position();
         double movementDistance = currentPosition.distanceTo(lastPosition);
 
-        // Prüfe ob Drache sich ausreichend bewegt hat
-        if (movementDistance < MIN_MOVEMENT) {
+        // Check if dragon has moved sufficiently
+        if (movementDistance < DragonConstants.MIN_MOVEMENT_PER_TICK) {
             stuckCounter++;
 
-            // Debug-Ausgabe alle halbe Sekunde während Steckenbleiben
+            // Debug output every half second while stuck
             if (stuckCounter % 10 == 0 && !dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] ⚠️ Dragon seems stuck! Counter: " + stuckCounter + "/" + STUCK_THRESHOLD +
-                    " (movement: " + String.format("%.4f", movementDistance) + ")");
+                LOGGER.warn("Dragon {} seems stuck! Counter: {}/{} (movement: {})",
+                    dragon.getId(), stuckCounter, DragonConstants.STUCK_THRESHOLD_TICKS,
+                    String.format("%.4f", movementDistance));
             }
 
-            // Wenn Drache zu lange steckt, Notfallmanöver einleiten
-            if (stuckCounter >= STUCK_THRESHOLD) {
+            // If dragon stuck too long, initiate emergency maneuver
+            if (stuckCounter >= DragonConstants.STUCK_THRESHOLD_TICKS) {
                 initiateEmergencyManeuver();
                 stuckCounter = 0; // Reset counter
             }
         } else {
-            // Drache bewegt sich normal, Counter zurücksetzen
+            // Dragon moving normally, reset counter
             if (stuckCounter > 0) {
                 stuckCounter = 0;
             }
@@ -753,72 +757,73 @@ public class DragonFlyingGoal extends Goal {
     }
 
     /**
-     * Initiiert ein Notfall-Ausweichmanöver wenn der Drache steckengeblieben ist
+     * Initiates emergency evasive maneuver when dragon gets stuck
      */
     private void initiateEmergencyManeuver() {
         if (!dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] 🚨 EMERGENCY MANEUVER INITIATED - Dragon is stuck!");
+            LOGGER.warn("Dragon {} emergency maneuver initiated - dragon is stuck!", dragon.getId());
         }
 
         isPerformingEmergencyManeuver = true;
-        emergencyManeuverTimer = 60; // 3 Sekunden Ausweichmanöver
+        emergencyManeuverTimer = DragonConstants.EMERGENCY_MANEUVER_DURATION_TICKS;
 
-        // Strategie: Zuerst Richtungswechsel versuchen, dann nach oben fliegen
-        // Wähle zufällige neue Richtung (180° gedreht + Zufall)
+        // Strategy: First try direction change, then fly upward
+        // Choose random new direction (180° rotated + random)
         float currentYaw = dragon.getYRot();
-        float newYaw = currentYaw + 150.0F + dragon.getRandom().nextFloat() * 60.0F; // 150-210° Drehung
+        float newYaw = currentYaw + 150.0F + dragon.getRandom().nextFloat() * 60.0F; // 150-210° rotation
 
         double angle = Math.toRadians(newYaw);
         double distance = 20.0D;
 
-        // Neue Richtung mit leichtem Steigflug
+        // New direction with slight climb
         emergencyDirection = new Vec3(
             Math.sin(angle) * distance,
-            5.0D, // Leicht nach oben
+            5.0D, // Slightly upward
             Math.cos(angle) * distance
         ).normalize();
 
         if (!dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] Emergency direction: " +
-                String.format("X=%.2f, Y=%.2f, Z=%.2f", emergencyDirection.x, emergencyDirection.y, emergencyDirection.z));
+            LOGGER.debug("Dragon {} emergency direction: X={}, Y={}, Z={}",
+                dragon.getId(), String.format("%.2f", emergencyDirection.x),
+                String.format("%.2f", emergencyDirection.y), String.format("%.2f", emergencyDirection.z));
         }
     }
 
     /**
-     * Führt ein Notfall-Ausweichmanöver durch, wenn der Drache stecken bleibt
+     * Performs emergency evasive maneuver when dragon gets stuck
      */
     private void performEmergencyManeuver() {
         emergencyManeuverTimer--;
 
         if (emergencyManeuverTimer <= 0) {
-            // Manöver beendet
+            // Maneuver finished
             isPerformingEmergencyManeuver = false;
-            pickNewTarget(); // Neues Ziel wählen
+            pickNewTarget(); // Pick new target
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] ✅ Emergency maneuver completed, resuming normal flight");
+                LOGGER.info("Dragon {} emergency maneuver completed, resuming normal flight", dragon.getId());
             }
             return;
         }
 
-        // Prüfe ob immer noch Hindernis im Weg ist
+        // Check if still blocked
         if (checkForObstacleAhead() && emergencyManeuverTimer > 20) {
-            // Immer noch blockiert nach 1 Sekunde - Plan B: Nach oben fliegen!
+            // Still blocked after 1 second - Plan B: Fly upward!
             if (!dragon.level().isClientSide) {
-                System.out.println("[FLYING-GOAL] 🚁 Still blocked - ASCENDING as last resort!");
+                LOGGER.warn("Dragon {} still blocked - ascending as last resort!", dragon.getId());
             }
 
-            // Stark nach oben fliegen
+            // Strong upward flight
             Vec3 currentVel = dragon.getDeltaMovement();
-            dragon.setDeltaMovement(currentVel.x * 0.5, 0.5D, currentVel.z * 0.5); // Starker Aufstieg
-            emergencyManeuverTimer = 20; // Noch 1 Sekunde weitermachen
+            dragon.setDeltaMovement(currentVel.x * 0.5, 0.5D, currentVel.z * 0.5); // Strong climb
+            emergencyManeuverTimer = 20; // Continue for 1 more second
             return;
         }
 
-        // Ausweichmanöver: In neue Richtung fliegen
+        // Evasive maneuver: Fly in new direction
         double speed = 0.8D;
         Vec3 currentVel = dragon.getDeltaMovement();
 
-        // Sanfter Übergang zur Notfallrichtung
+        // Smooth transition to emergency direction
         double newVelX = Mth.lerp(0.2D, currentVel.x, emergencyDirection.x * speed);
         double newVelY = Mth.lerp(0.2D, currentVel.y, emergencyDirection.y * speed);
         double newVelZ = Mth.lerp(0.2D, currentVel.z, emergencyDirection.z * speed);
@@ -830,13 +835,12 @@ public class DragonFlyingGoal extends Goal {
      * Sets a random flying duration for variety
      */
     private void setRandomFlyingDuration() {
-        currentFlyingDuration = MIN_FLYING_DURATION +
-            dragon.getRandom().nextInt(MAX_FLYING_DURATION - MIN_FLYING_DURATION + 1);
+        currentFlyingDuration = DragonConstants.MIN_FLYING_DURATION_TICKS +
+            dragon.getRandom().nextInt(DragonConstants.MAX_FLYING_DURATION_TICKS - DragonConstants.MIN_FLYING_DURATION_TICKS + 1);
         if (!dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] New random flying duration: " +
-                (currentFlyingDuration / 20) + " seconds (" +
-                (currentFlyingDuration / 20 / 60) + " min " +
-                ((currentFlyingDuration / 20) % 60) + " sec)");
+            LOGGER.debug("Dragon {} new random flying duration: {} seconds ({}min {}sec)",
+                dragon.getId(), currentFlyingDuration / 20, currentFlyingDuration / 20 / 60,
+                (currentFlyingDuration / 20) % 60);
         }
     }
 
@@ -844,13 +848,12 @@ public class DragonFlyingGoal extends Goal {
      * Sets a random landing duration for variety
      */
     private void setRandomLandingDuration() {
-        currentLandingDuration = MIN_LANDING_DURATION +
-            dragon.getRandom().nextInt(MAX_LANDING_DURATION - MIN_LANDING_DURATION + 1);
+        currentLandingDuration = DragonConstants.MIN_LANDING_DURATION_TICKS +
+            dragon.getRandom().nextInt(DragonConstants.MAX_LANDING_DURATION_TICKS - DragonConstants.MIN_LANDING_DURATION_TICKS + 1);
         if (!dragon.level().isClientSide) {
-            System.out.println("[FLYING-GOAL] New random landing duration: " +
-                (currentLandingDuration / 20) + " seconds (" +
-                (currentLandingDuration / 20 / 60) + " min " +
-                ((currentLandingDuration / 20) % 60) + " sec)");
+            LOGGER.debug("Dragon {} new random landing duration: {} seconds ({}min {}sec)",
+                dragon.getId(), currentLandingDuration / 20, currentLandingDuration / 20 / 60,
+                (currentLandingDuration / 20) % 60);
         }
     }
 
@@ -861,11 +864,11 @@ public class DragonFlyingGoal extends Goal {
         double currentY = dragon.getY();
 
         // If already high enough, start landing immediately
-        if (currentY >= 180.0D) {
+        if (currentY >= DragonConstants.MIN_FLIGHT_ALTITUDE) {
             startLandingSequence();
         } else {
-            // Climb to 180 first
-            targetY = 180.0D;
+            // Climb to minimum altitude first
+            targetY = DragonConstants.MIN_FLIGHT_ALTITUDE;
             // Will trigger landing on next tick when high enough
             dragon.setFlyingTimer(currentFlyingDuration);
         }

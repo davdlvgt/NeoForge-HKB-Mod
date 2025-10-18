@@ -1,5 +1,6 @@
 package de.davidvogt.hkbmod.item.entity.ai;
 
+import de.davidvogt.hkbmod.item.entity.custom.DragonConstants;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -8,26 +9,24 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
 import java.util.List;
 
 /**
  * Goal that makes dragons defend their nest by attacking players who come too close.
- * - When resting: smaller detection radius (10 blocks), wakes up and attacks from ground
- * - When landed: normal detection radius (20 blocks), attacks from ground without flying
- * - When flying: flies towards player to attack, retreats if too close (< 20 blocks), random chance to land
+ * - When resting: smaller detection radius, wakes up and attacks from ground
+ * - When landed: normal detection radius, attacks from ground without flying
+ * - When flying: flies towards player to attack, retreats if too close, random chance to land
  */
 public class DefendNestGoal extends Goal {
-    private static final double NEST_DEFENSE_RADIUS = 50.0D; // Increased for aerial combat
-    private static final double RESTING_DETECTION_RADIUS = 10.0D; // Smaller radius when resting
-    private static final double MIN_ATTACK_DISTANCE = 20.0D; // Minimum distance for aerial attack
-    private static final double MAX_ATTACK_DISTANCE = 40.0D; // Maximum distance for aerial attack
-    private static final double FIRE_BREATH_DISTANCE = 10.0D; // Distance for fire breath attack
-    private static final int FIREBALL_COOLDOWN = 40; // 2 seconds between fireballs
-    private static final int FIRE_BREATH_COOLDOWN = 20; // 1 second between fire breaths (faster!)
-    private static final int CHECK_INTERVAL = 20; // Check for intruders every second
-    private static final float LAND_TO_ATTACK_CHANCE = 0.15F; // 15% chance to land and attack from ground
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefendNestGoal.class);
+
+    private static final double MIN_ATTACK_DISTANCE = 20.0D;
+    private static final double MAX_ATTACK_DISTANCE = 40.0D;
+    private static final float LAND_TO_ATTACK_CHANCE = 0.15F;
 
     private final DragonEntity dragon;
     private LivingEntity target;
@@ -59,7 +58,7 @@ public class DefendNestGoal extends Goal {
 
         // Check periodically
         checkTimer++;
-        if (checkTimer < CHECK_INTERVAL) {
+        if (checkTimer < DragonConstants.CHECK_INTERVAL_TICKS) {
             return false;
         }
         checkTimer = 0;
@@ -79,7 +78,7 @@ public class DefendNestGoal extends Goal {
         if (checkTimer > 0 && target != null && target.isAlive()) {
             return true; // Keep attacking current target
         }
-        checkTimer = CHECK_INTERVAL;
+        checkTimer = DragonConstants.CHECK_INTERVAL_TICKS;
 
         BlockPos nestPos = dragon.getNestPosition();
         if (nestPos == null) {
@@ -87,7 +86,7 @@ public class DefendNestGoal extends Goal {
         }
 
         // Use smaller radius when resting, normal radius otherwise
-        double detectionRadius = dragon.isResting() ? RESTING_DETECTION_RADIUS : NEST_DEFENSE_RADIUS;
+        double detectionRadius = dragon.isResting() ? DragonConstants.RESTING_DETECTION_RADIUS : DragonConstants.NEST_DEFENSE_RADIUS;
 
         // Find players near the nest
         AABB searchArea = new AABB(nestPos).inflate(detectionRadius);
@@ -125,7 +124,7 @@ public class DefendNestGoal extends Goal {
         }
 
         // Use smaller radius when resting, normal radius otherwise
-        double detectionRadius = dragon.isResting() ? RESTING_DETECTION_RADIUS : NEST_DEFENSE_RADIUS;
+        double detectionRadius = dragon.isResting() ? DragonConstants.RESTING_DETECTION_RADIUS : DragonConstants.NEST_DEFENSE_RADIUS;
         double distanceToNest = target.distanceToSqr(nestPos.getX(), nestPos.getY(), nestPos.getZ());
         return distanceToNest <= detectionRadius * detectionRadius;
     }
@@ -141,7 +140,7 @@ public class DefendNestGoal extends Goal {
         if (dragon.isResting()) {
             dragon.setResting(false);
             if (!dragon.level().isClientSide) {
-                System.out.println("[DRAGON-DEFENSE] Dragon woke up from rest to defend nest!");
+                LOGGER.info("Dragon {} woke up from rest to defend nest", dragon.getId());
             }
         }
 
@@ -149,7 +148,7 @@ public class DefendNestGoal extends Goal {
         if (!dragon.isLanded() && dragon.getRandom().nextFloat() < LAND_TO_ATTACK_CHANCE) {
             decidedToLandAttack = true;
             if (!dragon.level().isClientSide) {
-                System.out.println("[DRAGON-DEFENSE] Dragon decided to LAND and attack from ground!");
+                LOGGER.info("Dragon {} decided to land and attack from ground", dragon.getId());
             }
         }
     }
@@ -198,17 +197,17 @@ public class DefendNestGoal extends Goal {
         double distanceToTarget = dragon.distanceTo(target);
 
         // Use fire breath if very close, otherwise use fireballs
-        if (distanceToTarget < FIRE_BREATH_DISTANCE) {
+        if (distanceToTarget < DragonConstants.FIRE_BREATH_RANGE) {
             // Fire breath for close combat
             fireBreathCooldown--;
             if (fireBreathCooldown <= 0) {
                 if (dragon.hasLineOfSight(target)) {
                     dragon.breatheFire(target);
-                    fireBreathCooldown = FIRE_BREATH_COOLDOWN;
+                    fireBreathCooldown = DragonConstants.FIRE_BREATH_COOLDOWN_TICKS;
 
                     if (!dragon.level().isClientSide) {
-                        System.out.println("[DRAGON-DEFENSE] Breathing FIRE from GROUND at close range (" +
-                            String.format("%.1f", distanceToTarget) + "m)!");
+                        LOGGER.debug("Dragon {} breathing fire from ground at close range ({} blocks)",
+                            dragon.getId(), String.format("%.1f", distanceToTarget));
                     }
                 }
             }
@@ -218,10 +217,11 @@ public class DefendNestGoal extends Goal {
             if (fireballCooldown <= 0) {
                 if (dragon.hasLineOfSight(target)) {
                     dragon.shootExplosiveFireball(target);
-                    fireballCooldown = FIREBALL_COOLDOWN;
+                    fireballCooldown = DragonConstants.FIREBALL_COOLDOWN_TICKS;
 
                     if (!dragon.level().isClientSide) {
-                        System.out.println("[DRAGON-DEFENSE] Shooting fireball from GROUND at " + target.getName().getString());
+                        LOGGER.debug("Dragon {} shooting fireball from ground at {}",
+                            dragon.getId(), target.getName().getString());
                     }
                 }
             }
@@ -241,8 +241,8 @@ public class DefendNestGoal extends Goal {
                 combatState = CombatState.RETREATING;
                 calculateRetreatTarget();
                 if (!dragon.level().isClientSide) {
-                    System.out.println("[DRAGON-DEFENSE] Too close (" + String.format("%.1f", distanceToTarget) +
-                        "m) - RETREATING!");
+                    LOGGER.debug("Dragon {} too close ({} blocks) - retreating",
+                        dragon.getId(), String.format("%.1f", distanceToTarget));
                 }
             }
         } else if (distanceToTarget > MAX_ATTACK_DISTANCE) {
@@ -269,17 +269,17 @@ public class DefendNestGoal extends Goal {
         // Shoot fireballs when cooldown is ready and in attack state
         // Use fire breath if very close (< 10 blocks), otherwise use fireballs
         if (combatState == CombatState.ATTACKING || combatState == CombatState.APPROACHING) {
-            if (distanceToTarget < FIRE_BREATH_DISTANCE) {
+            if (distanceToTarget < DragonConstants.FIRE_BREATH_RANGE) {
                 // Very close - use fire breath!
                 fireBreathCooldown--;
                 if (fireBreathCooldown <= 0) {
                     if (dragon.hasLineOfSight(target)) {
                         dragon.breatheFire(target);
-                        fireBreathCooldown = FIRE_BREATH_COOLDOWN;
+                        fireBreathCooldown = DragonConstants.FIRE_BREATH_COOLDOWN_TICKS;
 
                         if (!dragon.level().isClientSide) {
-                            System.out.println("[DRAGON-DEFENSE] Breathing FIRE from AIR at " +
-                                target.getName().getString() + " (" + String.format("%.1f", distanceToTarget) + "m away)");
+                            LOGGER.debug("Dragon {} breathing fire from air at {} ({} blocks away)",
+                                dragon.getId(), target.getName().getString(), String.format("%.1f", distanceToTarget));
                         }
                     }
                 }
@@ -289,11 +289,11 @@ public class DefendNestGoal extends Goal {
                 if (fireballCooldown <= 0) {
                     if (dragon.hasLineOfSight(target)) {
                         dragon.shootExplosiveFireball(target);
-                        fireballCooldown = FIREBALL_COOLDOWN;
+                        fireballCooldown = DragonConstants.FIREBALL_COOLDOWN_TICKS;
 
                         if (!dragon.level().isClientSide) {
-                            System.out.println("[DRAGON-DEFENSE] Shooting fireball from AIR at " +
-                                target.getName().getString() + " (" + String.format("%.1f", distanceToTarget) + "m away)");
+                            LOGGER.debug("Dragon {} shooting fireball from air at {} ({} blocks away)",
+                                dragon.getId(), target.getName().getString(), String.format("%.1f", distanceToTarget));
                         }
                     }
                 }
@@ -367,7 +367,7 @@ public class DefendNestGoal extends Goal {
             combatState = CombatState.APPROACHING; // Turn around and attack again
             retreatTarget = null;
             if (!dragon.level().isClientSide) {
-                System.out.println("[DRAGON-DEFENSE] Retreat complete - turning around for another attack!");
+                LOGGER.debug("Dragon {} retreat complete - turning around for another attack", dragon.getId());
             }
             return;
         }
@@ -411,8 +411,9 @@ public class DefendNestGoal extends Goal {
         retreatTarget = new Vec3(retreatTarget.x, Math.max(retreatTarget.y, 180.0D), retreatTarget.z);
 
         if (!dragon.level().isClientSide) {
-            System.out.println("[DRAGON-DEFENSE] Retreat target set: " +
-                String.format("%.1f, %.1f, %.1f", retreatTarget.x, retreatTarget.y, retreatTarget.z));
+            LOGGER.debug("Dragon {} retreat target set: {}, {}, {}",
+                dragon.getId(), String.format("%.1f", retreatTarget.x),
+                String.format("%.1f", retreatTarget.y), String.format("%.1f", retreatTarget.z));
         }
     }
 
@@ -440,8 +441,8 @@ public class DefendNestGoal extends Goal {
             );
 
             if (!dragon.level().isClientSide) {
-                System.out.println("[DRAGON-DEFENSE] Gliding to ground at " + groundPos.toShortString() +
-                    " to attack from there!");
+                LOGGER.debug("Dragon {} gliding to ground at {} to attack",
+                    dragon.getId(), groundPos.toShortString());
             }
         }
     }

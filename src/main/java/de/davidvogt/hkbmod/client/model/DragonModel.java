@@ -13,8 +13,11 @@ import net.minecraft.client.renderer.entity.state.EnderDragonRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.boss.enderdragon.DragonFlightHistory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DragonModel extends EntityModel<EnderDragonRenderState> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DragonModel.class);
 
     private static final int NECK_PART_COUNT = 5;
     private static final int TAIL_PART_COUNT = 12;
@@ -241,10 +244,10 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         if (isSleeping) {
             // ===== RESTING/SLEEPING ANIMATION =====
             // Triggered when dragon is resting on nest OR sitting on command
-            // Flügel wie beim Laufen (gefaltet an der Seite)
+            // Wings like when walking (folded to the side)
             this.leftWing.xRot = 0.2F;
             this.leftWing.yRot = -0.5F;
-            this.leftWing.zRot = 0.6F;      // Gefaltet
+            this.leftWing.zRot = 0.6F;      // Folded
 
             this.leftWingTip.xRot = 0.0F;
             this.leftWingTip.yRot = -0.5F;
@@ -258,8 +261,8 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
             this.rightWingTip.yRot = 0.5F;
             this.rightWingTip.zRot = -0.8F;
 
-            // Beine wie beim Fliegen (eingeklappt)
-            // Vorderbeine
+            // Legs like when flying (tucked in)
+            // Front legs
             this.leftFrontLeg.xRot = 1.0F;
             this.leftFrontLegTip.xRot = 0.9F;
             this.leftFrontFoot.xRot = 0.6F;
@@ -268,7 +271,7 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
             this.rightFrontLegTip.xRot = 0.9F;
             this.rightFrontFoot.xRot = 0.6F;
 
-            // Hinterbeine
+            // Hind legs
             this.leftRearLeg.xRot = 1.0F;
             this.leftRearLegTip.xRot = 0.9F;
             this.leftRearFoot.xRot = 0.7F;
@@ -277,15 +280,15 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
             this.rightRearLegTip.xRot = 0.9F;
             this.rightRearFoot.xRot = 0.7F;
 
-            // Körper leicht nach unten geneigt
+            // Body slightly tilted downward
             this.body.xRot = 0.1F;
             this.body.yRot = 0.0F;
             this.body.zRot = 0.0F;
 
-            // Kiefer leicht geöffnet (entspannt)
+            // Jaw slightly open (relaxed)
             this.jaw.xRot = 0.05F;
 
-            // Schwanz gekrümmt um den Körper beim Schlafen
+            // Tail curved around body when sleeping
             float tailBaseY = tailParts[0].y;
             float tailBaseZ = tailParts[0].z;
             float tailBaseX = tailParts[0].x;
@@ -295,7 +298,7 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 float curveFactor = (i + 1) / (float)TAIL_PART_COUNT;
 
                 tailSegment.yRot = (180.0F + curveFactor * 120.0F) * ((float)Math.PI / 180F);
-                tailSegment.xRot = 0.05F + curveFactor * 0.25F;  // Nach unten gekrümmt (positiv)
+                tailSegment.xRot = 0.05F + curveFactor * 0.25F;  // Curved downward (positive)
                 tailSegment.zRot = curveFactor * 0.2F;
 
                 tailSegment.x = tailBaseX;
@@ -307,7 +310,7 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 tailBaseX -= Mth.sin(tailSegment.yRot) * Mth.cos(tailSegment.xRot) * 10.0F;
             }
 
-            // Hals und Kopf gekrümmt nach unten beim Schlafen
+            // Neck and head curved downward when sleeping
             float neckBaseX = neckParts[0].x;
             float neckBaseY = neckParts[0].y;
             float neckBaseZ = neckParts[0].z;
@@ -316,9 +319,9 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 ModelPart neckSegment = neckParts[i];
                 float neckCurveFactor = (i + 1) / (float)NECK_PART_COUNT;
 
-                // Hals krümmt sich zur Seite mit leichter Abwärtsneigung
-                neckSegment.xRot = 0.05F + neckCurveFactor * 0.1F;  // Minimale vertikale Neigung
-                neckSegment.yRot = -neckCurveFactor * 0.8F;  // Stark zur Seite geneigt
+                // Neck curves to the side with slight downward tilt
+                neckSegment.xRot = 0.05F + neckCurveFactor * 0.1F;  // Minimal vertical tilt
+                neckSegment.yRot = -neckCurveFactor * 0.8F;  // Strong sideways tilt
                 neckSegment.zRot = 0.0F;
 
                 neckSegment.x = neckBaseX;
@@ -330,12 +333,12 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 neckBaseZ -= Mth.cos(neckSegment.yRot) * Mth.cos(neckSegment.xRot) * 10.0F;
             }
 
-            // Kopf liegt entspannt zur Seite geneigt
+            // Head rests relaxed tilted to the side
             this.head.x = neckBaseX;
             this.head.y = neckBaseY;
             this.head.z = neckBaseZ;
-            this.head.xRot = 0.15F;  // Minimale Abwärtsneigung
-            this.head.yRot = -0.8F;  // Stark zur Seite gedreht
+            this.head.xRot = 0.15F;  // Minimal downward tilt
+            this.head.yRot = -0.8F;  // Strong sideways rotation
             this.head.zRot = 0.0F;
 
         } else if (isLanded) {
@@ -357,13 +360,8 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
             this.rightWingTip.yRot = 0.5F;
             this.rightWingTip.zRot = -0.8F; // Fold the tip even more inward
 
-            // Log once every 40 ticks (2 seconds) when landed
-            if (state.ageInTicks % 40 == 0) {
-                System.out.println("[MODEL-CLIENT] Applying LANDED pose - wings folded, flapTime=" +
-                    String.format("%.4f", state.flapTime));
-            }
         } else {
-            // Flügelbewegung (flying animation)
+            // Wing movement (flying animation)
             this.leftWing.xRot = 0.125F - Mth.cos(flap) * 0.2F;
             this.leftWing.zRot = -(Mth.sin(flap) + 0.125F) * 0.8F;
             this.leftWingTip.zRot = (Mth.sin(flap + 2.0F) + 0.5F) * 0.75F;
@@ -372,9 +370,9 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
             this.rightWingTip.zRot = -leftWingTip.zRot;
         }
 
-        // Nur Hals/Kopf/Schwanz animieren wenn NICHT resting
+        // Only animate neck/head/tail when NOT resting
         if (!isSleeping) {
-            // Positionierung und Animation von Hals
+            // Position and animate neck
             DragonFlightHistory.Sample neckBase = state.getHistoricalPos(6);
             float headYawOffset = Mth.wrapDegrees(state.getHistoricalPos(5).yRot() - state.getHistoricalPos(10).yRot());
             float headYawAvg = Mth.wrapDegrees(state.getHistoricalPos(5).yRot() + headYawOffset / 2.0F);
@@ -415,14 +413,14 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
             head.xRot = headBob + Mth.wrapDegrees(state.getHeadPartYOffset(6, neckBase, headSample)) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
             head.zRot = -Mth.wrapDegrees(headSample.yRot() - headYawAvg) * ((float)Math.PI / 180F);
 
-            // Drehung des Körpers
+            // Body rotation
             body.zRot = -headYawOffset * 1.5F * ((float)Math.PI / 180F);
 
-            // Beine posieren - each side needs separate animation
+            // Pose legs - each side needs separate animation
             poseLimbsLeft(state, flap, leftFrontLeg, leftFrontLegTip, leftFrontFoot, leftRearLeg, leftRearLegTip, leftRearFoot);
             poseLimbsRight(state, flap, rightFrontLeg, rightFrontLegTip, rightFrontFoot, rightRearLeg, rightRearLegTip, rightRearFoot);
 
-            // Schwanzanimation
+            // Tail animation
             float tailSwing = 0.0F;
             y = tailParts[0].y;
             z = tailParts[0].z;
@@ -495,10 +493,6 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 rearLegTip.xRot = 0.25F + Math.max(0.0F, leftRearSwing * 0.6F);
                 rearFoot.xRot = -0.1F + Math.min(0.0F, -leftRearSwing * 0.4F);
 
-                if (state.ageInTicks % 40 == 0) {
-                    System.out.println("[MODEL-CLIENT] LEFT SIDE walking - speed=" + String.format("%.3f", this.movementSpeed) +
-                        ", animScale=" + String.format("%.2f", animationScale));
-                }
             } else {
                 // Standing still - neutral standing pose
                 frontLeg.xRot = 0.0F;
@@ -509,9 +503,6 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 rearLegTip.xRot = 0.25F;
                 rearFoot.xRot = -0.1F;
 
-                if (state.ageInTicks % 40 == 0) {
-                    System.out.println("[MODEL-CLIENT] LEFT SIDE standing still - speed=" + String.format("%.3f", this.movementSpeed));
-                }
             }
         } else {
             // Flying pose - legs tucked back
@@ -553,10 +544,6 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 rearLegTip.xRot = 0.25F + Math.max(0.0F, rightRearSwing * 0.6F);
                 rearFoot.xRot = -0.1F + Math.min(0.0F, -rightRearSwing * 0.4F);
 
-                if (state.ageInTicks % 40 == 0) {
-                    System.out.println("[MODEL-CLIENT] RIGHT SIDE walking - speed=" + String.format("%.3f", this.movementSpeed) +
-                        ", animScale=" + String.format("%.2f", animationScale));
-                }
             } else {
                 // Standing still - neutral standing pose
                 frontLeg.xRot = 0.0F;
@@ -567,9 +554,6 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 rearLegTip.xRot = 0.25F;
                 rearFoot.xRot = -0.1F;
 
-                if (state.ageInTicks % 40 == 0) {
-                    System.out.println("[MODEL-CLIENT] RIGHT SIDE standing still - speed=" + String.format("%.3f", this.movementSpeed));
-                }
             }
         } else {
             // Flying pose - legs tucked back

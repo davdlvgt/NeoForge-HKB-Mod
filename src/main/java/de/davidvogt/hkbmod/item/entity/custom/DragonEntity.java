@@ -4,6 +4,9 @@ import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.item.entity.ai.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -41,6 +44,7 @@ import java.util.UUID;
  * Dragons defend their nests by shooting explosive fireballs at players who approach within 30 blocks.
  */
 public class DragonEntity extends Monster {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DragonEntity.class);
 
     // Synced data accessors - these automatically sync to client
     private static final EntityDataAccessor<Boolean> DATA_IS_LANDED =
@@ -59,23 +63,24 @@ public class DragonEntity extends Monster {
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_FLYING_MODE =
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
+    // Per-entity scale so you can experiment with different sizes per dragon
+    private static final EntityDataAccessor<Float> DATA_DRAGON_SCALE =
+            SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.FLOAT);
 
     private final DragonFlightHistory flightHistory = new DragonFlightHistory();
     private int landedTimer = 0;
     private int flyingTimer = 0;
-    private int tamingTimer = 0; // Timer für die 3-Sekunden-Zeitspanne nach dem Essen des goldenen Apfels
-    private int lastJumpTime = 0; // Timer für Doppelklick-Erkennung (Leertaste)
-    private int fireballCooldown = 0; // Cooldown für Feuerball-Attacken (30 ticks = 1.5 Sekunden)
-    private int fireBreathDuration = 0; // Wie lange der Drache bereits Feuer speit (max 60 ticks = 3 Sekunden)
-    private int fireBreathCooldown = 0; // Cooldown nach 3 Sekunden Feuer speien (40 ticks = 2 Sekunden)
+    private int tamingTimer = 0; // Timer for 3-second window after eating golden apple
+    private int lastJumpTime = 0; // Timer for double-tap detection (spacebar)
+    private int fireballCooldown = 0; // Cooldown for fireball attacks
+    private int fireBreathDuration = 0; // How long dragon has been breathing fire
+    private int fireBreathCooldown = 0; // Cooldown after breathing fire
 
-    // Stabile Boden-Erkennung mit Hysterese
-    private int onGroundTimer = 0; // Zählt Ticks, in denen der Drache auf dem Boden ist
-    private int inAirTimer = 0; // Zählt Ticks, in denen der Drache in der Luft ist
-    private static final int GROUND_STABILITY_THRESHOLD = 10; // 0.5 Sekunden stabil auf Boden
-    private static final int AIR_STABILITY_THRESHOLD = 10; // 0.5 Sekunden stabil in der Luft
+    // Stable ground detection with hysteresis
+    private int onGroundTimer = 0; // Counts ticks dragon has been on ground
+    private int inAirTimer = 0; // Counts ticks dragon has been in air
 
-    private boolean isBreathingFire = false; // Ob der Drache gerade aktiv Feuer speit
+    private boolean isBreathingFire = false; // Whether dragon is actively breathing fire
 
     // Nest position tracking
     @Nullable
@@ -100,6 +105,8 @@ public class DragonEntity extends Monster {
         builder.define(DATA_OWNER_UUID, "");
         builder.define(DATA_IS_SITTING, false);
         builder.define(DATA_IS_FLYING_MODE, false);
+        // Initialize per-entity scale with the default from DragonConstants
+        builder.define(DATA_DRAGON_SCALE, DragonConstants.DRAGON_SCALE);
     }
 
     public boolean isLanded() {
@@ -109,8 +116,9 @@ public class DragonEntity extends Monster {
     public void setLanded(boolean landed) {
         boolean oldValue = this.entityData.get(DATA_IS_LANDED);
         if (oldValue != landed && !this.level().isClientSide) {
-            System.out.println("[DRAGON] State change - isLanded: " + oldValue + " -> " + landed +
-                " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+            LOGGER.debug("Dragon {} state change - isLanded: {} -> {} at position: {}, {}, {}",
+                this.getId(), oldValue, landed, String.format("%.2f", this.getX()),
+                String.format("%.2f", this.getY()), String.format("%.2f", this.getZ()));
         }
         this.entityData.set(DATA_IS_LANDED, landed);
     }
@@ -122,8 +130,9 @@ public class DragonEntity extends Monster {
     public void setLandingMode(boolean landingMode) {
         boolean oldValue = this.entityData.get(DATA_IS_LANDING_MODE);
         if (oldValue != landingMode && !this.level().isClientSide) {
-            System.out.println("[DRAGON] State change - isLandingMode: " + oldValue + " -> " + landingMode +
-                " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+            LOGGER.debug("Dragon {} state change - isLandingMode: {} -> {} at position: {}, {}, {}",
+                this.getId(), oldValue, landingMode, String.format("%.2f", this.getX()),
+                String.format("%.2f", this.getY()), String.format("%.2f", this.getZ()));
         }
         this.entityData.set(DATA_IS_LANDING_MODE, landingMode);
     }
@@ -141,8 +150,9 @@ public class DragonEntity extends Monster {
     public void setResting(boolean resting) {
         boolean oldValue = this.entityData.get(DATA_IS_RESTING);
         if (oldValue != resting && !this.level().isClientSide) {
-            System.out.println("[DRAGON] State change - isResting: " + oldValue + " -> " + resting +
-                " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+            LOGGER.debug("Dragon {} state change - isResting: {} -> {} at position: {}, {}, {}",
+                this.getId(), oldValue, resting, String.format("%.2f", this.getX()),
+                String.format("%.2f", this.getY()), String.format("%.2f", this.getZ()));
         }
         this.entityData.set(DATA_IS_RESTING, resting);
 
@@ -166,8 +176,9 @@ public class DragonEntity extends Monster {
     public void setTamed(boolean tamed) {
         boolean oldValue = this.entityData.get(DATA_IS_TAMED);
         if (oldValue != tamed && !this.level().isClientSide) {
-            System.out.println("[DRAGON] State change - isTamed: " + oldValue + " -> " + tamed +
-                    " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+            LOGGER.info("Dragon {} state change - isTamed: {} -> {} at position: {}, {}, {}",
+                this.getId(), oldValue, tamed, String.format("%.2f", this.getX()),
+                String.format("%.2f", this.getY()), String.format("%.2f", this.getZ()));
         }
         this.entityData.set(DATA_IS_TAMED, tamed);
     }
@@ -185,8 +196,9 @@ public class DragonEntity extends Monster {
     public void setSitting(boolean sitting) {
         boolean oldValue = this.entityData.get(DATA_IS_SITTING);
         if (oldValue != sitting && !this.level().isClientSide) {
-            System.out.println("[DRAGON] State change - isSitting: " + oldValue + " -> " + sitting +
-                    " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+            LOGGER.info("Dragon {} state change - isSitting: {} -> {} at position: {}, {}, {}",
+                this.getId(), oldValue, sitting, String.format("%.2f", this.getX()),
+                String.format("%.2f", this.getY()), String.format("%.2f", this.getZ()));
         }
         this.entityData.set(DATA_IS_SITTING, sitting);
 
@@ -199,7 +211,7 @@ public class DragonEntity extends Monster {
             }
         } else {
             this.setPose(net.minecraft.world.entity.Pose.STANDING);
-            System.out.println("[DRAGON] Pose set to STANDING, dragon should be able to move now");
+            LOGGER.debug("Dragon {} pose set to STANDING, dragon should be able to move now", this.getId());
         }
     }
 
@@ -210,8 +222,9 @@ public class DragonEntity extends Monster {
     public void setAteGoldenApple(boolean ateGoldenApple) {
         boolean oldValue = this.entityData.get(DATA_ATE_GOLDEN_APPLE);
         if (oldValue != ateGoldenApple && !this.level().isClientSide) {
-            System.out.println("[DRAGON] State change - ateGoldenApple: " + oldValue + " -> " + ateGoldenApple +
-                    " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+            LOGGER.debug("Dragon {} state change - ateGoldenApple: {} -> {} at position: {}, {}, {}",
+                this.getId(), oldValue, ateGoldenApple, String.format("%.2f", this.getX()),
+                String.format("%.2f", this.getY()), String.format("%.2f", this.getZ()));
         }
         this.entityData.set(DATA_ATE_GOLDEN_APPLE, ateGoldenApple);
     }
@@ -229,8 +242,9 @@ public class DragonEntity extends Monster {
     public void setFlyingMode(boolean flyingMode) {
         boolean oldValue = this.entityData.get(DATA_IS_FLYING_MODE);
         if (oldValue != flyingMode && !this.level().isClientSide) {
-            System.out.println("[DRAGON] State change - isFlyingMode: " + oldValue + " -> " + flyingMode +
-                    " at position: " + String.format("%.2f, %.2f, %.2f", this.getX(), this.getY(), this.getZ()));
+            LOGGER.debug("Dragon {} state change - isFlyingMode: {} -> {} at position: {}, {}, {}",
+                this.getId(), oldValue, flyingMode, String.format("%.2f", this.getX()),
+                String.format("%.2f", this.getY()), String.format("%.2f", this.getZ()));
         }
         this.entityData.set(DATA_IS_FLYING_MODE, flyingMode);
     }
@@ -263,7 +277,8 @@ public class DragonEntity extends Monster {
 
     public void setLandedTimer(int timer) {
         if (!this.level().isClientSide && timer != this.landedTimer) {
-            System.out.println("[DRAGON] landedTimer set to: " + timer + " ticks (" + (timer / 20.0) + " seconds)");
+            LOGGER.debug("Dragon {} landedTimer set to: {} ticks ({} seconds)",
+                this.getId(), timer, timer / 20.0);
         }
         this.landedTimer = timer;
     }
@@ -282,7 +297,7 @@ public class DragonEntity extends Monster {
     public void setNestPosition(@Nullable BlockPos pos) {
         this.nestPosition = pos;
         if (!this.level().isClientSide && pos != null) {
-            System.out.println("[DRAGON] Nest position set to: " + pos.toShortString());
+            LOGGER.info("Dragon {} nest position set to: {}", this.getId(), pos.toShortString());
         }
     }
 
@@ -304,7 +319,7 @@ public class DragonEntity extends Monster {
     @Override
     protected void registerGoals() {
         // Priority 0: Follow owner if tamed (HIGHEST PRIORITY for tamed dragons)
-        this.goalSelector.addGoal(0, new FollowOwnerGoal(this, 0.6D, 3.0F, 15.0F));
+        this.goalSelector.addGoal(0, new FollowOwnerGoal(this, 0.6D, 6.0F, 15.0F));
 
         // Priority 1: Return to nest when too far away or health is low (only for wild dragons)
         this.goalSelector.addGoal(1, new ReturnToNestGoal(this));
@@ -364,11 +379,11 @@ public class DragonEntity extends Monster {
      */
     public void shootFireballInDirection(Vec3 direction) {
         if (this.level().isClientSide) {
-            System.out.println("[DRAGON-FIREBALL] shootFireballInDirection called on CLIENT - returning!");
+            LOGGER.debug("Dragon {} shootFireballInDirection called on CLIENT - returning", this.getId());
             return;
         }
 
-        System.out.println("[DRAGON-FIREBALL] shootFireballInDirection executing on SERVER!");
+        LOGGER.debug("Dragon {} shootFireballInDirection executing on SERVER", this.getId());
 
         // Normalize direction
         Vec3 normalizedDir = direction.normalize();
@@ -397,7 +412,7 @@ public class DragonEntity extends Monster {
         // Play fireball shooting sound
         this.playSound(SoundEvents.GHAST_SHOOT, 1.0F, 1.0F);
 
-        System.out.println("[DRAGON-FIREBALL] Fireball shot in direction: " + normalizedDir);
+        LOGGER.debug("Dragon {} fireball shot in direction: {}", this.getId(), normalizedDir);
     }
 
     /**
@@ -468,7 +483,7 @@ public class DragonEntity extends Monster {
 
         // Calculate direction to target
         Vec3 lookVec = this.getViewVector(1.0F);
-        Vec3 startPos = new Vec3(this.getX(), this.getY(0.5) + 0.5, this.getZ());
+        Vec3 startPos = new Vec3(this.getX(), this.getY(0.5) + 0.5, this.getZ()).add(lookVec.scale(6.0));
 
         // Create a cone of fire in front of the dragon
         // Fire breath extends 8 blocks forward
@@ -489,7 +504,7 @@ public class DragonEntity extends Monster {
                 if (!this.level().isClientSide) {
                     // Server: Send particle packet to clients
                     ((net.minecraft.server.level.ServerLevel)this.level()).sendParticles(
-                        net.minecraft.core.particles.ParticleTypes.FLAME,
+                        ParticleTypes.FLAME,
                         checkPos.x, checkPos.y, checkPos.z,
                         2, // particle count
                         0.1, 0.1, 0.1, // random offset
@@ -499,7 +514,7 @@ public class DragonEntity extends Monster {
                     // Also add some smoke
                     if (distance > 2.0D && this.random.nextFloat() < 0.3F) {
                         ((net.minecraft.server.level.ServerLevel)this.level()).sendParticles(
-                            net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
+                            ParticleTypes.LARGE_SMOKE,
                             checkPos.x, checkPos.y, checkPos.z,
                             1,
                             0.15, 0.15, 0.15,
@@ -531,7 +546,7 @@ public class DragonEntity extends Monster {
         this.playSound(SoundEvents.ENDER_DRAGON_SHOOT, 1.0F, 0.8F);
 
         if (!this.level().isClientSide) {
-            System.out.println("[DRAGON-FIRE-BREATH] Dragon breathing fire at close range!");
+            LOGGER.debug("Dragon {} breathing fire at close range", this.getId());
         }
     }
 
@@ -541,23 +556,24 @@ public class DragonEntity extends Monster {
      */
     public void breatheFireInDirection(Vec3 direction) {
         if (this.level().isClientSide) {
-            System.out.println("[DRAGON-BREATH] breatheFireInDirection called on CLIENT - returning!");
+            LOGGER.debug("Dragon {} breatheFireInDirection called on CLIENT - returning", this.getId());
             return;
         }
 
-        System.out.println("[DRAGON-BREATH] breatheFireInDirection executing on SERVER!");
-        System.out.println("[DRAGON-BREATH] Dragon position: " + this.getX() + ", " + this.getY() + ", " + this.getZ());
-        System.out.println("[DRAGON-BREATH] Direction: " + direction);
+        LOGGER.debug("Dragon {} breatheFireInDirection executing on SERVER", this.getId());
+        LOGGER.debug("Dragon {} position: {}, {}, {}", this.getId(), this.getX(), this.getY(), this.getZ());
+        LOGGER.debug("Dragon {} direction: {}", this.getId(), direction);
 
         Vec3 normalizedDir = direction.normalize();
-        Vec3 startPos = new Vec3(this.getX() + 2, this.getY(0.5) + 0.5, this.getZ());
+        Vec3 startPos = new Vec3(this.getX(), this.getY(0.5) + 0.5, this.getZ()).add(normalizedDir.scale(2.0));
 
-        System.out.println("[DRAGON-BREATH] Start position: " + startPos);
-        System.out.println("[DRAGON-BREATH] Normalized direction: " + normalizedDir);
+
+        LOGGER.debug("Dragon {} start position: {}", this.getId(), startPos);
+        LOGGER.debug("Dragon {} normalized direction: {}", this.getId(), normalizedDir);
 
         // Create a cone of fire in front of the dragon
         // Fire breath extends 10 blocks forward (slightly longer than auto-breath)
-        double breathRange = 8.0D;
+        double breathRange = 6.0D;
 
         int particleCount = 0;
         int entityHitCount = 0;
@@ -573,9 +589,9 @@ public class DragonEntity extends Monster {
                     normalizedDir.z * distance + perpendicular.z * offset * distance * 0.3
                 );
 
-                // Spawn fire particles - NUR FEUER!
+                // Spawn fire particles
                 ((ServerLevel)this.level()).sendParticles(
-                    net.minecraft.core.particles.ParticleTypes.FLAME,
+                    ParticleTypes.FLAME,
                     checkPos.x, checkPos.y, checkPos.z,
                     5, // More particles for visibility
                     0.2, 0.2, 0.2,
@@ -586,7 +602,7 @@ public class DragonEntity extends Monster {
                 // Add smoke
                 if (distance > 2.0D && this.random.nextFloat() < 0.5F) {
                     ((ServerLevel)this.level()).sendParticles(
-                        net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
+                        ParticleTypes.LARGE_SMOKE,
                         checkPos.x, checkPos.y, checkPos.z,
                         3,
                         0.25, 0.25, 0.25,
@@ -611,7 +627,7 @@ public class DragonEntity extends Monster {
                     // Set entity on fire for 6 seconds (120 ticks)
                     entity.setRemainingFireTicks(120);
                     entityHitCount++;
-                    System.out.println("[DRAGON-BREATH] Hit entity: " + entity.getName().getString());
+                    LOGGER.debug("Dragon {} hit entity: {}", this.getId(), entity.getName().getString());
                 }
             }
         }
@@ -619,9 +635,9 @@ public class DragonEntity extends Monster {
         // Play dragon fire sound
         this.playSound(SoundEvents.ENDER_DRAGON_SHOOT, 1.5F, 0.8F);
 
-        System.out.println("[DRAGON-BREATH] Spawned " + particleCount + " particle groups");
-        System.out.println("[DRAGON-BREATH] Hit " + entityHitCount + " entities");
-        System.out.println("[DRAGON-BREATH] Dragon breathing fire in commanded direction - COMPLETE!");
+        LOGGER.debug("Dragon {} spawned {} particle groups", this.getId(), particleCount);
+        LOGGER.debug("Dragon {} hit {} entities", this.getId(), entityHitCount);
+        LOGGER.debug("Dragon {} breathing fire in commanded direction - complete", this.getId());
     }
 
     /**
@@ -637,13 +653,13 @@ public class DragonEntity extends Monster {
      */
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 100.0D)      // Less than Ender Dragon's 200
-                .add(Attributes.MOVEMENT_SPEED, 0.5D)    // Moderate speed
-                .add(Attributes.FLYING_SPEED, 4.5D)      // Fast flying speed
-                .add(Attributes.FOLLOW_RANGE, 64.0D)     // Can notice entities from far away
-                .add(Attributes.ATTACK_DAMAGE, 8.0D)     // Moderate damage if it attacks
-                .add(Attributes.ARMOR, 4.0D)             // Some protection
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.5D); // Resistant to knockback
+                .add(Attributes.MAX_HEALTH, DragonConstants.MAX_HEALTH)
+                .add(Attributes.MOVEMENT_SPEED, DragonConstants.MOVEMENT_SPEED)
+                .add(Attributes.FLYING_SPEED, DragonConstants.FLYING_SPEED)
+                .add(Attributes.FOLLOW_RANGE, DragonConstants.FOLLOW_RANGE)
+                .add(Attributes.ATTACK_DAMAGE, DragonConstants.ATTACK_DAMAGE)
+                .add(Attributes.ARMOR, DragonConstants.ARMOR)
+                .add(Attributes.KNOCKBACK_RESISTANCE, DragonConstants.KNOCKBACK_RESISTANCE);
     }
 
     /**
@@ -653,7 +669,21 @@ public class DragonEntity extends Monster {
      * @return Scale factor (0.35 = 35% of original Ender Dragon size)
      */
     public float getDragonScale() {
-        return 0.35F;
+        return this.entityData.get(DATA_DRAGON_SCALE);
+    }
+
+    /**
+     * Set the per-entity dragon scale. This is synced to clients.
+     * Use values >0.0f. Values too large may cause clipping or unexpected behavior.
+     */
+    public void setDragonScale(float scale) {
+        float old = this.entityData.get(DATA_DRAGON_SCALE);
+        if (Float.compare(old, scale) != 0) {
+            if (!this.level().isClientSide) {
+                LOGGER.info("Dragon {} scale changed: {} -> {}", this.getId(), old, scale);
+            }
+            this.entityData.set(DATA_DRAGON_SCALE, scale);
+        }
     }
 
     /**
@@ -709,7 +739,7 @@ public class DragonEntity extends Monster {
             float scale = this.getDragonScale();
             double xOffset = 0.0D;
             double yOffset = 1.2D * scale; // Adjust height based on dragon scale
-            double zOffset = scale; // Slightly forward of center
+            double zOffset = scale -1.0D; // Slightly behind of center
 
             // Apply rotation to offset
             float yaw = this.getYRot() * ((float)Math.PI / 180F);
@@ -766,54 +796,54 @@ public class DragonEntity extends Monster {
                 float strafe = rider.xxa * 0.5F; // A/D keys (left/right)
                 float forward = rider.zza; // W/S keys (forward/backward)
 
-                // Flugsteuerung: Nur fliegen, wenn Leertaste gedrückt gehalten wird
+                // Flight control: Only fly when spacebar is held
                 boolean isJumping = rider.isJumping();
 
                 if (isJumping) {
-                    // FLUGMODUS - Leertaste wird gedrückt gehalten
+                    // FLIGHT MODE - Spacebar is held
 
-                    float movementSpeed = (float)this.getAttributeValue(Attributes.FLYING_SPEED) * 0.15F;
+                    float movementSpeed = (float)this.getAttributeValue(Attributes.FLYING_SPEED) * DragonConstants.RIDING_FLYING_SPEED_MULTIPLIER;
 
-                    // W-Taste erhöht die Geschwindigkeit (Boost-Effekt)
-                    float speedMultiplier = 1.0F;
+                    // W key increases speed (boost effect)
+                    float speedMultiplier = DragonConstants.RIDING_GROUND_SPEED_MULTIPLIER;
                     if (forward > 0) {
-                        // W gedrückt = schneller fliegen (1.5x bis 2.0x Geschwindigkeit)
-                        speedMultiplier = 1.0F + (forward * 1.0F); // Bei vollem W-Druck: 2.0x Geschwindigkeit
+                        // W pressed = fly faster (1.5x to 2.0x speed)
+                        speedMultiplier = DragonConstants.RIDING_GROUND_SPEED_MULTIPLIER + (forward * DragonConstants.BOOST_SPEED_MULTIPLIER);
                     } else if (forward < 0) {
-                        // S gedrückt = langsamer / rückwärts (0.5x Geschwindigkeit)
+                        // S pressed = slower / backwards (0.5x speed)
                         speedMultiplier = 0.5F;
                     }
 
                     // Enable flying
                     this.setNoGravity(true);
-                    this.setLanded(false); // Nur im aktiven Flugmodus auf false setzen
+                    this.setLanded(false); // Only set to false in active flight mode
                     this.setFlyingMode(true);
 
-                    // Maus steuert die Flugrichtung (Look-Vektor)
+                    // Mouse controls flight direction (look vector)
                     Vec3 lookVec = rider.getLookAngle();
 
-                    // Bewegung in Blickrichtung mit Geschwindigkeitsmultiplikator
+                    // Movement in look direction with speed multiplier
                     Vec3 forwardMovement = new Vec3(
                         lookVec.x * movementSpeed * speedMultiplier,
-                        lookVec.y * movementSpeed * speedMultiplier, // Volle vertikale Kontrolle durch Maus
+                        lookVec.y * movementSpeed * speedMultiplier, // Full vertical control via mouse
                         lookVec.z * movementSpeed * speedMultiplier
                     );
 
-                    // Strafe movement (A/D für seitliche Bewegung)
+                    // Strafe movement (A/D for sideways movement)
                     Vec3 rightVec = lookVec.cross(new Vec3(0, 1, 0)).normalize();
                     Vec3 strafeMovement = new Vec3(
-                        rightVec.x * strafe * movementSpeed * 0.8F,
+                        rightVec.x * strafe * movementSpeed * DragonConstants.STRAFE_SPEED_MULTIPLIER,
                         0,
-                        rightVec.z * strafe * movementSpeed * 0.8F
+                        rightVec.z * strafe * movementSpeed * DragonConstants.STRAFE_SPEED_MULTIPLIER
                     );
 
-                    // Optional: Shift für gezieltes Sinken (unabhängig von der Maus-Blickrichtung)
+                    // Optional: Shift for targeted descent (independent of mouse look direction)
                     Vec3 verticalAdjustment = Vec3.ZERO;
                     if (rider.isShiftKeyDown()) {
-                        verticalAdjustment = new Vec3(0, -movementSpeed * 0.6D, 0);
+                        verticalAdjustment = new Vec3(0, -movementSpeed * DragonConstants.DESCENT_SPEED, 0);
                     }
 
-                    // Kombiniere alle Bewegungen
+                    // Combine all movements
                     Vec3 totalMovement = forwardMovement.add(strafeMovement).add(verticalAdjustment);
 
                     // Apply movement
@@ -831,24 +861,25 @@ public class DragonEntity extends Monster {
                     // Move the entity
                     this.move(net.minecraft.world.entity.MoverType.SELF, this.getDeltaMovement());
                 } else {
-                    // LANDUNGSMODUS - Leertaste nicht gedrückt, Drache schwebt zurück zum Boden
+                    // LANDING MODE - Spacebar not pressed, dragon glides back to ground
                     this.setFlyingMode(false);
 
-                    // Prüfe, ob der Drache den Boden berührt
+                    // Check if dragon is touching ground
                     boolean isOnGround = this.onGround();
 
-                    // DEBUG: Zeige aktuellen Status an
+                    // DEBUG: Show current status
                     if (!this.level().isClientSide && this.tickCount % 5 == 0) {
-                        System.out.println("[DRAGON-TRAVEL] onGround: " + isOnGround + ", isLanded: " + this.isLanded() + ", flyingMode: " + this.isFlyingMode());
+                        LOGGER.debug("Dragon {} travel - onGround: {}, isLanded: {}, flyingMode: {}",
+                            this.getId(), isOnGround, this.isLanded(), this.isFlyingMode());
                     }
 
                     if (!isOnGround) {
-                        // Drache ist noch in der Luft - sanftes Gleiten zum Boden
-                        this.setNoGravity(false); // Gravity aktivieren für sanftes Sinken
+                        // Dragon still in air - gentle gliding to ground
+                        this.setNoGravity(false); // Activate gravity for gentle descent
 
                         float movementSpeed = (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.5F;
 
-                        // Horizontale Bewegung ist weiterhin möglich während des Gleitens
+                        // Horizontal movement still possible during gliding
                         Vec3 lookVec = rider.getLookAngle();
                         Vec3 forwardMovement = new Vec3(
                             lookVec.x * forward * movementSpeed,
@@ -863,36 +894,36 @@ public class DragonEntity extends Monster {
                             rightVec.z * strafe * movementSpeed
                         );
 
-                        // Sanftes Sinken - Gravitation + kleine Bremsung
+                        // Gentle descent - gravity + small braking
                         Vec3 currentMovement = this.getDeltaMovement();
                         Vec3 totalMovement = forwardMovement.add(strafeMovement);
 
                         this.setDeltaMovement(
                             totalMovement.x,
-                            currentMovement.y * 0.95D - 0.05D, // Sanftes Sinken
+                            currentMovement.y * DragonConstants.GLIDE_DESCENT_MULTIPLIER - DragonConstants.GLIDE_DESCENT_BASE, // Gentle descent
                             totalMovement.z
                         );
 
                         // Move the entity
                         this.move(net.minecraft.world.entity.MoverType.SELF, this.getDeltaMovement());
 
-                        // Prüfe erneut, ob der Drache jetzt gelandet ist
+                        // Check again if dragon has now landed
                         if (this.onGround()) {
                             if (!this.isLanded()) {
                                 this.playSound(SoundEvents.HORSE_LAND, 1.0F, 1.0F);
-                                System.out.println("[DRAGON-RIDING] Dragon landed on ground - setting isLanded to TRUE");
+                                LOGGER.info("Dragon {} landed on ground - setting isLanded to TRUE", this.getId());
                             }
                             this.setLanded(true);
                         }
                     } else {
-                        // LAUFMODUS - Drache ist am Boden und läuft
+                        // WALKING MODE - Dragon is on ground and walking
                         this.setNoGravity(false);
 
-                        // DEBUG: Zeige wenn wir isLanded setzen
+                        // DEBUG: Show when we set isLanded
                         if (!this.level().isClientSide && !this.isLanded()) {
-                            System.out.println("[DRAGON-TRAVEL] Dragon is on ground in walk mode - setting isLanded to TRUE");
+                            LOGGER.debug("Dragon {} is on ground in walk mode - setting isLanded to TRUE", this.getId());
                         }
-                        this.setLanded(true); // WICHTIG: Setze landed auf true!
+                        this.setLanded(true); // IMPORTANT: Set landed to true!
 
                         // Use normal ground movement speed
                         float movementSpeed = (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED);
@@ -993,11 +1024,11 @@ public class DragonEntity extends Monster {
     public void tick() {
         super.tick();
 
-        // NEUE STABILE BODEN-ERKENNUNG MIT HYSTERESE UND TOLERANZ
+        // NEW STABLE GROUND DETECTION WITH HYSTERESIS AND TOLERANCE
         if (!this.level().isClientSide) {
-            // Wenn der Drache einen Reiter hat
+            // If dragon has a rider
             if (this.isVehicle() && this.getControllingPassenger() != null) {
-                // Wenn Flugmodus aktiv ist (Leertaste gedrückt), setze isLanded sofort auf false
+                // If flight mode is active (spacebar pressed), set isLanded immediately to false
                 if (this.isFlyingMode()) {
                     this.onGroundTimer = 0;
                     this.inAirTimer = 0;
@@ -1005,51 +1036,51 @@ public class DragonEntity extends Monster {
                         this.setLanded(false);
                     }
                 } else {
-                    // NICHT im Flugmodus: Verwende Hysterese-Logik mit Toleranz-Prüfung
+                    // NOT in flight mode: Use hysteresis logic with tolerance check
                     boolean currentlyOnGround = this.onGround();
 
-                    // ZUSÄTZLICHE PRÜFUNG: Ist der Drache innerhalb von 0.1 Blöcken über dem Boden?
+                    // ADDITIONAL CHECK: Is dragon within 0.1 blocks above ground?
                     boolean isNearGround = false;
                     if (!currentlyOnGround) {
-                        // Prüfe die vertikale Distanz zum Boden
+                        // Check vertical distance to ground
                         BlockPos posBelow = this.blockPosition().below();
-                        double distanceToGround = this.getY() - posBelow.getY() - 1.0; // -1.0 weil posBelow bereits 1 Block unter dem Drachen ist
+                        double distanceToGround = this.getY() - posBelow.getY() - 1.0; // -1.0 because posBelow is already 1 block below dragon
 
-                        // Wenn der Drache weniger als 0.1 Blöcke über dem Boden schwebt, gilt er als "auf dem Boden"
-                        if (distanceToGround <= 0.1) {
+                        // If dragon is hovering less than 0.1 blocks above ground, consider it "on ground"
+                        if (distanceToGround <= DragonConstants.GROUND_TOLERANCE_DISTANCE) {
                             isNearGround = true;
                         }
                     }
 
-                    // Der Drache gilt als "auf dem Boden" wenn onGround() true ist ODER er sehr nahe am Boden ist
+                    // Dragon is considered "on ground" if onGround() is true OR it's very close to ground
                     boolean effectivelyOnGround = currentlyOnGround || isNearGround;
 
                     if (effectivelyOnGround) {
-                        // Drache berührt den Boden oder ist sehr nahe dran
+                        // Dragon touching ground or very close
                         this.onGroundTimer++;
                         this.inAirTimer = 0;
 
-                        // Nur wenn er STABIL auf dem Boden ist (10+ Ticks), setze isLanded auf true
-                        if (this.onGroundTimer >= GROUND_STABILITY_THRESHOLD && !this.isLanded()) {
+                        // Only when STABLE on ground (10+ ticks), set isLanded to true
+                        if (this.onGroundTimer >= DragonConstants.GROUND_STABILITY_THRESHOLD_TICKS && !this.isLanded()) {
                             this.setLanded(true);
-                            System.out.println("[DRAGON-TICK-STABLE] Dragon stable on ground for " +
-                                this.onGroundTimer + " ticks (tolerance check: " + isNearGround + ") - setting isLanded to TRUE");
+                            LOGGER.debug("Dragon {} stable on ground for {} ticks (tolerance check: {}) - setting isLanded to TRUE",
+                                this.getId(), this.onGroundTimer, isNearGround);
                         }
                     } else {
-                        // Drache ist in der Luft
+                        // Dragon is in the air
                         this.inAirTimer++;
                         this.onGroundTimer = 0;
 
-                        // Nur wenn er STABIL in der Luft ist (10+ Ticks), setze isLanded auf false
-                        if (this.inAirTimer >= AIR_STABILITY_THRESHOLD && this.isLanded()) {
+                        // Only when STABLE in air (10+ ticks), set isLanded to false
+                        if (this.inAirTimer >= DragonConstants.AIR_STABILITY_THRESHOLD_TICKS && this.isLanded()) {
                             this.setLanded(false);
-                            System.out.println("[DRAGON-TICK-STABLE] Dragon stable in air for " +
-                                this.inAirTimer + " ticks - setting isLanded to FALSE");
+                            LOGGER.debug("Dragon {} stable in air for {} ticks - setting isLanded to FALSE",
+                                this.getId(), this.inAirTimer);
                         }
                     }
                 }
             } else {
-                // Kein Reiter: Reset Timer
+                // No rider: Reset timers
                 this.onGroundTimer = 0;
                 this.inAirTimer = 0;
             }
@@ -1061,7 +1092,7 @@ public class DragonEntity extends Monster {
             if (this.tamingTimer == 0 && this.hasEatenGoldenApple()) {
                 // Timer expired - reset the golden apple state
                 this.setAteGoldenApple(false);
-                System.out.println("[DRAGON-TAMING] Taming timer expired, resetting golden apple state");
+                LOGGER.info("Dragon {} taming timer expired, resetting golden apple state", this.getId());
             }
         }
 
@@ -1096,12 +1127,12 @@ public class DragonEntity extends Monster {
 
             // Debug output
             if (this.tickCount % 20 == 0 && !this.level().isClientSide) {
-                System.out.println("Target Yaw: " + targetYaw);
+                LOGGER.debug("Dragon {} target yaw: {}", this.getId(), String.format("%.2f", targetYaw));
             }
 
             // Smooth rotation transition - use rotLerp to handle angle wrapping correctly
             float currentYaw = this.getYRot();
-            // Erhöhe den Interpolationsfaktor für schnellere Drehung
+            // Increase interpolation factor for faster rotation
             float newYaw = Mth.rotLerp(0.98F, currentYaw, targetYaw);
 
             // Set yaw rotation
@@ -1139,7 +1170,7 @@ public class DragonEntity extends Monster {
 
         // Check if player is already the owner (for sitting/standing commands)
         if (this.isTamed() && this.getOwnerUUID().isPresent() && this.getOwnerUUID().get().equals(player.getUUID())) {
-            System.out.println("[DRAGON-INTERACT] Is tamed! Checking interaction...");
+            LOGGER.debug("Dragon {} is tamed - checking interaction with owner {}", this.getId(), player.getName().getString());
 
             // Check if player has a lead in offhand and dragon is not sitting
             boolean hasLeadInOffhand = offHandItem.is(Items.LEAD);
@@ -1147,11 +1178,11 @@ public class DragonEntity extends Monster {
             if (hasLeadInOffhand && !this.isSitting()) {
                 // Player wants to ride the dragon
                 if (player.startRiding(this)) {
-                    System.out.println("[DRAGON-RIDING] Player " + player.getName().getString() + " is now riding the dragon!");
+                    LOGGER.info("Dragon {} now being ridden by player {}", this.getId(), player.getName().getString());
                     this.playSound(SoundEvents.HORSE_SADDLE.value(), 1.0F, 1.0F);
                     return InteractionResult.SUCCESS;
                 } else {
-                    System.out.println("[DRAGON-RIDING] Failed to mount dragon!");
+                    LOGGER.warn("Dragon {} failed to mount for player {}", this.getId(), player.getName().getString());
                     return InteractionResult.FAIL;
                 }
             }
@@ -1160,19 +1191,19 @@ public class DragonEntity extends Monster {
             // This prevents accidental toggling when holding items
             boolean hasBothHandsEmpty = mainHandItem.isEmpty() && offHandItem.isEmpty();
 
-            System.out.println("[DRAGON-INTERACT] MainHand empty: " + mainHandItem.isEmpty() + ", OffHand empty: " + offHandItem.isEmpty());
-            System.out.println("[DRAGON-INTERACT] Both hands empty: " + hasBothHandsEmpty);
+            LOGGER.debug("Dragon {} interaction - MainHand empty: {}, OffHand empty: {}, Both hands empty: {}",
+                this.getId(), mainHandItem.isEmpty(), offHandItem.isEmpty(), hasBothHandsEmpty);
 
             if (hasBothHandsEmpty) {
                 boolean wasSitting = this.entityData.get(DATA_IS_SITTING);
 
-                System.out.println("[DRAGON-INTERACT] Player clicked dragon with empty hands - wasSitting=" + wasSitting);
-                System.out.println("[DRAGON-INTERACT] About to toggle sitting to: " + !wasSitting);
+                LOGGER.debug("Dragon {} player clicked with empty hands - wasSitting: {}, toggling to: {}",
+                    this.getId(), wasSitting, !wasSitting);
 
                 // Toggle between sitting and following
                 this.setSitting(!wasSitting);
 
-                System.out.println("[DRAGON-INTERACT] After setSitting - isSitting=" + this.isSitting());
+                LOGGER.debug("Dragon {} after setSitting - isSitting: {}", this.getId(), this.isSitting());
 
                 if (this.isSitting()) {
                     // Dragon sits down
@@ -1180,29 +1211,28 @@ public class DragonEntity extends Monster {
                     this.setLanded(true); // Ensure dragon is on ground
                     this.setNoGravity(true); // Prevent falling through blocks
                     this.playSound(SoundEvents.WOLF_STEP, 1.0F, 1.0F);
-                    System.out.println("[DRAGON-TAMED] Dragon is now sitting and waiting");
-                    System.out.println("[DRAGON-TAMED] Status: isSitting=" + this.isSitting() + ", isLanded=" + this.isLanded() + ", noGravity=" + this.isNoGravity());
+                    LOGGER.info("Dragon {} is now sitting and waiting - Status: isSitting: {}, isLanded: {}, noGravity: {}",
+                        this.getId(), this.isSitting(), this.isLanded(), this.isNoGravity());
                 } else {
                     // Dragon stands up and follows
-                    System.out.println("[DRAGON-TAMED] Dragon standing up - Before status change:");
-                    System.out.println("  isSitting=" + this.isSitting() + ", isLanded=" + this.isLanded() + ", noGravity=" + this.isNoGravity());
+                    LOGGER.debug("Dragon {} standing up - Before: isSitting: {}, isLanded: {}, noGravity: {}",
+                        this.getId(), this.isSitting(), this.isLanded(), this.isNoGravity());
 
                     this.setLanded(true); // Set to landed so it walks
                     this.setLandingMode(false); // Not in landing mode
                     this.setNoGravity(false); // Enable gravity for walking
                     this.setResting(false); // Make sure not resting
 
-                    System.out.println("[DRAGON-TAMED] Dragon standing up - After status change:");
-                    System.out.println("  isSitting=" + this.isSitting() + ", isLanded=" + this.isLanded() + ", noGravity=" + this.isNoGravity());
-                    System.out.println("  isResting=" + this.isResting() + ", pose=" + this.getPose());
+                    LOGGER.debug("Dragon {} standing up - After: isSitting: {}, isLanded: {}, noGravity: {}, isResting: {}, pose: {}",
+                        this.getId(), this.isSitting(), this.isLanded(), this.isNoGravity(), this.isResting(), this.getPose());
 
                     this.playSound(SoundEvents.WOLF_STEP, 1.0F, 1.0F);
-                    System.out.println("[DRAGON-TAMED] Dragon is now following owner - ready to walk");
+                    LOGGER.info("Dragon {} is now following owner - ready to walk", this.getId());
                 }
 
                 return InteractionResult.SUCCESS;
             } else {
-                System.out.println("[DRAGON-INTERACT] Hands not empty, not toggling sitting state");
+                LOGGER.debug("Dragon {} interaction - hands not empty, not toggling sitting state", this.getId());
             }
         }
 
@@ -1225,7 +1255,8 @@ public class DragonEntity extends Monster {
                 this.playSound(SoundEvents.GENERIC_EAT.value(), 1.0F, 1.0F);
                 this.level().broadcastEntityEvent(this, (byte) 7); // Heart particles
 
-                System.out.println("[DRAGON-TAMING] Dragon ate enchanted golden apple! Player has 3 seconds to apply saddle.");
+                LOGGER.info("Dragon {} ate enchanted golden apple from player {} - 3 seconds to apply saddle",
+                    this.getId(), player.getName().getString());
                 return InteractionResult.SUCCESS;
             } else if (this.hasEatenGoldenApple() && hasDragonSaddleInMainhand && this.tamingTimer > 0) {
                 // Step 2: Player applies dragon saddle within 3 seconds
@@ -1246,7 +1277,7 @@ public class DragonEntity extends Monster {
                 // Heal the dragon to full health
                 this.setHealth(this.getMaxHealth());
 
-                System.out.println("[DRAGON-TAMING] Dragon successfully tamed by " + player.getName().getString() + "!");
+                LOGGER.info("Dragon {} successfully tamed by player {}", this.getId(), player.getName().getString());
                 return InteractionResult.SUCCESS;
             }
         }
@@ -1281,6 +1312,9 @@ public class DragonEntity extends Monster {
         output.putInt("FlyingTimer", this.flyingTimer);
         output.putInt("TamingTimer", this.tamingTimer);
 
+        // Save per-entity scale so it persists between world saves
+        output.putFloat("DragonScale", this.getDragonScale());
+
         // Save taming data
         output.putBoolean("IsTamed", this.isTamed());
         output.putBoolean("IsSitting", this.isSitting());
@@ -1301,7 +1335,7 @@ public class DragonEntity extends Monster {
             int z = input.getIntOr("NestZ", 0);
             this.nestPosition = new BlockPos(x, y, z);
             if (!this.level().isClientSide) {
-                System.out.println("[DRAGON] Loaded nest position: " + this.nestPosition.toShortString());
+                LOGGER.info("Dragon {} loaded nest position: {}", this.getId(), this.nestPosition.toShortString());
             }
         }
 
@@ -1309,6 +1343,10 @@ public class DragonEntity extends Monster {
         this.landedTimer = input.getIntOr("LandedTimer", 0);
         this.flyingTimer = input.getIntOr("FlyingTimer", 0);
         this.tamingTimer = input.getIntOr("TamingTimer", 0);
+
+        // Load per-entity scale; default to constant if not present
+        float loadedScale = input.getFloatOr("DragonScale", DragonConstants.DRAGON_SCALE);
+        this.entityData.set(DATA_DRAGON_SCALE, loadedScale);
 
         // Load taming data
         this.setTamed(input.getBooleanOr("IsTamed", false));
@@ -1319,7 +1357,7 @@ public class DragonEntity extends Monster {
             try {
                 this.setOwnerUUID(UUID.fromString(ownerUuidString));
             } catch (IllegalArgumentException e) {
-                System.out.println("[DRAGON] Failed to parse owner UUID: " + ownerUuidString);
+                LOGGER.warn("Dragon {} failed to parse owner UUID: {}", this.getId(), ownerUuidString);
             }
         }
     }

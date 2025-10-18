@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.client.model.DragonModel;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
+import de.davidvogt.hkbmod.item.entity.custom.DragonConstants;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -13,6 +14,8 @@ import net.minecraft.client.renderer.entity.state.EnderDragonRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Renderer for the custom Dragon entity.
@@ -20,11 +23,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRenderState> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DragonRenderer.class);
     private static final ResourceLocation ENDER_DRAGON_TEXTURE =
             ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "textures/entity/dragon.png");
 
     private final DragonModel model;
     private float dragonYaw;
+    // current scale read from the entity in extractRenderState
+    private float currentScale = DragonConstants.DRAGON_SCALE;
 
     public DragonRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -56,36 +62,20 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
         // Pass sitting state to the model (for tamed dragons that are commanded to sit)
         this.model.setSitting(entity.isSitting());
 
-        // Debug: Log movement speed every second when landed
-        if (entity.isLanded() && entity.tickCount % 20 == 0) {
-            System.out.println("[RENDERER] Setting movement speed: " + String.format("%.4f", movementSpeed) +
-                ", deltaX=" + String.format("%.4f", entity.getDeltaMovement().x) +
-                ", deltaZ=" + String.format("%.4f", entity.getDeltaMovement().z) +
-                    ", isResting=" + entity.isResting() +
-                    ", isSitting=" + entity.isSitting());
-        }
-
         // Set the flap time for wing animation based on entity age
         // Only fold wings when ACTUALLY LANDED, not during landing approach
         if (entity.isLanded()) {
             // Dragon is on the ground - fold wings
             renderState.flapTime = 0.0F;
-            // Log every second (20 ticks) on client side
-            if (entity.tickCount % 20 == 0) {
-                /*System.out.println("[RENDERER-CLIENT] Dragon animation state: flapTime=0.0 (WINGS FOLDED), " +
-                    "isLanded=true, movementSpeed=" + String.format("%.3f", movementSpeed));*/
-            }
         } else {
             // Dragon is flying (includes landing approach) - keep wings flapping
             renderState.flapTime = (entity.tickCount + partialTick) / 10.0F;
-            // Log every 5 seconds (100 ticks) during flight
-            if (entity.tickCount % 100 == 0) {
-                /*System.out.println("[RENDERER-CLIENT] Dragon animation state: flapTime=" +
-                    String.format("%.2f", renderState.flapTime) + " (WINGS FLAPPING), isLandingMode=" + entity.isLandingMode());*/
-            }
         }
 
         this.dragonYaw = entity.getYRot();
+
+        // Read per-entity scale so we can render variations
+        this.currentScale = entity.getDragonScale();
     }
 
     @Override
@@ -98,11 +88,11 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
         // Move the dragon down so it stands on the ground properly after rotation
         poseStack.translate(0.0D, -1.5D, 0.0D);
 
-        // Scale down to 35% of the Ender Dragon's size
-        float scale = 0.35F;
+        // Scale using per-entity value (fallback already set in currentScale)
+        float scale = this.currentScale;
         poseStack.scale(scale, scale, scale);
 
-        // Drehe den Drachen um die aktuelle Yaw-Rotation
+        // Rotate the dragon around the current yaw rotation
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(this.dragonYaw));
 
         // Setup the model animation

@@ -1,10 +1,13 @@
 package de.davidvogt.hkbmod.item.entity.ai;
 
+import de.davidvogt.hkbmod.item.entity.custom.DragonConstants;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
 
@@ -13,15 +16,11 @@ import java.util.EnumSet;
  * or when their health is low.
  */
 public class ReturnToNestGoal extends Goal {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReturnToNestGoal.class);
+
     private final DragonEntity dragon;
     private BlockPos nestPosition;
     private int checkInterval = 0;
-
-    // Configuration
-    private static final double MAX_DISTANCE_FROM_NEST = 128.0D; // Max distance before returning
-    private static final double NEST_ARRIVAL_DISTANCE = 10.0D; // How close to get to nest
-    private static final double LOW_HEALTH_THRESHOLD = 0.3D; // Return at 30% health
-    private static final int CHECK_EVERY_N_TICKS = 40; // Check every 2 seconds
 
     public ReturnToNestGoal(DragonEntity dragon) {
         this.dragon = dragon;
@@ -42,7 +41,7 @@ public class ReturnToNestGoal extends Goal {
 
         // Check periodically to avoid too many distance calculations
         checkInterval++;
-        if (checkInterval < CHECK_EVERY_N_TICKS) {
+        if (checkInterval < DragonConstants.CHECK_INTERVAL_TICKS) {
             return false;
         }
         checkInterval = 0;
@@ -59,20 +58,20 @@ public class ReturnToNestGoal extends Goal {
 
         // Check if health is low
         double healthPercent = dragon.getHealth() / dragon.getMaxHealth();
-        if (healthPercent < LOW_HEALTH_THRESHOLD) {
+        if (healthPercent < DragonConstants.LOW_HEALTH_THRESHOLD) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[RETURN-TO-NEST] Dragon health low (" +
-                    String.format("%.0f", healthPercent * 100) + "%), returning to nest");
+                LOGGER.info("Dragon {} health low ({:.0f}%), returning to nest",
+                    dragon.getId(), healthPercent * 100);
             }
             return true;
         }
 
         // Check if too far from nest
         double distanceToNest = dragon.position().distanceTo(Vec3.atCenterOf(nestPosition));
-        if (distanceToNest > MAX_DISTANCE_FROM_NEST) {
+        if (distanceToNest > DragonConstants.NEST_RETURN_DISTANCE) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[RETURN-TO-NEST] Dragon too far from nest (" +
-                    String.format("%.1f", distanceToNest) + " blocks), returning");
+                LOGGER.debug("Dragon {} too far from nest ({:.1f} blocks), returning",
+                    dragon.getId(), distanceToNest);
             }
             return true;
         }
@@ -90,10 +89,10 @@ public class ReturnToNestGoal extends Goal {
         double distanceToNest = dragon.position().distanceTo(Vec3.atCenterOf(nestPosition));
 
         // Stop if we're close enough to nest
-        if (distanceToNest < NEST_ARRIVAL_DISTANCE) {
+        if (distanceToNest < DragonConstants.NEST_ARRIVAL_DISTANCE) {
             if (!dragon.level().isClientSide) {
-                System.out.println("[RETURN-TO-NEST] Arrived at nest (distance: " +
-                    String.format("%.1f", distanceToNest) + " blocks)");
+                LOGGER.debug("Dragon {} arrived at nest (distance: {:.1f} blocks)",
+                    dragon.getId(), distanceToNest);
             }
             return false;
         }
@@ -105,7 +104,7 @@ public class ReturnToNestGoal extends Goal {
     @Override
     public void start() {
         if (!dragon.level().isClientSide) {
-            System.out.println("[RETURN-TO-NEST] Starting return to nest at " + nestPosition);
+            LOGGER.debug("Dragon {} starting return to nest at {}", dragon.getId(), nestPosition);
         }
         // Ensure dragon is in flying mode
         dragon.setNoGravity(true);
@@ -115,7 +114,7 @@ public class ReturnToNestGoal extends Goal {
     @Override
     public void stop() {
         if (!dragon.level().isClientSide) {
-            System.out.println("[RETURN-TO-NEST] Stopped returning to nest");
+            LOGGER.debug("Dragon {} stopped returning to nest", dragon.getId());
         }
     }
 
@@ -133,8 +132,7 @@ public class ReturnToNestGoal extends Goal {
 
         // Log progress every 2 seconds
         if (dragon.tickCount % 40 == 0 && !dragon.level().isClientSide) {
-            System.out.println("[RETURN-TO-NEST] Distance to nest: " +
-                String.format("%.1f", distanceToNest) + " blocks");
+            LOGGER.debug("Dragon {} distance to nest: {:.1f} blocks", dragon.getId(), distanceToNest);
         }
 
         // Normalize direction
@@ -162,7 +160,7 @@ public class ReturnToNestGoal extends Goal {
         dragon.setDeltaMovement(newVelX, newVelY, newVelZ);
 
         // If very close, start landing sequence
-        if (distanceToNest < NEST_ARRIVAL_DISTANCE * 2) {
+        if (distanceToNest < DragonConstants.NEST_ARRIVAL_DISTANCE * 2) {
             // Slow down for landing
             dragon.setDeltaMovement(
                 dragon.getDeltaMovement().scale(0.9)

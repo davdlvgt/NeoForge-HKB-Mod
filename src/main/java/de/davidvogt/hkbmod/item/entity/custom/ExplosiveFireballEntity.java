@@ -13,8 +13,6 @@ import net.minecraft.world.phys.HitResult;
  */
 public class ExplosiveFireballEntity extends AbstractHurtingProjectile {
 
-    private static final float EXPLOSION_POWER = 2.0F; // TNT has 4.0, this is moderate
-
     public ExplosiveFireballEntity(EntityType<? extends AbstractHurtingProjectile> entityType, Level level) {
         super(entityType, level);
     }
@@ -48,7 +46,7 @@ public class ExplosiveFireballEntity extends AbstractHurtingProjectile {
                 this.getX(),
                 this.getY(),
                 this.getZ(),
-                EXPLOSION_POWER,
+                DragonConstants.EXPLOSION_POWER,
                 Level.ExplosionInteraction.MOB
             );
 
@@ -63,7 +61,7 @@ public class ExplosiveFireballEntity extends AbstractHurtingProjectile {
 
         if (!this.level().isClientSide) {
             // Deal direct damage to the entity hit
-            result.getEntity().hurt(this.damageSources().mobProjectile(this, this.getOwner() instanceof LivingEntity le ? le : null), 6.0F);
+            result.getEntity().hurt(this.damageSources().mobProjectile(this, this.getOwner() instanceof LivingEntity le ? le : null), DragonConstants.FIREBALL_DIRECT_DAMAGE);
         }
     }
 
