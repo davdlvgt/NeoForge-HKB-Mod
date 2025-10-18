@@ -318,20 +318,29 @@ public class DragonEntity extends Monster {
 
     @Override
     protected void registerGoals() {
-        // Priority 0: Follow owner if tamed (HIGHEST PRIORITY for tamed dragons)
-        this.goalSelector.addGoal(0, new FollowOwnerGoal(this, 0.6D, 6.0F, 15.0F));
+        // Priority 0: Retaliate when dragon is attacked (highest priority)
+        this.goalSelector.addGoal(0, new DragonRetaliateAttackGoal(this));
 
-        // Priority 1: Return to nest when too far away or health is low (only for wild dragons)
-        this.goalSelector.addGoal(1, new ReturnToNestGoal(this));
+        // Priority 1: Follow owner if tamed
+        this.goalSelector.addGoal(1, new FollowOwnerGoal(this, 0.6D, 6.0F, 15.0F));
 
-        // Priority 2: Defend nest from nearby players (only for wild dragons)
-        this.goalSelector.addGoal(2, new DefendNestGoal(this));
+        // Priority 2: Protect owner - breathes fire at monsters near the owner (6 block radius)
+        this.goalSelector.addGoal(2, new DragonProtectOwnerGoal(this, 6.0D));
 
-        // Priority 3: Rest occasionally (lie down and curl up like polar fox) (only for wild dragons)
-        this.goalSelector.addGoal(3, new DragonRestGoal(this));
+        // Priority 3: Return to nest when too far away or health is low (only for wild dragons)
+        this.goalSelector.addGoal(3, new ReturnToNestGoal(this));
 
-        // Priority 4: Custom flying behavior - handles all movement AND rotation (only for wild dragons)
-        this.goalSelector.addGoal(4, new DragonFlyingGoal(this));
+        // Priority 4: Defend nest from nearby players (only for wild dragons)
+        this.goalSelector.addGoal(4, new DefendNestGoal(this));
+
+        // Priority 5: Rest occasionally (lie down and curl up like polar fox) (only for wild dragons)
+        this.goalSelector.addGoal(5, new DragonRestGoal(this));
+
+        // Priority 6: Custom flying behavior - handles all movement AND rotation (only for wild dragons)
+        this.goalSelector.addGoal(6, new DragonFlyingGoal(this));
+
+        // Targeting: react to being hurt
+        this.targetSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this));
 
         // Removed LookAtPlayerGoal - it was interfering with flight direction
         // The dragon should look where it's flying, not at players
@@ -1171,6 +1180,49 @@ public class DragonEntity extends Monster {
         // Check if player is already the owner (for sitting/standing commands)
         if (this.isTamed() && this.getOwnerUUID().isPresent() && this.getOwnerUUID().get().equals(player.getUUID())) {
             LOGGER.debug("Dragon {} is tamed - checking interaction with owner {}", this.getId(), player.getName().getString());
+
+            // --- FEEDING LOGIC: owner may feed dragon with golden apples ---
+            // Accept enchanted golden apple or normal golden apple from either hand
+            ItemStack feedStack = ItemStack.EMPTY;
+            boolean feedFromMain = false;
+            if (mainHandItem.is(Items.ENCHANTED_GOLDEN_APPLE) || mainHandItem.is(Items.GOLDEN_APPLE)) {
+                feedStack = mainHandItem;
+                feedFromMain = true;
+            } else if (offHandItem.is(Items.ENCHANTED_GOLDEN_APPLE) || offHandItem.is(Items.GOLDEN_APPLE)) {
+                feedStack = offHandItem;
+                feedFromMain = false;
+            }
+
+            if (!feedStack.isEmpty()) {
+                // Only owner can feed (we're already in owner branch, but double-check)
+                if (this.getOwnerUUID().isPresent() && this.getOwnerUUID().get().equals(player.getUUID())) {
+                    // Enchanted golden apple: full heal
+                    if (feedStack.is(Items.ENCHANTED_GOLDEN_APPLE) && this.getHealth() != this.getMaxHealth()) {
+                        if (!player.isCreative()) {
+                            feedStack.shrink(1);
+                        }
+                        this.setHealth(this.getMaxHealth());
+                        this.playSound(SoundEvents.PLAYER_LEVELUP, 1.0F, 1.0F);
+                        this.level().broadcastEntityEvent(this, (byte) 7); // hearts
+                        LOGGER.info("Dragon {} fully healed by enchanted golden apple from owner {}", this.getId(), player.getName().getString());
+                        return InteractionResult.SUCCESS;
+                    }
+
+                    // Normal golden apple: heal 1/3 of max health
+                    if (feedStack.is(Items.GOLDEN_APPLE) && this.getHealth() != this.getMaxHealth()) {
+                        if (!player.isCreative()) {
+                            feedStack.shrink(1);
+                        }
+                        float healAmount = this.getMaxHealth() / 3.0F;
+                        this.heal(healAmount);
+                        this.playSound(SoundEvents.GENERIC_EAT.value(), 1.0F, 1.0F);
+                        this.level().broadcastEntityEvent(this, (byte) 7); // hearts
+                        LOGGER.info("Dragon {} healed by {} HP from golden apple by owner {}", this.getId(), healAmount, player.getName().getString());
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+            }
+            // --- end feeding logic ---
 
             // Check if player has a lead in offhand and dragon is not sitting
             boolean hasLeadInOffhand = offHandItem.is(Items.LEAD);
