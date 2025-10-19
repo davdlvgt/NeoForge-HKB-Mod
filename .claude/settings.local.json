@@ -33,7 +33,8 @@
       "Bash(.gradlew.bat build:*)",
       "Bash(Select-String -Pattern \"(BUILD|FAILED|error|warning)\" -Context 0,2)",
       "Bash(.gradlew.bat compileJava:*)",
-      "Bash(cmd.exe:*)"
+      "Bash(cmd.exe:*)",
+      "Bash(findstr dragon_nest)"
     ],
     "deny": [],
     "ask": []

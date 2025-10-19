@@ -1035,8 +1035,18 @@ public class DragonEntity extends Monster {
 
         // NEW STABLE GROUND DETECTION WITH HYSTERESIS AND TOLERANCE
         if (!this.level().isClientSide) {
+            // Grant flight abilities to rider to prevent "Flying is not enabled" kick
+            LivingEntity rider = this.getControllingPassenger();
+            if (rider instanceof Player player) {
+                // Enable flight while riding the dragon
+                if (!player.getAbilities().mayfly) {
+                    player.getAbilities().mayfly = true;
+                    player.onUpdateAbilities();
+                }
+            }
+
             // If dragon has a rider
-            if (this.isVehicle() && this.getControllingPassenger() != null) {
+            if (this.isVehicle() && rider != null) {
                 // If flight mode is active (spacebar pressed), set isLanded immediately to false
                 if (this.isFlyingMode()) {
                     this.onGroundTimer = 0;
@@ -1158,6 +1168,20 @@ public class DragonEntity extends Monster {
             float newPitch = Mth.rotLerp(0.9F, currentPitch, targetPitch);
             this.setXRot(newPitch);
         }
+    }
+
+    @Override
+    protected void removePassenger(Entity passenger) {
+        // Remove flight ability when player dismounts
+        if (passenger instanceof Player player && !this.level().isClientSide) {
+            // Only remove mayfly if the player is not in creative mode
+            if (!player.getAbilities().instabuild) {
+                player.getAbilities().mayfly = false;
+                player.getAbilities().flying = false;
+                player.onUpdateAbilities();
+            }
+        }
+        super.removePassenger(passenger);
     }
 
     /**

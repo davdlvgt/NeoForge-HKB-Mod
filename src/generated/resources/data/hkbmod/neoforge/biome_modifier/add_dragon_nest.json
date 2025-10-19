@@ -5,11 +5,11 @@
     "minecraft:frozen_peaks",
     "minecraft:jagged_peaks",
     "minecraft:windswept_hills",
-    "minecraft:windswept_gravelly_hills",
     "minecraft:windswept_forest",
+    "minecraft:windswept_savanna",
+    "minecraft:eroded_badlands",
     "minecraft:meadow",
-    "minecraft:grove",
-    "minecraft:snowy_slopes"
+    "minecraft:plains"
   ],
   "features": "hkbmod:dragon_nest_placed",
   "step": "surface_structures"

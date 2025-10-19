@@ -1,24 +1,38 @@
 package de.davidvogt.hkbmod.worldgen.feature;
 
 import com.mojang.serialization.Codec;
-import de.davidvogt.hkbmod.block.ModBlocks;
 import de.davidvogt.hkbmod.HKBMod;
+import de.davidvogt.hkbmod.item.entity.ModEntities;
+import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
+
+import java.util.Optional;
 
 /**
  * Custom feature that places dragon nests on mountain peaks.
- * Creates a 7x7 platform with mossy cobblestone stairs, slabs, nest block and dragon eggs.
+ * Loads the structure from data/hkbmod/structure/dragon_nest.nbt
+ * Spawns 1-3 dragons near the nest after placement.
  */
 public class DragonNestFeature extends Feature<NoneFeatureConfiguration> {
+    private static final int DRAGON_COUNT = 1;
+
+    private static final ResourceLocation DRAGON_NEST_STRUCTURE =
+        ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "dragon_nest");
 
     public DragonNestFeature(Codec<NoneFeatureConfiguration> codec) {
         super(codec);
@@ -47,12 +61,18 @@ public class DragonNestFeature extends Feature<NoneFeatureConfiguration> {
             return false;
         }
 
-        // Build the nest structure (no space check - we build it anyway for testing)
-        buildDragonNest(level, surfacePos);
+        // Load and place the structure from NBT file
+        boolean success = placeStructure(level, surfacePos);
 
-        HKBMod.LOGGER.info("=== DRAGON NEST: Successfully placed at: {} ===", surfacePos);
+        if (success) {
+            // Spawn dragons after placing the structure
+            spawnDragons(level, surfacePos, context.random());
+            HKBMod.LOGGER.info("=== DRAGON NEST: Successfully placed at: {} ===", surfacePos);
+        } else {
+            HKBMod.LOGGER.warn("=== DRAGON NEST: Failed to load structure template ===");
+        }
 
-        return true;
+        return success;
     }
 
     /**
@@ -85,133 +105,83 @@ public class DragonNestFeature extends Feature<NoneFeatureConfiguration> {
 
 
     /**
-     * Checks if there's enough open space above for the nest
+     * Loads and places the dragon nest structure from the NBT file.
+     * The structure file is located at data/hkbmod/structure/dragon_nest.nbt
      */
-    private boolean hasEnoughSpace(WorldGenLevel level, BlockPos pos) {
-        // Check at least 5 blocks of air above
-        for (int y = 1; y <= 5; y++) {
-            BlockState above = level.getBlockState(pos.above(y));
-            if (!above.isAir() && !above.canBeReplaced()) {
-                return false;
-            }
+    private boolean placeStructure(WorldGenLevel level, BlockPos pos) {
+        // Get the structure template manager from the level
+        StructureTemplateManager templateManager = level.getLevel().getStructureManager();
+
+        // Load the structure template
+        Optional<StructureTemplate> templateOptional = templateManager.get(DRAGON_NEST_STRUCTURE);
+
+        if (templateOptional.isEmpty()) {
+            HKBMod.LOGGER.error("Failed to load dragon nest structure template from: {}", DRAGON_NEST_STRUCTURE);
+            return false;
         }
 
-        // Check that we have solid ground
-        BlockState below = level.getBlockState(pos.below());
-        return below.isSolidRender();
-    }
+        StructureTemplate template = templateOptional.get();
 
-    /**
-     * Checks if the location is suitable for a dragon nest
-     * Requires at least a 5x5 flat area, ideally 7x7
-     */
-    private boolean isSuitableLocation(WorldGenLevel level, BlockPos pos) {
-        // DISABLED FOR TESTING - always return true
+        // Create placement settings
+        StructurePlaceSettings settings = new StructurePlaceSettings()
+            .setRotation(Rotation.NONE)
+            .setMirror(Mirror.NONE)
+            .setIgnoreEntities(false);
+
+        // Get the structure size to center it properly
+        Vec3i size = template.getSize();
+
+        // Calculate offset to center the structure at the placement position
+        // Subtract half the structure size to center it
+        BlockPos placementPos = pos.offset(-size.getX() / 2, 0, -size.getZ() / 2);
+
+        // Place the structure
+        template.placeInWorld(level, placementPos, placementPos, settings, level.getRandom(), 2);
+
+        HKBMod.LOGGER.info("Dragon nest structure placed at {} (centered from {})", placementPos, pos);
         return true;
     }
 
-
     /**
-     * Builds the complete dragon nest structure:
-     * - 7x7 base with mossy cobblestone stairs at edges
-     * - Mossy cobblestone slabs filling between stairs and center
-     * - Dragon nest block in center
-     * - Double slabs with dragon eggs in N, E, S, W positions
+     * Spawns 1-3 dragons near the nest after it's been placed.
+     * Dragons are spawned in the air around the nest to make them look natural.
      */
-    private void buildDragonNest(WorldGenLevel level, BlockPos center) {
-        // Clear and flatten the area if needed
-        for (int x = -3; x <= 3; x++) {
-            for (int z = -3; z <= 3; z++) {
-                BlockPos basePos = center.offset(x, 0, z);
-                BlockState existing = level.getBlockState(basePos);
-
-                // Replace air or replaceable blocks with solid base
-                if (existing.isAir() || existing.canBeReplaced()) {
-                    level.setBlock(basePos, Blocks.STONE.defaultBlockState(), 3);
-                }
-            }
+    private void spawnDragons(WorldGenLevel level, BlockPos nestPos, RandomSource random) {
+        // Only spawn dragons on server side
+        if (!(level.getLevel() instanceof ServerLevel serverLevel)) {
+            return;
         }
 
-        // Layer 1: Mossy Cobblestone Slabs as base layer
-        for (int x = -3; x <= 3; x++) {
-            for (int z = -3; z <= 3; z++) {
-                if (x == 0 && z == 0) {
-                    continue; // Center is for nest block
-                }
+        // Random number of dragons: 1 to 3
+        int dragonCount = DRAGON_COUNT;
 
-                BlockPos slabPos = center.offset(x, 1, z);
-                level.setBlock(slabPos, Blocks.MOSSY_COBBLESTONE_SLAB.defaultBlockState(), 3);
-            }
+        HKBMod.LOGGER.info("Dragon nest: Spawning {} dragons near nest at {}", dragonCount, nestPos);
+
+        for (int i = 0; i < dragonCount; i++) {
+            // Spawn dragons in a circle around the nest, in the air
+            double angle = (2 * Math.PI * i) / dragonCount; // Evenly distribute around nest
+            double radius = 5.0 + random.nextDouble() * 3.0; // 5-8 blocks away from center
+
+            double offsetX = Math.cos(angle) * radius;
+            double offsetZ = Math.sin(angle) * radius;
+            double offsetY = 3.0 + random.nextDouble() * 2.0; // 3-5 blocks above nest
+
+            BlockPos spawnPos = nestPos.offset((int) offsetX, (int) offsetY, (int) offsetZ);
+
+            // Create and spawn the dragon using the EntityType constructor
+            DragonEntity dragon = new DragonEntity(ModEntities.DRAGON.get(), serverLevel);
+
+            // Position the dragon
+            dragon.setPos(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
+            dragon.setYRot(random.nextFloat() * 360F);
+
+            // Set the dragon's home position to this nest
+            dragon.setNestPosition(nestPos);
+
+            // Add the dragon to the world
+            serverLevel.addFreshEntity(dragon);
+
+            HKBMod.LOGGER.info("Dragon nest: Spawned dragon {} at {}", i + 1, spawnPos);
         }
-
-        // Layer 2: Place stairs at the outer edge (distance 3 from center)
-        for (int x = -3; x <= 3; x++) {
-            for (int z = -3; z <= 3; z++) {
-                int absX = Math.abs(x);
-                int absZ = Math.abs(z);
-
-                // Only place stairs at the very edge (distance 3)
-                if (absX == 3 || absZ == 3) {
-                    BlockPos stairPos = center.offset(x, 1, z);
-                    BlockState stairState = getStairStateForPosition(x, z);
-                    level.setBlock(stairPos, stairState, 3);
-                }
-            }
-        }
-
-        // Place the nest block in the center at ground level + 1
-        BlockPos nestPos = center.above();
-        level.setBlock(nestPos, ModBlocks.DRAGON_NEST.get().defaultBlockState(), 3);
-
-        // ========================================
-        // DRAGON EGGS PLATZIERUNG
-        // ========================================
-        // HIER WERDEN DIE 4 DRAGON EGGS PLATZIERT!
-        // - Auf doppelten Mossy Cobblestone Slabs (ein Slab auf dem anderen)
-        // - In den 4 Himmelsrichtungen: Nord, Ost, Süd, West
-        // - Direkt neben dem Nest-Block
-        // ========================================
-        placeDoubleSlabWithEgg(level, center.offset(0, 1, -1)); // North (Norden)
-        placeDoubleSlabWithEgg(level, center.offset(1, 1, 0));   // East (Osten)
-        placeDoubleSlabWithEgg(level, center.offset(0, 1, 1));  // South (Süden)
-        placeDoubleSlabWithEgg(level, center.offset(-1, 1, 0));  // West (Westen)
-        // ========================================
-    }
-
-    /**
-     * Returns the appropriate stair state based on position to create an inward-facing border
-     */
-    private BlockState getStairStateForPosition(int x, int z) {
-        BlockState baseState = Blocks.MOSSY_COBBLESTONE_STAIRS.defaultBlockState();
-
-        // Determine facing direction (stairs should face inward toward nest)
-        Direction facing;
-
-        if (z == -3) {
-            // North edge, face south (inward)
-            facing = Direction.SOUTH;
-        } else if (z == 3) {
-            // South edge, face north (inward)
-            facing = Direction.NORTH;
-        } else if (x == -3) {
-            // West edge, face east (inward)
-            facing = Direction.EAST;
-        } else {
-            // East edge, face west (inward)
-            facing = Direction.WEST;
-        }
-
-        return baseState.setValue(StairBlock.FACING, facing)
-                       .setValue(StairBlock.HALF, Half.BOTTOM);
-    }
-
-    /**
-     * Places a second slab on top of an existing slab and puts a dragon egg on top
-     */
-    private void placeDoubleSlabWithEgg(WorldGenLevel level, BlockPos baseSlabPos) {
-        // Place second slab on top of the existing one
-        level.setBlock(baseSlabPos, Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 3);
-        BlockPos eggPos = baseSlabPos.above();
-        level.setBlock(eggPos, ModBlocks.DRAGON_EGG.get().defaultBlockState(), 3);
     }
 }

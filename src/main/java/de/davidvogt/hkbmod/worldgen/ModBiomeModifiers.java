@@ -36,7 +36,8 @@ public class ModBiomeModifiers {
                         biomes.getOrThrow(Biomes.WINDSWEPT_FOREST),
                         biomes.getOrThrow(Biomes.WINDSWEPT_SAVANNA),
                         biomes.getOrThrow(Biomes.ERODED_BADLANDS),
-                        biomes.getOrThrow(Biomes.MEADOW)
+                        biomes.getOrThrow(Biomes.MEADOW),
+                        biomes.getOrThrow(Biomes.PLAINS)
                 ),
                 HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.DRAGON_NEST_PLACED_KEY)),
                 GenerationStep.Decoration.SURFACE_STRUCTURES));
