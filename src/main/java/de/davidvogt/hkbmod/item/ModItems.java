@@ -5,7 +5,11 @@ import de.davidvogt.hkbmod.item.custom.LongbowArrowItem;
 import de.davidvogt.hkbmod.item.custom.LongbowItem;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
 import de.davidvogt.hkbmod.item.custom.TimeSetterItem;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -78,6 +82,46 @@ public class ModItems {
                             ModMaterials.EMERALD_MATERIAL,   // Material to use
                             -3.0F,                                  // Type-specific attack damage bonus
                             0.0F                               // Type-specific attack speed modifier
+                    )
+            )
+    );
+
+    public static final DeferredItem<Item> EMERALD_HELMET = ITEMS.registerItem(
+            "emerald_helmet",
+            props -> new Item(
+                    props.humanoidArmor(
+                            ModMaterials.EMERALD_ARMOR_MATERIAL,
+                            ArmorType.HELMET
+                    )
+            )
+    );
+
+    public static final DeferredItem<Item> EMERALD_CHESTPLATE = ITEMS.registerItem(
+            "emerald_chestplate",
+            props -> new Item(
+                    props.humanoidArmor(
+                            ModMaterials.EMERALD_ARMOR_MATERIAL,
+                            ArmorType.CHESTPLATE
+                    )
+            )
+    );
+
+    public static final DeferredItem<Item> EMERALD_LEGGINGS = ITEMS.registerItem(
+            "emerald_leggings",
+            props -> new Item(
+                    props.humanoidArmor(
+                            ModMaterials.EMERALD_ARMOR_MATERIAL,
+                            ArmorType.LEGGINGS
+                    )
+            )
+    );
+
+    public static final DeferredItem<Item> EMERALD_BOOTS = ITEMS.registerItem(
+            "emerald_boots",
+            props -> new Item(
+                    props.humanoidArmor(
+                            ModMaterials.EMERALD_ARMOR_MATERIAL,
+                            ArmorType.BOOTS
                     )
             )
     );

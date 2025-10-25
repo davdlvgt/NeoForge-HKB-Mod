@@ -33,6 +33,12 @@ public class ModModelProvider extends ModelProvider {
         itemModels.generateFlatItem(ModItems.EMERALD_SHOVEL.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(ModItems.EMERALD_HOE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
+        // Armor pieces
+        itemModels.generateFlatItem(ModItems.EMERALD_HELMET.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(ModItems.EMERALD_CHESTPLATE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(ModItems.EMERALD_LEGGINGS.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(ModItems.EMERALD_BOOTS.get(), ModelTemplates.FLAT_ITEM);
+
         itemModels.generateFlatItem(ModItems.MAGIC_PICKAXE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(ModItems.TIME_SETTER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
 

@@ -34,7 +34,10 @@
       "Bash(Select-String -Pattern \"(BUILD|FAILED|error|warning)\" -Context 0,2)",
       "Bash(.gradlew.bat compileJava:*)",
       "Bash(cmd.exe:*)",
-      "Bash(findstr dragon_nest)"
+      "Bash(findstr dragon_nest)",
+      "WebFetch(domain:nekoyue.github.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:maven.fabricmc.net)"
     ],
     "deny": [],
     "ask": []

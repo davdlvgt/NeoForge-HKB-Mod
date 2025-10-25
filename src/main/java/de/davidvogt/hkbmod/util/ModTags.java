@@ -34,6 +34,8 @@ public class ModTags {
 
         public static final TagKey<Item> PLANKS = createTag("planks");
 
+        public static final TagKey<Item> REPAIRS_EMERALD_ARMOR = createTag("repairs_emerald_armor");
+
         private static TagKey<Item> createTag(String name) {
             return ItemTags.create(ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, name));
         }
