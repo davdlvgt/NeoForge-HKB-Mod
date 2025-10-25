@@ -172,12 +172,12 @@ public class HKBMod {
             PlayerResearchData researchData = serverPlayer.getData(ModAttachments.PLAYER_RESEARCH);
             serverPlayer.connection.send(new SyncPlayerResearchPacket(researchData.getCompletedLevels()));
             LOGGER.info("Synced research data for player {} - {} classes completed",
-                serverPlayer.getName().getString(), researchData.getCompletedLevels().size());
+                    serverPlayer.getName().getString(), researchData.getCompletedLevels().size());
 
             // Sync unlocked recipes to client
             serverPlayer.connection.send(SyncUnlockedRecipesPacket.fromSet(researchData.getUnlockedRecipes()));
             LOGGER.info("Synced unlocked recipes for player {} - {} recipes unlocked",
-                serverPlayer.getName().getString(), researchData.getUnlockedRecipeCount());
+                    serverPlayer.getName().getString(), researchData.getUnlockedRecipeCount());
         }
     }
 

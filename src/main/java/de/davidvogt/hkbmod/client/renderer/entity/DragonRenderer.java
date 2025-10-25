@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.client.model.DragonModel;
-import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import de.davidvogt.hkbmod.item.entity.custom.DragonConstants;
+import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -31,6 +31,10 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
     private float dragonYaw;
     // current scale read from the entity in extractRenderState
     private float currentScale = DragonConstants.DRAGON_SCALE;
+    // current variant color tint read from the entity in extractRenderState
+    private float colorRed = 1.0f;
+    private float colorGreen = 1.0f;
+    private float colorBlue = 1.0f;
 
     public DragonRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -52,8 +56,8 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
         renderState.flightHistory.copyFrom(entity.getFlightHistory());
 
         // Pass movement speed to the model for walking animation
-        float movementSpeed = (float)Math.sqrt(entity.getDeltaMovement().x * entity.getDeltaMovement().x +
-            entity.getDeltaMovement().z * entity.getDeltaMovement().z);
+        float movementSpeed = (float) Math.sqrt(entity.getDeltaMovement().x * entity.getDeltaMovement().x +
+                entity.getDeltaMovement().z * entity.getDeltaMovement().z);
         this.model.setMovementSpeed(movementSpeed);
 
         // Pass resting state to the model (for wild dragons resting on nests)
@@ -76,6 +80,12 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
 
         // Read per-entity scale so we can render variations
         this.currentScale = entity.getDragonScale();
+
+        // Read variant color for tinting
+        de.davidvogt.hkbmod.item.entity.custom.DragonVariant variant = entity.getVariant();
+        this.colorRed = variant.getRed();
+        this.colorGreen = variant.getGreen();
+        this.colorBlue = variant.getBlue();
     }
 
     @Override
@@ -102,10 +112,69 @@ public class DragonRenderer extends EntityRenderer<DragonEntity, EnderDragonRend
         RenderType renderType = this.model.renderType(ENDER_DRAGON_TEXTURE);
         VertexConsumer vertexConsumer = buffer.getBuffer(renderType);
 
-        // Render the model
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+        // Apply color multiplier using OverlayVertexConsumer wrapper for tinting
+        int colorARGB = 0xFF000000 |
+                        (((int)(this.colorRed * 255) & 0xFF) << 16) |
+                        (((int)(this.colorGreen * 255) & 0xFF) << 8) |
+                        ((int)(this.colorBlue * 255) & 0xFF);
+
+        // Render the model with color tinting via a wrapper
+        this.model.renderToBuffer(poseStack, new ColoredVertexConsumer(vertexConsumer, this.colorRed, this.colorGreen, this.colorBlue),
+                packedLight, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
         super.render(renderState, poseStack, buffer, packedLight);
+    }
+
+    /**
+     * Wrapper class that multiplies vertex colors with a tint color.
+     * Used to apply color variants to the dragon model.
+     */
+    private static class ColoredVertexConsumer implements VertexConsumer {
+        private final VertexConsumer delegate;
+        private final float red, green, blue;
+
+        public ColoredVertexConsumer(VertexConsumer delegate, float red, float green, float blue) {
+            this.delegate = delegate;
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+        }
+
+        @Override
+        public VertexConsumer addVertex(float x, float y, float z) {
+            return delegate.addVertex(x, y, z);
+        }
+
+        @Override
+        public VertexConsumer setColor(int r, int g, int b, int a) {
+            // Multiply the texture color with the tint color
+            return delegate.setColor(
+                    (int)(r * red),
+                    (int)(g * green),
+                    (int)(b * blue),
+                    a
+            );
+        }
+
+        @Override
+        public VertexConsumer setUv(float u, float v) {
+            return delegate.setUv(u, v);
+        }
+
+        @Override
+        public VertexConsumer setUv1(int u, int v) {
+            return delegate.setUv1(u, v);
+        }
+
+        @Override
+        public VertexConsumer setUv2(int u, int v) {
+            return delegate.setUv2(u, v);
+        }
+
+        @Override
+        public VertexConsumer setNormal(float x, float y, float z) {
+            return delegate.setNormal(x, y, z);
+        }
     }
 }

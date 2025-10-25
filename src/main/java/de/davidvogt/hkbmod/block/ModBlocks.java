@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -20,7 +19,6 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Function;
@@ -89,14 +87,15 @@ public class ModBlocks {
     public static final DeferredBlock<Block> ROBINIA_WOOD = registerBlock("robinia_wood",
             (properties) -> new ModFlammableRotatedPillarBlock(
                     properties.instrument(NoteBlockInstrument.BASS).strength(2.0F).sound(SoundType.CHERRY_WOOD).ignitedByLava()));
+    public static final DeferredBlock<StairBlock> ROBINIA_STAIRS = registerBlock("robinia_stairs",
+            (properties) -> new StairBlock(ModBlocks.ROBINIA_WOOD.get().defaultBlockState(),
+                    properties.strength(2f).requiresCorrectToolForDrops()));
     public static final DeferredBlock<Block> STRIPPED_ROBINIA_LOG = registerBlock("stripped_robinia_log",
             (properties) -> new ModFlammableRotatedPillarBlock(
                     properties.instrument(NoteBlockInstrument.BASS).strength(2.0F).sound(SoundType.CHERRY_WOOD).ignitedByLava()));
     public static final DeferredBlock<Block> STRIPPED_ROBINIA_WOOD = registerBlock("stripped_robinia_wood",
             (properties) -> new ModFlammableRotatedPillarBlock(
                     properties.instrument(NoteBlockInstrument.BASS).strength(2.0F).sound(SoundType.CHERRY_WOOD).ignitedByLava()));
-
-
     public static final DeferredBlock<Block> ROBINIA_PLANKS = registerBlock("robinia_planks",
             (properties) -> new Block(properties) {
                 @Override
@@ -114,7 +113,6 @@ public class ModBlocks {
                     return 5;
                 }
             });
-
     public static final DeferredBlock<Block> ROBINIA_LEAVES = registerBlock("robinia_leaves",
             (properties) -> new UntintedParticleLeavesBlock(0.01f, ParticleTypes.CHERRY_LEAVES,
                     properties.mapColor(MapColor.PLANT).strength(0.2F).randomTicks().sound(SoundType.CHERRY_LEAVES)
@@ -134,15 +132,10 @@ public class ModBlocks {
                     return 30;
                 }
             });
-
     public static final DeferredBlock<Block> ROBINIA_SAPLING = registerBlock("robinia_sapling",
             (properties) -> new SaplingBlock(ModTreeGrowers.ROBINIA,
                     properties.mapColor(MapColor.PLANT).noCollission().randomTicks().instabreak()
                             .sound(SoundType.GRASS).pushReaction(PushReaction.DESTROY)));
-
-    public static final DeferredBlock<StairBlock> ROBINIA_STAIRS = registerBlock("robinia_stairs",
-            (properties) -> new StairBlock(ModBlocks.ROBINIA_WOOD.get().defaultBlockState(),
-                    properties.strength(2f).requiresCorrectToolForDrops()));
     public static final DeferredBlock<SlabBlock> ROBINIA_SLAB = registerBlock("robinia_slab",
             (properties) -> new SlabBlock(properties.strength(2f).requiresCorrectToolForDrops()));
 

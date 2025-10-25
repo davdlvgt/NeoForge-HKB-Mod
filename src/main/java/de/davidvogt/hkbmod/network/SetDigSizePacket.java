@@ -20,19 +20,19 @@ public record SetDigSizePacket(int digSize) implements CustomPacketPayload {
             SetDigSizePacket::new
     );
 
-    @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
-
     public static void handle(SetDigSizePacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 // Update server-side dig size for this player
                 ModEvents.PLAYER_DIG_SIZE.put(serverPlayer.getUUID(), packet.digSize());
                 HKBMod.LOGGER.debug("SERVER: Set dig size for player {} to {}",
-                    serverPlayer.getName().getString(), packet.digSize());
+                        serverPlayer.getName().getString(), packet.digSize());
             }
         });
+    }
+
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

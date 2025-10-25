@@ -17,8 +17,6 @@ import java.util.UUID;
  * This consolidates state management that was scattered throughout DragonEntity.
  */
 public class DragonStateManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DragonStateManager.class);
-
     // Entity Data Accessors - synced to client
     public static final EntityDataAccessor<Boolean> DATA_IS_LANDED =
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
@@ -36,7 +34,7 @@ public class DragonStateManager {
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> DATA_IS_FLYING_MODE =
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.BOOLEAN);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(DragonStateManager.class);
     private final DragonEntity dragon;
 
     // Non-synced state

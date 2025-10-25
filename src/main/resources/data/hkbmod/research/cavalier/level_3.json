@@ -24,8 +24,8 @@
     }
   ],
   "unlocks": [],
-    "advancement": {
-        "title": "Cavalier: Expert",
-        "description": "Become an expert cavalier"
-    }
+  "advancement": {
+    "title": "Cavalier: Expert",
+    "description": "Become an expert cavalier"
+  }
 }

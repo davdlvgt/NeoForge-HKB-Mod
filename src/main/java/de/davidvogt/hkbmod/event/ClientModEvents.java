@@ -4,8 +4,8 @@ import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.item.ModItems;
 import de.davidvogt.hkbmod.item.custom.MagicPickaxeItem;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
-import de.davidvogt.hkbmod.network.SetDigSizePacket;
 import de.davidvogt.hkbmod.network.DragonBreathFirePacket;
+import de.davidvogt.hkbmod.network.SetDigSizePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -61,11 +61,11 @@ public class ClientModEvents {
 
     @SubscribeEvent
     public static void onComputeFovModifierEvent(ComputeFovModifierEvent event) {
-        if(event.getPlayer().isUsingItem() && event.getPlayer().getUseItem().getItem() == ModItems.LONGBOW.get()) {
+        if (event.getPlayer().isUsingItem() && event.getPlayer().getUseItem().getItem() == ModItems.LONGBOW.get()) {
             float fovModifier = 1f;
             int ticksUsingItem = event.getPlayer().getTicksUsingItem();
-            float deltaTicks = (float)ticksUsingItem / 20f;
-            if(deltaTicks > 1f) {
+            float deltaTicks = (float) ticksUsingItem / 20f;
+            if (deltaTicks > 1f) {
                 deltaTicks = 1f;
             } else {
                 deltaTicks *= deltaTicks;

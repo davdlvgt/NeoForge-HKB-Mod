@@ -15,8 +15,8 @@
     }
   ],
   "unlocks": [],
-    "advancement": {
-        "title": "Magician: Apprentice",
-        "description": "Begin your magical studies"
-    }
+  "advancement": {
+    "title": "Magician: Apprentice",
+    "description": "Begin your magical studies"
+  }
 }

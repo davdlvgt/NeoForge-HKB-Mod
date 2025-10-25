@@ -1,7 +1,12 @@
 {
   "class": "magician",
   "level": 1,
-  "prerequisites": [{"class": "magician", "level": 0}],
+  "prerequisites": [
+    {
+      "class": "magician",
+      "level": 0
+    }
+  ],
   "displayName": "Level 1: Basic",
   "description": "Expand your magical knowledge",
   "requirements": [
@@ -15,8 +20,8 @@
     }
   ],
   "unlocks": [],
-    "advancement": {
-        "title": "Magician: Journeyman",
-        "description": "Expand your magical knowledge"
-    }
+  "advancement": {
+    "title": "Magician: Journeyman",
+    "description": "Expand your magical knowledge"
+  }
 }

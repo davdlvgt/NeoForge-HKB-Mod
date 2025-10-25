@@ -15,23 +15,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMenu> {
     public static final ResourceLocation GUI_TEXTURE =
             ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "textures/gui/research_table/research_table_gui.png");
-
-    public ResearchTableScreen(ResearchTableMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        this.imageWidth = 256;
-        this.imageHeight = 170;
-    }
-
-    // Scrollbare Button-Liste für den gewünschten Bereich
-    private final List<Research> currentResearches = new ArrayList<>();
-    private String selectedClass = "knight"; // Default class
-    private int scrollOffset = 0;
     private static final int SCROLL_BUTTON_HEIGHT = 13;
     private static final int SCROLL_BUTTON_WIDTH = 106; // Platz für Scrollbar rechts lassen
     private static final int SCROLL_AREA_X = 119;
@@ -39,10 +28,18 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
     private static final int SCROLL_AREA_WIDTH = 130;
     private static final int SCROLL_AREA_HEIGHT = 56;
     private static final int SCROLL_MAX_VISIBLE = 4; // Genau 4 Buttons anzeigen
-
+    // Scrollbare Button-Liste für den gewünschten Bereich
+    private final List<Research> currentResearches = new ArrayList<>();
+    private String selectedClass = "knight"; // Default class
+    private int scrollOffset = 0;
     private Button scrollUpButton;
     private Button scrollDownButton;
     private Button startResearchButton;
+    public ResearchTableScreen(ResearchTableMenu menu, Inventory playerInventory, Component title) {
+        super(menu, playerInventory, title);
+        this.imageWidth = 256;
+        this.imageHeight = 170;
+    }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
@@ -70,19 +67,19 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
 
 
         // Progressbar für Research
-         int barX = x + 177;
-         int barY = y + 142;
-         int barWidth = 72;
-         int barHeight = 2;
+        int barX = x + 177;
+        int barY = y + 142;
+        int barWidth = 72;
+        int barHeight = 2;
 
-         // Progress aus BlockEntity holen
-         float progress = menu.blockEntity.getResearchProgress();
+        // Progress aus BlockEntity holen
+        float progress = menu.blockEntity.getResearchProgress();
 
-         int filled = (int)(progress * barWidth);
-         guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF222222);
-         if (filled > 0) {
-             guiGraphics.fill(barX, barY, barX + filled, barY + barHeight, 0xFF00FF00);
-         }
+        int filled = (int) (progress * barWidth);
+        guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF222222);
+        if (filled > 0) {
+            guiGraphics.fill(barX, barY, barX + filled, barY + barHeight, 0xFF00FF00);
+        }
     }
 
     @Override
@@ -90,39 +87,39 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
         super.init();
         // Beispiel-Button: Position und Größe ggf. anpassen
         this.addRenderableWidget(Button.builder(
-                        Component.literal("Knight"),
-                        btn -> loadClassResearches("knight")
-                )
-                .bounds(this.leftPos + 69, this.topPos + 16, 42, 12)
-                .build()
+                                Component.literal("Knight"),
+                                btn -> loadClassResearches("knight")
+                        )
+                        .bounds(this.leftPos + 69, this.topPos + 16, 42, 12)
+                        .build()
         );
         this.addRenderableWidget(Button.builder(
-                        Component.literal("Archer"),
-                        btn -> loadClassResearches("archer")
-                )
-                .bounds(this.leftPos + 69, this.topPos + 30, 42, 12)
-                .build()
+                                Component.literal("Archer"),
+                                btn -> loadClassResearches("archer")
+                        )
+                        .bounds(this.leftPos + 69, this.topPos + 30, 42, 12)
+                        .build()
         );
         this.addRenderableWidget(Button.builder(
-                        Component.literal("Cavalier"),
-                        btn -> loadClassResearches("cavalier")
-                )
-                .bounds(this.leftPos + 69, this.topPos + 44, 42, 12)
-                .build()
+                                Component.literal("Cavalier"),
+                                btn -> loadClassResearches("cavalier")
+                        )
+                        .bounds(this.leftPos + 69, this.topPos + 44, 42, 12)
+                        .build()
         );
         this.addRenderableWidget(Button.builder(
-                        Component.literal("Magician"),
-                        btn -> loadClassResearches("magician")
-                )
-                .bounds(this.leftPos + 69, this.topPos + 58, 42, 12)
-                .build()
+                                Component.literal("Magician"),
+                                btn -> loadClassResearches("magician")
+                        )
+                        .bounds(this.leftPos + 69, this.topPos + 58, 42, 12)
+                        .build()
         );
         this.addRenderableWidget(Button.builder(
-                        Component.literal("Miner"),
-                        btn -> loadClassResearches("miner")
-                )
-                .bounds(this.leftPos + 69, this.topPos + 72, 42, 12)
-                .build()
+                                Component.literal("Miner"),
+                                btn -> loadClassResearches("miner")
+                        )
+                        .bounds(this.leftPos + 69, this.topPos + 72, 42, 12)
+                        .build()
         );
         startResearchButton = Button.builder(
                         Component.literal("Start Research"),
@@ -131,16 +128,16 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
                                 // Send cancel packet to server
                                 HKBMod.LOGGER.info("CLIENT: Sending cancel research packet");
                                 Minecraft.getInstance().getConnection().send(new ResearchActionPacket(
-                                    menu.blockEntity.getBlockPos(),
-                                    ResearchActionPacket.Action.CANCEL
+                                        menu.blockEntity.getBlockPos(),
+                                        ResearchActionPacket.Action.CANCEL
                                 ));
                             } else if (canStartResearch()) {
                                 // Send start packet to server
                                 HKBMod.LOGGER.info("CLIENT: Sending start research packet for level {} class {}",
-                                    menu.blockEntity.getSelectedLevelIndex(), menu.blockEntity.getSelectedClass());
+                                        menu.blockEntity.getSelectedLevelIndex(), menu.blockEntity.getSelectedClass());
                                 Minecraft.getInstance().getConnection().send(new ResearchActionPacket(
-                                    menu.blockEntity.getBlockPos(),
-                                    ResearchActionPacket.Action.START
+                                        menu.blockEntity.getBlockPos(),
+                                        ResearchActionPacket.Action.START
                                 ));
                             } else {
                                 HKBMod.LOGGER.info("CLIENT: Cannot start research - requirements not met");
@@ -229,9 +226,9 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
                 menu.blockEntity.setSelectedLevel(research.level(), research.classType());
                 // Send to server
                 Minecraft.getInstance().getConnection().send(new SetSelectedLevelPacket(
-                    menu.blockEntity.getBlockPos(),
-                    research.level(),
-                    research.classType()
+                        menu.blockEntity.getBlockPos(),
+                        research.level(),
+                        research.classType()
                 ));
                 System.out.println("Button geklickt: " + research.displayName());
                 return true;
@@ -270,7 +267,7 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
 
             // Prüfen ob Maus über Button ist
             boolean isHovered = mouseX >= btnX && mouseX <= btnX + btnW &&
-                               mouseY >= btnY && mouseY <= btnY + btnH;
+                    mouseY >= btnY && mouseY <= btnY + btnH;
 
             // Button Hintergrund - different colors based on state
             boolean isSelected = (research.level() == menu.blockEntity.getSelectedLevelIndex());
@@ -365,9 +362,9 @@ public class ResearchTableScreen extends AbstractContainerScreen<ResearchTableMe
         // Prüfe ob benötigte Materialien in den Slots vorhanden sind
         boolean hasMaterials = menu.blockEntity.hasRequiredMaterials(menu.blockEntity.getSelectedLevelIndex());
         HKBMod.LOGGER.info("CLIENT: canStartResearch - level: {}, class: {}, hasMaterials: {}",
-            menu.blockEntity.getSelectedLevelIndex(),
-            menu.blockEntity.getSelectedClass(),
-            hasMaterials);
+                menu.blockEntity.getSelectedLevelIndex(),
+                menu.blockEntity.getSelectedClass(),
+                hasMaterials);
         return hasMaterials;
     }
 

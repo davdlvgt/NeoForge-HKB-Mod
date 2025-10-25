@@ -11,7 +11,6 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,17 +18,37 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class LongbowItem extends BowItem {
-    private final Predicate<ItemStack> supportedProjectiles;
-
     // Longbow configuration - stronger than vanilla bow
     private static final float VELOCITY_MULTIPLIER = 1.35F; // 35% more velocity than vanilla bow (3.0 base -> 4.05)
     private static final float DAMAGE_BONUS = 1; // +2.5 extra damage
     private static final int DRAW_TIME = 15; // Slightly slower than vanilla (20 ticks) - balanced for power
     private static final float BASE_DAMAGE = 2.0F;
+    private final Predicate<ItemStack> supportedProjectiles;
 
     public LongbowItem(Properties properties, Predicate<ItemStack> supportedProjectiles) {
         super(properties);
         this.supportedProjectiles = supportedProjectiles;
+    }
+
+    /**
+     * Returns the draw time in ticks (how long to fully charge)
+     * Vanilla bow uses 20 ticks, longbow uses 15 for slightly slower but more powerful shots
+     */
+    public static int getDrawTime() {
+        return DRAW_TIME;
+    }
+
+    /**
+     * Custom power calculation for longbow
+     * Uses custom draw time for balanced charging
+     */
+    public static float getPowerForTime(int charge) {
+        float f = (float) charge / (float) DRAW_TIME;
+        f = (f * f + f * 2.0F) / 3.0F;
+        if (f > 1.0F) {
+            f = 1.0F;
+        }
+        return f;
     }
 
     @Override
@@ -41,14 +60,6 @@ public class LongbowItem extends BowItem {
     @Override
     public int getUseDuration(ItemStack stack, LivingEntity entity) {
         return 72000; // Max draw time
-    }
-
-    /**
-     * Returns the draw time in ticks (how long to fully charge)
-     * Vanilla bow uses 20 ticks, longbow uses 15 for slightly slower but more powerful shots
-     */
-    public static int getDrawTime() {
-        return DRAW_TIME;
     }
 
     @Override
@@ -100,22 +111,9 @@ public class LongbowItem extends BowItem {
         }
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
-            SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
+                SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
 
         player.awardStat(net.minecraft.stats.Stats.ITEM_USED.get(this));
         return false;
-    }
-
-    /**
-     * Custom power calculation for longbow
-     * Uses custom draw time for balanced charging
-     */
-    public static float getPowerForTime(int charge) {
-        float f = (float) charge / (float) DRAW_TIME;
-        f = (f * f + f * 2.0F) / 3.0F;
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-        return f;
     }
 }

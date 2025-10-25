@@ -13,11 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -31,18 +27,13 @@ import java.util.List;
 public record PlaceRecipePacket(ResourceLocation recipeId, boolean placeAll) implements CustomPacketPayload {
 
     public static final Type<PlaceRecipePacket> TYPE =
-        new Type<>(ResourceLocation.fromNamespaceAndPath("hkbmod", "place_recipe"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath("hkbmod", "place_recipe"));
 
     public static final StreamCodec<ByteBuf, PlaceRecipePacket> STREAM_CODEC = StreamCodec.composite(
-        ResourceLocation.STREAM_CODEC, PlaceRecipePacket::recipeId,
-        StreamCodec.of((buf, val) -> buf.writeBoolean(val), ByteBuf::readBoolean), PlaceRecipePacket::placeAll,
-        PlaceRecipePacket::new
+            ResourceLocation.STREAM_CODEC, PlaceRecipePacket::recipeId,
+            StreamCodec.of((buf, val) -> buf.writeBoolean(val), ByteBuf::readBoolean), PlaceRecipePacket::placeAll,
+            PlaceRecipePacket::new
     );
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
 
     /**
      * Handle the packet on the server side
@@ -97,7 +88,7 @@ public record PlaceRecipePacket(ResourceLocation recipeId, boolean placeAll) imp
      * Places a recipe's ingredients into the crafting grid
      */
     private static void placeRecipeInGrid(ResearchCraftingTableMenu menu, ShapedRecipe recipe,
-                                         ServerPlayer player, boolean placeAll) {
+                                          ServerPlayer player, boolean placeAll) {
         HKBMod.LOGGER.info("Starting placeRecipeInGrid");
 
         // Clear the crafting grid first
@@ -291,5 +282,10 @@ public record PlaceRecipePacket(ResourceLocation recipeId, boolean placeAll) imp
         }
 
         return ItemStack.EMPTY;
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

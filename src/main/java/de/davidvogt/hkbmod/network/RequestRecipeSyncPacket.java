@@ -26,15 +26,10 @@ import java.util.List;
 public record RequestRecipeSyncPacket() implements CustomPacketPayload {
 
     public static final Type<RequestRecipeSyncPacket> TYPE =
-        new Type<>(ResourceLocation.fromNamespaceAndPath("hkbmod", "request_recipe_sync"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath("hkbmod", "request_recipe_sync"));
 
     // Empty codec since packet has no data
     public static final StreamCodec<ByteBuf, RequestRecipeSyncPacket> STREAM_CODEC = StreamCodec.unit(new RequestRecipeSyncPacket());
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
 
     /**
      * Handle the packet on the server side
@@ -71,12 +66,17 @@ public record RequestRecipeSyncPacket() implements CustomPacketPayload {
 
                 // Convert to RecipeData for network transmission
                 List<ResearchRecipeSyncPacket.RecipeData> recipeDataList = availableRecipes.stream()
-                    .map(ResearchRecipeSyncPacket.RecipeData::fromRecipeHolder)
-                    .toList();
+                        .map(ResearchRecipeSyncPacket.RecipeData::fromRecipeHolder)
+                        .toList();
 
                 // Send packet back to client
                 PacketDistributor.sendToPlayer(serverPlayer, new ResearchRecipeSyncPacket(recipeDataList));
             }
         });
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

@@ -2,13 +2,11 @@
   "__comment": "This is a JSON representation of the DeerModel Java class for reference/documentation purposes",
   "__warning": "This file is NOT used by Minecraft/NeoForge. Entity models must be defined in Java code.",
   "__usage": "Use this as reference for recreating the model in BlockBench or other 3D modeling tools",
-
   "model_name": "deer",
   "texture_size": {
     "width": 64,
     "height": 64
   },
-
   "parts": [
     {
       "name": "body",
@@ -38,7 +36,6 @@
         }
       ]
     },
-
     {
       "name": "head",
       "parent": "root",
@@ -276,7 +273,6 @@
         }
       ]
     },
-
     {
       "name": "leg_front_left",
       "parent": "root",
@@ -305,7 +301,6 @@
         }
       ]
     },
-
     {
       "name": "leg_front_right",
       "parent": "root",
@@ -334,7 +329,6 @@
         }
       ]
     },
-
     {
       "name": "leg_back_left",
       "parent": "root",
@@ -363,7 +357,6 @@
         }
       ]
     },
-
     {
       "name": "leg_back_right",
       "parent": "root",
@@ -393,7 +386,6 @@
       ]
     }
   ],
-
   "animations": {
     "walk": {
       "description": "Walking animation - legs swing back and forth",
@@ -426,7 +418,6 @@
       }
     }
   },
-
   "metadata": {
     "created_from": "DeerModel.java",
     "texture_file": "assets/hkbmod/textures/entity/deer.png",

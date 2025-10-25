@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
  * Dragon Nest Block - A special block that serves as home for dragons.
  * This block spawns and maintains 1-2 dragons that consider it their nest.
  * Dragons will return to this location periodically.
- *
+ * <p>
  * Can only be mined with a Pickaxe enchanted with Silk Touch.
  * Completely immune to explosions.
  */

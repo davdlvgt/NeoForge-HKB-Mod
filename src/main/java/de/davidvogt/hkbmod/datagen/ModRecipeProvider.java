@@ -21,22 +21,6 @@ public class ModRecipeProvider extends RecipeProvider {
         super(provider, recipeOutput);
     }
 
-    public static class Runner extends RecipeProvider.Runner {
-        public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> provider) {
-            super(packOutput, provider);
-        }
-
-        @Override
-        protected RecipeProvider createRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
-            return new ModRecipeProvider(provider, recipeOutput);
-        }
-
-        @Override
-        public String getName() {
-            return "My Recipes";
-        }
-    }
-
     /**
      * Creates a RecipeOutput wrapper that converts ShapedRecipes to ResearchCraftingRecipes
      */
@@ -259,5 +243,21 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_robinia_planks", has(ModBlocks.ROBINIA_PLANKS.get())).save(output);
         trapdoorBuilder(ModBlocks.ROBINIA_TRAPDOOR.get(), Ingredient.of(ModBlocks.ROBINIA_PLANKS.get())).group("robinia_planks")
                 .unlockedBy("has_robinia_planks", has(ModBlocks.ROBINIA_PLANKS.get())).save(output);
+    }
+
+    public static class Runner extends RecipeProvider.Runner {
+        public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> provider) {
+            super(packOutput, provider);
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
+            return new ModRecipeProvider(provider, recipeOutput);
+        }
+
+        @Override
+        public String getName() {
+            return "My Recipes";
+        }
     }
 }

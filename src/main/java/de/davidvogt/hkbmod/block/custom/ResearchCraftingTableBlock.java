@@ -2,18 +2,12 @@ package de.davidvogt.hkbmod.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import de.davidvogt.hkbmod.block.entity.ResearchCraftingTableBlockEntity;
-import de.davidvogt.hkbmod.block.entity.ResearchTableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -62,7 +56,7 @@ public class ResearchCraftingTableBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof ResearchCraftingTableBlockEntity researchCraftingTableBlockEntity) {
             if (!level.isClientSide) {
-                ((ServerPlayer) player).openMenu(new SimpleMenuProvider(researchCraftingTableBlockEntity, Component.literal("Research Crafting Table")), pos);
+                player.openMenu(new SimpleMenuProvider(researchCraftingTableBlockEntity, Component.literal("Research Crafting Table")), pos);
                 // player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE); // ToDo: Own ModStats Class maybe?
             }
             return InteractionResult.SUCCESS;

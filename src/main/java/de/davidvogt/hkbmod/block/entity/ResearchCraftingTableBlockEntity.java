@@ -59,7 +59,7 @@ public class ResearchCraftingTableBlockEntity extends BlockEntity implements Men
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-    // Serialisiert das Inventar direkt ins ValueOutput
+        // Serialisiert das Inventar direkt ins ValueOutput
         inventory.serialize(output);
     }
 

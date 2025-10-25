@@ -16,7 +16,7 @@ import java.util.UUID;
 /**
  * Goal that makes a tamed dragon automatically protect its owner by breathing fire
  * at hostile monsters that come within a specified radius around the owner.
- *
+ * <p>
  * Conditions:
  * - Dragon must be tamed
  * - Dragon must not be sitting
@@ -133,9 +133,9 @@ public class DragonProtectOwnerGoal extends Goal {
         if (nearest != null) {
             // Compute direction from dragon to target
             Vec3 toTarget = new Vec3(
-                nearest.getX() - this.dragon.getX(),
-                (nearest.getY(0.5) - this.dragon.getY(0.5)),
-                nearest.getZ() - this.dragon.getZ()
+                    nearest.getX() - this.dragon.getX(),
+                    (nearest.getY(0.5) - this.dragon.getY(0.5)),
+                    nearest.getZ() - this.dragon.getZ()
             );
 
             // Avoid zero-length vectors (can cause particles at dragon center)
@@ -160,6 +160,6 @@ public class DragonProtectOwnerGoal extends Goal {
 
             // Start cooldown so dragon doesn't spam breath
             this.dragon.startFireBreathCooldown();
-         }
+        }
     }
 }

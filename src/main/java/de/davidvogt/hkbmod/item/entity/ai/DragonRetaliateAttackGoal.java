@@ -33,7 +33,7 @@ public class DragonRetaliateAttackGoal extends Goal {
         // Safety: don't retaliate against the owner
         if (t instanceof net.minecraft.world.entity.player.Player) {
             java.util.Optional<java.util.UUID> ownerUuid = this.dragon.getOwnerUUID();
-            if (ownerUuid.isPresent() && ownerUuid.get().equals(((net.minecraft.world.entity.player.Player) t).getUUID())) {
+            if (ownerUuid.isPresent() && ownerUuid.get().equals(t.getUUID())) {
                 return false;
             }
         }
@@ -66,12 +66,12 @@ public class DragonRetaliateAttackGoal extends Goal {
         if (this.target == null) return;
 
         // Look at target
-        this.dragon.getLookControl().setLookAt(this.target, 30.0F, (float)this.dragon.getMaxHeadXRot());
+        this.dragon.getLookControl().setLookAt(this.target, 30.0F, (float) this.dragon.getMaxHeadXRot());
 
         double dx = this.target.getX() - this.dragon.getX();
         double dy = this.target.getY(0.5) - this.dragon.getY(0.5);
         double dz = this.target.getZ() - this.dragon.getZ();
-        double distSq = dx*dx + dy*dy + dz*dz;
+        double distSq = dx * dx + dy * dy + dz * dz;
 
         // Cooldown between attacks (safety)
         if (--this.attackCooldown > 0) return;

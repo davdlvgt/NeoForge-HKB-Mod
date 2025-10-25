@@ -6,7 +6,6 @@ import de.davidvogt.hkbmod.research.PlayerResearchHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

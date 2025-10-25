@@ -29,7 +29,7 @@ public class ModTags {
 
     public static class Items {
         public static final TagKey<Item> TRANSFORMABLE_ITEMS = createTag("transformable_items");
-        public static final TagKey<Item> ROBINIA_LOG =createTag("robinia_log");
+        public static final TagKey<Item> ROBINIA_LOG = createTag("robinia_log");
         // public static final TagKey<Item> BISMUTH_REPAIRABLE = createTag("bismuth_repairable");
 
         public static final TagKey<Item> PLANKS = createTag("planks");

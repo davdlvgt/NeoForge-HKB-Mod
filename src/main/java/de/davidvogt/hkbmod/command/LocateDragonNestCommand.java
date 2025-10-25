@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Command to locate the nearest dragon nest.
  * Usage: /locate_dragonnest [radius]
- *
+ * <p>
  * Searches for dragon nest blocks in a spiral pattern around the player.
  * Default search radius is 5000 blocks, can be specified up to 10000.
  */
@@ -94,7 +94,7 @@ public class LocateDragonNestCommand {
         if (foundNests.isEmpty()) {
             source.sendFailure(Component.literal(
                     "Kein Drachennest im Umkreis von " + searchRadius + " Blöcken gefunden. " +
-                    "(" + chunksSearched + " Chunks durchsucht in " + duration + "ms)"
+                            "(" + chunksSearched + " Chunks durchsucht in " + duration + "ms)"
             ));
             return 0;
         }
@@ -139,6 +139,7 @@ public class LocateDragonNestCommand {
 
     /**
      * Searches a single chunk for dragon nest blocks
+     *
      * @return The position of a dragon nest block, or null if none found
      */
     private static BlockPos searchChunkForNest(ServerLevel level, int chunkX, int chunkZ) {

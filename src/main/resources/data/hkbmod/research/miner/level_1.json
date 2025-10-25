@@ -1,7 +1,12 @@
 {
   "class": "miner",
   "level": 1,
-  "prerequisites": [{"class": "miner", "level": 0}],
+  "prerequisites": [
+    {
+      "class": "miner",
+      "level": 0
+    }
+  ],
   "displayName": "Level 1: Prospector",
   "description": "Learn to find valuable resources",
   "requirements": [

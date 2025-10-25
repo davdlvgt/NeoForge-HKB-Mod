@@ -61,7 +61,7 @@ public class ReturnToNestGoal extends Goal {
         if (healthPercent < DragonConstants.LOW_HEALTH_THRESHOLD) {
             if (!dragon.level().isClientSide) {
                 LOGGER.info("Dragon {} health low ({:.0f}%), returning to nest",
-                    dragon.getId(), healthPercent * 100);
+                        dragon.getId(), healthPercent * 100);
             }
             return true;
         }
@@ -71,7 +71,7 @@ public class ReturnToNestGoal extends Goal {
         if (distanceToNest > DragonConstants.NEST_RETURN_DISTANCE) {
             if (!dragon.level().isClientSide) {
                 LOGGER.debug("Dragon {} too far from nest ({:.1f} blocks), returning",
-                    dragon.getId(), distanceToNest);
+                        dragon.getId(), distanceToNest);
             }
             return true;
         }
@@ -92,7 +92,7 @@ public class ReturnToNestGoal extends Goal {
         if (distanceToNest < DragonConstants.NEST_ARRIVAL_DISTANCE) {
             if (!dragon.level().isClientSide) {
                 LOGGER.debug("Dragon {} arrived at nest (distance: {:.1f} blocks)",
-                    dragon.getId(), distanceToNest);
+                        dragon.getId(), distanceToNest);
             }
             return false;
         }
@@ -163,7 +163,7 @@ public class ReturnToNestGoal extends Goal {
         if (distanceToNest < DragonConstants.NEST_ARRIVAL_DISTANCE * 2) {
             // Slow down for landing
             dragon.setDeltaMovement(
-                dragon.getDeltaMovement().scale(0.9)
+                    dragon.getDeltaMovement().scale(0.9)
             );
         }
     }

@@ -1,16 +1,21 @@
 {
-    "item.hkbmod.emerald_axe": "Emerald Axe",
-    "item.hkbmod.emerald_pickaxe": "Emerald Pickaxe",
-    "item.hkbmod.emerald_sword": "Emerald Sword",
-
-    "entity.hkbmod.deer": "Deer",
-    "item.hkbmod.deer_beef": "Raw Venison",
-    "item.hkbmod.cooked_deer_beef": "Cooked Venison",
-    "item.hkbmod.deer_antlers": "Deer Antlers",
-    "entity.hkbmod.dragon": "Dragon",
-    "item.hkbmod.dragon_skin": "Dragon Skin",
-    "gui.hkbmod.recipe_book.ingredients": "Required Ingredients:",
-
-    "advancements.hkbmod.root.title": "HKB Mod",
-    "advancements.hkbmod.root.description": "Begin your journey with hero classes"
+  "item.hkbmod.emerald_axe": "Emerald Axe",
+  "item.hkbmod.emerald_pickaxe": "Emerald Pickaxe",
+  "item.hkbmod.emerald_sword": "Emerald Sword",
+  "entity.hkbmod.deer": "Deer",
+  "item.hkbmod.deer_beef": "Raw Venison",
+  "item.hkbmod.cooked_deer_beef": "Cooked Venison",
+  "item.hkbmod.deer_antlers": "Deer Antlers",
+  "entity.hkbmod.dragon": "Dragon",
+  "entity.hkbmod.dragon.variant.ice": "Ice Dragon",
+  "entity.hkbmod.dragon.variant.nature": "Nature Dragon",
+  "entity.hkbmod.dragon.variant.storm": "Storm Dragon",
+  "entity.hkbmod.dragon.variant.earth": "Earth Dragon",
+  "entity.hkbmod.dragon.variant.fire": "Fire Dragon",
+  "entity.hkbmod.dragon.variant.shadow": "Shadow Dragon",
+  "entity.hkbmod.dragon.variant.arcane": "Arcane Dragon",
+  "item.hkbmod.dragon_skin": "Dragon Skin",
+  "gui.hkbmod.recipe_book.ingredients": "Required Ingredients:",
+  "advancements.hkbmod.root.title": "HKB Mod",
+  "advancements.hkbmod.root.description": "Begin your journey with hero classes"
 }

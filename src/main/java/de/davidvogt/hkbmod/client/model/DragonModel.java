@@ -17,14 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DragonModel extends EntityModel<EnderDragonRenderState> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DragonModel.class);
-
-    private static final int NECK_PART_COUNT = 5;
-    private static final int TAIL_PART_COUNT = 12;
-
     public static final ModelLayerLocation LAYER_LOCATION =
             new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "dragon"), "main");
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(DragonModel.class);
+    private static final int NECK_PART_COUNT = 5;
+    private static final int TAIL_PART_COUNT = 12;
     private final ModelPart root;
     private final ModelPart head;
     private final ModelPart jaw;
@@ -54,27 +51,6 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
     private boolean isResting = false;
     // Track sitting state from entity (for tamed dragons)
     private boolean isSitting = false;
-
-    /**
-     * Sets the movement speed for the dragon, used to control walking animation
-     */
-    public void setMovementSpeed(float speed) {
-        this.movementSpeed = speed;
-    }
-
-    /**
-     * Sets the resting state for the dragon, used to control sleeping animation
-     */
-    public void setResting(boolean resting) {
-        this.isResting = resting;
-    }
-
-    /**
-     * Sets the sitting state for the dragon, used to control sleeping animation for tamed dragons
-     */
-    public void setSitting(boolean sitting) {
-        this.isSitting = sitting;
-    }
 
     public DragonModel(ModelPart root) {
         super(root);
@@ -228,10 +204,31 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
         return LayerDefinition.create(mesh, 256, 256);
     }
 
+    /**
+     * Sets the movement speed for the dragon, used to control walking animation
+     */
+    public void setMovementSpeed(float speed) {
+        this.movementSpeed = speed;
+    }
+
+    /**
+     * Sets the resting state for the dragon, used to control sleeping animation
+     */
+    public void setResting(boolean resting) {
+        this.isResting = resting;
+    }
+
+    /**
+     * Sets the sitting state for the dragon, used to control sleeping animation for tamed dragons
+     */
+    public void setSitting(boolean sitting) {
+        this.isSitting = sitting;
+    }
+
     @Override
     public void setupAnim(EnderDragonRenderState state) {
         super.setupAnim(state);
-        float flap = state.flapTime * ((float)Math.PI * 2F);
+        float flap = state.flapTime * ((float) Math.PI * 2F);
         this.jaw.xRot = (Mth.sin(flap) + 1.0F) * 0.2F;
 
         // Check if dragon is landed (flapTime is 0 or very small when landed)
@@ -295,9 +292,9 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
 
             for (int i = 0; i < TAIL_PART_COUNT; i++) {
                 ModelPart tailSegment = tailParts[i];
-                float curveFactor = (i + 1) / (float)TAIL_PART_COUNT;
+                float curveFactor = (i + 1) / (float) TAIL_PART_COUNT;
 
-                tailSegment.yRot = (180.0F + curveFactor * 120.0F) * ((float)Math.PI / 180F);
+                tailSegment.yRot = (180.0F + curveFactor * 120.0F) * ((float) Math.PI / 180F);
                 tailSegment.xRot = 0.05F + curveFactor * 0.25F;  // Curved downward (positive)
                 tailSegment.zRot = curveFactor * 0.2F;
 
@@ -317,7 +314,7 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
 
             for (int i = 0; i < NECK_PART_COUNT; i++) {
                 ModelPart neckSegment = neckParts[i];
-                float neckCurveFactor = (i + 1) / (float)NECK_PART_COUNT;
+                float neckCurveFactor = (i + 1) / (float) NECK_PART_COUNT;
 
                 // Neck curves to the side with slight downward tilt
                 neckSegment.xRot = 0.05F + neckCurveFactor * 0.1F;  // Minimal vertical tilt
@@ -393,9 +390,9 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 ModelPart neck = neckParts[i];
                 DragonFlightHistory.Sample sample = state.getHistoricalPos(5 - i);
                 flapOffset = Mth.cos(i * 0.45F + flap) * 0.15F;
-                neck.yRot = Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * ((float)Math.PI / 180F) * 1.5F;
-                neck.xRot = flapOffset + headBob + state.getHeadPartYOffset(i, neckBase, sample) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
-                neck.zRot = -Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
+                neck.yRot = Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * ((float) Math.PI / 180F) * 1.5F;
+                neck.xRot = flapOffset + headBob + state.getHeadPartYOffset(i, neckBase, sample) * ((float) Math.PI / 180F) * 1.5F * 5.0F;
+                neck.zRot = -Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float) Math.PI / 180F) * 1.5F;
                 neck.x = x;
                 neck.y = y;
                 neck.z = z;
@@ -409,12 +406,12 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
             head.y = y;
             head.z = z;
             DragonFlightHistory.Sample headSample = state.getHistoricalPos(0);
-            head.yRot = Mth.wrapDegrees(headSample.yRot() - neckBase.yRot()) * ((float)Math.PI / 180F);
-            head.xRot = headBob + Mth.wrapDegrees(state.getHeadPartYOffset(6, neckBase, headSample)) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
-            head.zRot = -Mth.wrapDegrees(headSample.yRot() - headYawAvg) * ((float)Math.PI / 180F);
+            head.yRot = Mth.wrapDegrees(headSample.yRot() - neckBase.yRot()) * ((float) Math.PI / 180F);
+            head.xRot = headBob + Mth.wrapDegrees(state.getHeadPartYOffset(6, neckBase, headSample)) * ((float) Math.PI / 180F) * 1.5F * 5.0F;
+            head.zRot = -Mth.wrapDegrees(headSample.yRot() - headYawAvg) * ((float) Math.PI / 180F);
 
             // Body rotation
-            body.zRot = -headYawOffset * 1.5F * ((float)Math.PI / 180F);
+            body.zRot = -headYawOffset * 1.5F * ((float) Math.PI / 180F);
 
             // Pose legs - each side needs separate animation
             poseLimbsLeft(state, flap, leftFrontLeg, leftFrontLegTip, leftFrontFoot, leftRearLeg, leftRearLegTip, leftRearFoot);
@@ -442,15 +439,15 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 if (isLanded) {
                     // When landed, use swaying animation instead of flight history
                     // Progressive sway - each segment sways more than the previous one
-                    float segmentSway = tailSway * (j + 1) / (float)TAIL_PART_COUNT;
-                    tail.yRot = segmentSway + 180.0F * ((float)Math.PI / 180F);
+                    float segmentSway = tailSway * (j + 1) / (float) TAIL_PART_COUNT;
+                    tail.yRot = segmentSway + 180.0F * ((float) Math.PI / 180F);
                     tail.xRot = tailSwing * 0.2F; // Minimal vertical movement
                     tail.zRot = 0.0F;
                 } else {
                     // Flying animation (original)
-                    tail.yRot = (Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * 1.5F + 180.0F) * ((float)Math.PI / 180F);
-                    tail.xRot = tailSwing + (float)(sample.y() - neckBase.y()) * ((float)Math.PI / 180F) * 1.5F * 5.0F;
-                    tail.zRot = Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float)Math.PI / 180F) * 1.5F;
+                    tail.yRot = (Mth.wrapDegrees(sample.yRot() - neckBase.yRot()) * 1.5F + 180.0F) * ((float) Math.PI / 180F);
+                    tail.xRot = tailSwing + (float) (sample.y() - neckBase.y()) * ((float) Math.PI / 180F) * 1.5F * 5.0F;
+                    tail.zRot = Mth.wrapDegrees(sample.yRot() - headYawAvg) * ((float) Math.PI / 180F) * 1.5F;
                 }
 
                 tail.x = x;
@@ -533,13 +530,13 @@ public class DragonModel extends EntityModel<EnderDragonRenderState> {
                 float animationScale = Math.min(this.movementSpeed * 3.0F, 1.0F);
 
                 // Right front leg movement (OPPOSITE phase from left front) - increased amplitude
-                float rightFrontSwing = Mth.cos(walkCycle + (float)Math.PI) * 1.2F * animationScale;
+                float rightFrontSwing = Mth.cos(walkCycle + (float) Math.PI) * 1.2F * animationScale;
                 frontLeg.xRot = rightFrontSwing * 0.7F;
                 frontLegTip.xRot = Math.max(0.0F, rightFrontSwing * 0.7F);
                 frontFoot.xRot = Math.min(0.0F, -rightFrontSwing * 0.5F);
 
                 // Right rear leg movement (OPPOSITE phase from left rear, SAME as right front) - increased amplitude
-                float rightRearSwing = Mth.cos(walkCycle + (float)Math.PI) * 0.9F * animationScale;
+                float rightRearSwing = Mth.cos(walkCycle + (float) Math.PI) * 0.9F * animationScale;
                 rearLeg.xRot = -0.15F + rightRearSwing * 0.5F;
                 rearLegTip.xRot = 0.25F + Math.max(0.0F, rightRearSwing * 0.6F);
                 rearFoot.xRot = -0.1F + Math.min(0.0F, -rightRearSwing * 0.4F);

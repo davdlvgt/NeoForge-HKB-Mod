@@ -7,15 +7,18 @@ import de.davidvogt.hkbmod.research.PlayerResearchHelper;
 import de.davidvogt.hkbmod.screen.ModMenuTypes;
 import de.davidvogt.hkbmod.util.RecipeHelper;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.SlotItemHandler;
@@ -66,7 +69,7 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
             for (int col = 0; col < 3; col++) {
                 int index = col + row * 3;
                 this.addSlot(new SlotItemHandler(this.blockEntity.inventory, index,
-                    craftingStartX + col * 18, craftingStartY + row * 18) {
+                        craftingStartX + col * 18, craftingStartY + row * 18) {
                     @Override
                     public void setChanged() {
                         super.setChanged();
@@ -78,7 +81,7 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
 
         // Add result slot (slot 9)
         this.resultSlot = new ResultSlot(playerInventory.player, craftMatrix,
-            resultContainer, 0, 124, 35) {
+                resultContainer, 0, 124, 35) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -95,7 +98,7 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
                 if (matchingRecipe != null) {
                     // Get remaining items (e.g., empty buckets)
                     net.minecraft.core.NonNullList<ItemStack> remainingItems =
-                        matchingRecipe.value().getRemainingItems(craftingInput);
+                            matchingRecipe.value().getRemainingItems(craftingInput);
 
                     // Update crafting grid: consume items and place remaining items
                     for (int i = 0; i < 9; i++) {
@@ -145,7 +148,7 @@ public class ResearchCraftingTableMenu extends AbstractContainerMenu {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 this.addSlot(new Slot(playerInventory, col + row * 9 + 9,
-                    8 + col * 18, playerInventoryY + row * 18));
+                        8 + col * 18, playerInventoryY + row * 18));
             }
         }
 

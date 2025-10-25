@@ -1,7 +1,7 @@
 package de.davidvogt.hkbmod.item.entity.custom;
 
-import de.davidvogt.hkbmod.item.entity.ModEntities;
 import de.davidvogt.hkbmod.item.ModItems;
+import de.davidvogt.hkbmod.item.entity.ModEntities;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;

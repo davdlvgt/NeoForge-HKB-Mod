@@ -3,24 +3,17 @@ package de.davidvogt.hkbmod.screen.cutsom.recipebook;
 import com.google.common.collect.Lists;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.network.PlaceRecipePacket;
-import de.davidvogt.hkbmod.recipe.ModRecipeTypes;
 import de.davidvogt.hkbmod.recipe.ResearchCraftingRecipe;
 import de.davidvogt.hkbmod.screen.cutsom.ResearchCraftingTableMenu;
-import de.davidvogt.hkbmod.util.RecipeHelper;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -33,33 +26,28 @@ import java.util.Map;
  */
 public class ResearchRecipeBookComponent implements Renderable, GuiEventListener {
     private static final ResourceLocation RECIPE_BOOK_TEXTURE =
-        ResourceLocation.withDefaultNamespace("textures/gui/recipe_book.png");
+            ResourceLocation.withDefaultNamespace("textures/gui/recipe_book.png");
 
     private static final int BOOK_WIDTH = 147;
     private static final int BOOK_HEIGHT = 166;
     private static final int TAB_WIDTH = 28;
     private static final int TAB_HEIGHT = 32;
-
+    private static final int RECIPES_PER_PAGE = 20; // 4x5 grid
     private final Map<ResearchRecipeCategory, ResearchRecipeCollection> recipeCollections = new EnumMap<>(ResearchRecipeCategory.class);
     private final List<ResearchRecipeButton> recipeButtons = Lists.newArrayList();
     private final List<RecipeHolder<ResearchCraftingRecipe>> cachedRecipes = new ArrayList<>();
     private final Map<ResearchRecipeCategory, CategoryTab> categoryTabs = new EnumMap<>(ResearchRecipeCategory.class);
-
     private ResearchCraftingTableMenu menu;
     private Minecraft minecraft;
     private Player player;
-
     private int leftPos;
     private int topPos;
     private boolean visible = false;
-
     private ResearchRecipeCategory currentCategory = ResearchRecipeCategory.EQUIPMENT;
     private RecipeHolder<ResearchCraftingRecipe> selectedRecipe;
-
     // Pagination
     private int currentPage = 0;
     private int totalPages = 0;
-    private static final int RECIPES_PER_PAGE = 20; // 4x5 grid
     private boolean recipesLoaded = false;
 
     public ResearchRecipeBookComponent() {
@@ -183,16 +171,6 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
     }
 
     /**
-     * Sets whether the recipe book is visible
-     */
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-        if (visible) {
-            updateRecipeCollections();
-        }
-    }
-
-    /**
      * Toggles the recipe book visibility
      */
     public void toggleVisibility() {
@@ -206,6 +184,16 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
         return visible;
     }
 
+    /**
+     * Sets whether the recipe book is visible
+     */
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        if (visible) {
+            updateRecipeCollections();
+        }
+    }
+
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!visible) {
@@ -217,7 +205,7 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
 
         // Render recipe book background
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, RECIPE_BOOK_TEXTURE,
-            bookX, bookY, 1, 1, BOOK_WIDTH, BOOK_HEIGHT, 256, 256);
+                bookX, bookY, 1, 1, BOOK_WIDTH, BOOK_HEIGHT, 256, 256);
 
         // Render category tabs
         for (CategoryTab tab : categoryTabs.values()) {
@@ -233,8 +221,8 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
         if (totalPages > 1) {
             Component pageText = Component.literal((currentPage + 1) + "/" + totalPages);
             guiGraphics.drawString(minecraft.font, pageText,
-                bookX + BOOK_WIDTH / 2 - minecraft.font.width(pageText) / 2,
-                bookY + BOOK_HEIGHT - 15, 0xFFFFFF);
+                    bookX + BOOK_WIDTH / 2 - minecraft.font.width(pageText) / 2,
+                    bookY + BOOK_HEIGHT - 15, 0xFFFFFF);
         }
     }
 
@@ -299,7 +287,7 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
         int bookX = leftPos - BOOK_WIDTH + 4;
         int bookY = topPos;
         if (mouseX >= bookX && mouseX < bookX + BOOK_WIDTH &&
-            mouseY >= bookY && mouseY < bookY + BOOK_HEIGHT) {
+                mouseY >= bookY && mouseY < bookY + BOOK_HEIGHT) {
 
             if (scrollY > 0 && currentPage > 0) {
                 currentPage--;
@@ -316,13 +304,13 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
     }
 
     @Override
-    public void setFocused(boolean focused) {
-        // Not needed for now
+    public boolean isFocused() {
+        return visible;
     }
 
     @Override
-    public boolean isFocused() {
-        return visible;
+    public void setFocused(boolean focused) {
+        // Not needed for now
     }
 
     /**
@@ -355,7 +343,7 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
 
             // Render tab background
             guiGraphics.blit(RenderPipelines.GUI_TEXTURED, RECIPE_BOOK_TEXTURE,
-                x, y, u, v, TAB_WIDTH, TAB_HEIGHT, 256, 256);
+                    x, y, u, v, TAB_WIDTH, TAB_HEIGHT, 256, 256);
 
             // Render category icon
             guiGraphics.renderItem(category.getIcon(), x + 6, y + 9);
@@ -363,7 +351,7 @@ public class ResearchRecipeBookComponent implements Renderable, GuiEventListener
 
         public boolean isMouseOver(double mouseX, double mouseY) {
             return mouseX >= x && mouseX < x + TAB_WIDTH &&
-                   mouseY >= y && mouseY < y + TAB_HEIGHT;
+                    mouseY >= y && mouseY < y + TAB_HEIGHT;
         }
 
         public ResearchRecipeCategory getCategory() {

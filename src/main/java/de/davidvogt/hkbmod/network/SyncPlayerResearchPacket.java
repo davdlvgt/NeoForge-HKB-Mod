@@ -23,11 +23,6 @@ public record SyncPlayerResearchPacket(Map<String, Integer> completedLevels) imp
             SyncPlayerResearchPacket::new
     );
 
-    @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
-
     public static void handle(SyncPlayerResearchPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() != null) {
@@ -39,5 +34,10 @@ public record SyncPlayerResearchPacket(Map<String, Integer> completedLevels) imp
                 HKBMod.LOGGER.info("CLIENT: Synced player research data - {} classes", packet.completedLevels().size());
             }
         });
+    }
+
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

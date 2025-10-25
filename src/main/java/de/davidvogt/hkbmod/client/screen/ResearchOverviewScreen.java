@@ -1,7 +1,5 @@
 package de.davidvogt.hkbmod.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.attachment.ModAttachments;
 import de.davidvogt.hkbmod.research.PlayerResearchData;
 import de.davidvogt.hkbmod.research.Research;
@@ -10,13 +8,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ResearchOverviewScreen extends Screen {
     private static final int NODE_WIDTH = 60;
@@ -131,16 +125,16 @@ public class ResearchOverviewScreen extends Screen {
             String researchClass = researchClasses.get(classIndex);
             List<Research> researches = ResearchManager.getResearchForClass(researchClass);
 
-            int classY = (int)(TOP_MARGIN + classIndex * NODE_SPACING_Y + scrollY);
+            int classY = (int) (TOP_MARGIN + classIndex * NODE_SPACING_Y + scrollY);
 
             // Render class name on the left
-            int classNameX = (int)(LEFT_MARGIN + scrollX);
+            int classNameX = (int) (LEFT_MARGIN + scrollX);
             guiGraphics.drawString(this.font, formatClassName(researchClass), classNameX, classY + 10, 0xFFFFFF);
 
             // Render research nodes for this class
             for (int i = 0; i < researches.size(); i++) {
                 Research research = researches.get(i);
-                int nodeX = (int)(LEFT_MARGIN + CLASS_COLUMN_WIDTH + i * (NODE_WIDTH + NODE_SPACING_X) + scrollX);
+                int nodeX = (int) (LEFT_MARGIN + CLASS_COLUMN_WIDTH + i * (NODE_WIDTH + NODE_SPACING_X) + scrollX);
                 int nodeY = classY;
 
                 // Draw connections to prerequisites first
@@ -178,10 +172,10 @@ public class ResearchOverviewScreen extends Screen {
     }
 
     private void drawResearchNode(GuiGraphics guiGraphics, Research research, int x, int y,
-                                   ResearchNodeState state, int mouseX, int mouseY) {
+                                  ResearchNodeState state, int mouseX, int mouseY) {
         // Check if mouse is hovering over this node
         boolean isHovered = mouseX >= x && mouseX <= x + NODE_WIDTH &&
-                           mouseY >= y && mouseY <= y + NODE_HEIGHT;
+                mouseY >= y && mouseY <= y + NODE_HEIGHT;
 
         if (isHovered) {
             hoveredNode = new ResearchNode(research, x, y);
@@ -210,7 +204,7 @@ public class ResearchOverviewScreen extends Screen {
     }
 
     private void drawConnectionsToPrerequisites(GuiGraphics guiGraphics, Research research,
-                                                 int nodeX, int nodeY, int classIndex) {
+                                                int nodeX, int nodeY, int classIndex) {
         if (research.prerequisites() == null || research.prerequisites().isEmpty()) {
             return;
         }
@@ -227,8 +221,8 @@ public class ResearchOverviewScreen extends Screen {
             int prereqIndex = prereqClassResearches.indexOf(prereqResearch);
             if (prereqIndex == -1) continue;
 
-            int prereqX = (int)(LEFT_MARGIN + CLASS_COLUMN_WIDTH + prereqIndex * (NODE_WIDTH + NODE_SPACING_X) + scrollX);
-            int prereqY = (int)(TOP_MARGIN + prereqClassIndex * NODE_SPACING_Y + scrollY);
+            int prereqX = (int) (LEFT_MARGIN + CLASS_COLUMN_WIDTH + prereqIndex * (NODE_WIDTH + NODE_SPACING_X) + scrollX);
+            int prereqY = (int) (TOP_MARGIN + prereqClassIndex * NODE_SPACING_Y + scrollY);
 
             // Calculate connection points based on whether it's same class or cross-class
             int startX, startY, endX, endY;
@@ -258,8 +252,8 @@ public class ResearchOverviewScreen extends Screen {
 
             // Draw line
             int lineColor = playerResearchData.isLevelCompleted(prereq.classType(), prereq.level())
-                           ? 0xFF00FF00 // Green if prerequisite is completed
-                           : 0xFF888888; // Gray if not completed
+                    ? 0xFF00FF00 // Green if prerequisite is completed
+                    : 0xFF888888; // Gray if not completed
 
             drawLine(guiGraphics, startX, startY, endX, endY, lineColor);
         }
@@ -313,10 +307,10 @@ public class ResearchOverviewScreen extends Screen {
         double py = nx;
 
         // Two arrowhead wing points
-        int wing1X = (int)(backX + px * arrowSize * 0.5);
-        int wing1Y = (int)(backY + py * arrowSize * 0.5);
-        int wing2X = (int)(backX - px * arrowSize * 0.5);
-        int wing2Y = (int)(backY - py * arrowSize * 0.5);
+        int wing1X = (int) (backX + px * arrowSize * 0.5);
+        int wing1Y = (int) (backY + py * arrowSize * 0.5);
+        int wing2X = (int) (backX - px * arrowSize * 0.5);
+        int wing2Y = (int) (backY - py * arrowSize * 0.5);
 
         // Draw the arrowhead triangle
         drawTriangle(guiGraphics, x2, y2, wing1X, wing1Y, wing2X, wing2Y, color);
@@ -453,5 +447,6 @@ public class ResearchOverviewScreen extends Screen {
         NOT_RESEARCHABLE
     }
 
-    private record ResearchNode(Research research, int x, int y) {}
+    private record ResearchNode(Research research, int x, int y) {
+    }
 }

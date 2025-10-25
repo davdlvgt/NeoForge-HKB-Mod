@@ -63,7 +63,7 @@ public class FollowOwnerGoal extends Goal {
 
         // Check if owner is too far away
         double distanceSq = this.dragon.distanceToSqr(owner);
-        if (distanceSq < (double)(this.minDistance * this.minDistance)) {
+        if (distanceSq < (double) (this.minDistance * this.minDistance)) {
             return false;
         }
 
@@ -71,7 +71,7 @@ public class FollowOwnerGoal extends Goal {
 
         if (!this.dragon.level().isClientSide) {
             LOGGER.debug("Dragon {} can follow owner - distance: {:.2f} blocks",
-                this.dragon.getId(), Math.sqrt(distanceSq));
+                    this.dragon.getId(), Math.sqrt(distanceSq));
         }
 
         return true;
@@ -175,7 +175,7 @@ public class FollowOwnerGoal extends Goal {
             return false;
         }
 
-        this.dragon.setPos((double) x + 0.5, (double) y, (double) z + 0.5);
+        this.dragon.setPos((double) x + 0.5, y, (double) z + 0.5);
         this.dragon.setYRot(this.dragon.getYRot());
         this.dragon.setXRot(this.dragon.getXRot());
         this.dragon.getNavigation().stop();
@@ -196,12 +196,8 @@ public class FollowOwnerGoal extends Goal {
         }
 
         // Check if position and above are not solid (space for dragon)
-        if (!this.dragon.level().getBlockState(pos).isAir() ||
-                !this.dragon.level().getBlockState(pos.above()).isAir()) {
-            return false;
-        }
-
-        return true;
+        return this.dragon.level().getBlockState(pos).isAir() &&
+                this.dragon.level().getBlockState(pos.above()).isAir();
     }
 
     /**

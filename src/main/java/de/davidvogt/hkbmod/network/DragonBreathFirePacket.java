@@ -22,14 +22,10 @@ public record DragonBreathFirePacket() implements CustomPacketPayload {
             new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "dragon_breath_fire"));
 
     public static final StreamCodec<ByteBuf, DragonBreathFirePacket> STREAM_CODEC = StreamCodec.of(
-            (buf, packet) -> {}, // No data to write
+            (buf, packet) -> {
+            }, // No data to write
             buf -> new DragonBreathFirePacket() // No data to read
     );
-
-    @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
 
     public static void handle(DragonBreathFirePacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
@@ -64,5 +60,10 @@ public record DragonBreathFirePacket() implements CustomPacketPayload {
                 }
             }
         });
+    }
+
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

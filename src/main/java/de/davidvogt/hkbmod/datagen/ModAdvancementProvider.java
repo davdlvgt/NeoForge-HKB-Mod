@@ -38,7 +38,7 @@ public class ModAdvancementProvider implements AdvancementSubProvider {
                 new ItemLike[]{ModBlocks.ELASTIC_WOOD, ModItems.LONG_STICK, ModItems.LONG_STRING},
                 new String[]{"elastic_wood", "long_stick", "long_string"});
         addCraftingAdvancement(saver, "archer/level_2", "archer/level_1", ModItems.LONGBOW_STICK, "longbow_stick");
-        addCraftingAdvancement(saver, "archer/level_3","archer/level_2",
+        addCraftingAdvancement(saver, "archer/level_3", "archer/level_2",
                 ModItems.LONGBOW,
                 new ItemLike[]{ModItems.LONGBOW, ModItems.LONGBOW_ARROW},
                 new String[]{"longbow", "longbow_arrow"});
@@ -88,7 +88,7 @@ public class ModAdvancementProvider implements AdvancementSubProvider {
      * @param saver       Der Consumer für das Advancement
      * @param path        Pfad des Advancements (z.B. "research/root")
      * @param displayItem Item das im Advancement-Tab angezeigt wird
-     * @param triggerItem Item das aufgehoben werden muss um das Advancement zu bekommen
+     * @param triggerItem Item das aufgehoben werden muss, um das Advancement zu bekommen
      * @param type        Typ des Advancements (TASK, GOAL, CHALLENGE)
      * @param experience  XP-Belohnung (0 für keine)
      */
@@ -187,11 +187,12 @@ public class ModAdvancementProvider implements AdvancementSubProvider {
 
     /**
      * Fügt ein Crafting-Advancement mit mehreren Rezept-Belohnungen hinzu
-     * @param saver Der Consumer für das Advancement
-     * @param path Pfad des Advancements (z.B. "crafting/workbench")
-     * @param parent Parent-Advancement
-     * @param displayItem Item das im Advancement-Tab angezeigt wird
-     * @param triggerItems Items die aufgehoben werden müssen (eines davon reicht)
+     *
+     * @param saver         Der Consumer für das Advancement
+     * @param path          Pfad des Advancements (z.B. "crafting/workbench")
+     * @param parent        Parent-Advancement
+     * @param displayItem   Item das im Advancement-Tab angezeigt wird
+     * @param triggerItems  Items die aufgehoben werden müssen (eines davon reicht)
      * @param recipeRewards Rezepte die freigeschaltet werden sollen
      */
     public void addCraftingAdvancement(Consumer<AdvancementHolder> saver, String path, String parent,

@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,7 +31,7 @@ public class DragonNestFeature extends Feature<NoneFeatureConfiguration> {
     private static final int DRAGON_COUNT = 1;
 
     private static final ResourceLocation DRAGON_NEST_STRUCTURE =
-        ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "dragon_nest");
+            ResourceLocation.fromNamespaceAndPath(HKBMod.MODID, "dragon_nest");
 
     public DragonNestFeature(Codec<NoneFeatureConfiguration> codec) {
         super(codec);
@@ -93,7 +92,7 @@ public class DragonNestFeature extends Feature<NoneFeatureConfiguration> {
                 // Only return if this is high enough for mountains
                 if (surfacePos.getY() >= 100) {
                     HKBMod.LOGGER.info("Dragon nest: Scanning found solid block at y={}, placing nest at y={}",
-                        y, surfacePos.getY());
+                            y, surfacePos.getY());
                     return surfacePos;
                 }
             }
@@ -124,9 +123,9 @@ public class DragonNestFeature extends Feature<NoneFeatureConfiguration> {
 
         // Create placement settings
         StructurePlaceSettings settings = new StructurePlaceSettings()
-            .setRotation(Rotation.NONE)
-            .setMirror(Mirror.NONE)
-            .setIgnoreEntities(false);
+                .setRotation(Rotation.NONE)
+                .setMirror(Mirror.NONE)
+                .setIgnoreEntities(false);
 
         // Get the structure size to center it properly
         Vec3i size = template.getSize();

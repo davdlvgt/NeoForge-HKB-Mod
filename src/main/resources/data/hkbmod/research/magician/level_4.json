@@ -24,8 +24,8 @@
     }
   ],
   "unlocks": [],
-    "advancement": {
-        "title": "Magician: Master",
-        "description": "Achieve magical mastery"
-    }
+  "advancement": {
+    "title": "Magician: Master",
+    "description": "Achieve magical mastery"
+  }
 }

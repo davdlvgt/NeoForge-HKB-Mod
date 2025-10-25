@@ -24,8 +24,8 @@
     }
   ],
   "unlocks": [],
-    "advancement": {
-        "title": "Cavalier: Advanced",
-        "description": "Master advanced cavalry tactics"
-    }
+  "advancement": {
+    "title": "Cavalier: Advanced",
+    "description": "Master advanced cavalry tactics"
+  }
 }

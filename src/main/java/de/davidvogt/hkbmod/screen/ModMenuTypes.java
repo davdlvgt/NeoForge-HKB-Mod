@@ -16,18 +16,18 @@ public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(Registries.MENU, HKBMod.MODID);
 
-    public static final DeferredHolder<MenuType<?>, MenuType<ResearchTableMenu>> RESEARCH_TABLE_MENU =
-            registerMenuType("research_table_menu", ResearchTableMenu::new);
-
-    public static final DeferredHolder<MenuType<?>, MenuType<ResearchCraftingTableMenu>> RESEARCH_CRAFTING_TABLE_MENU =
-            registerMenuType("research_crafting_table_menu", ResearchCraftingTableMenu::new);
-
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name,
                                                                                                                IContainerFactory<T> factory) {
         return MENUS.register(name, () -> IMenuTypeExtension.create(factory));
-    }
+    }    public static final DeferredHolder<MenuType<?>, MenuType<ResearchTableMenu>> RESEARCH_TABLE_MENU =
+            registerMenuType("research_table_menu", ResearchTableMenu::new);
 
     public static void register(IEventBus eventBus) {
         MENUS.register(eventBus);
-    }
+    }    public static final DeferredHolder<MenuType<?>, MenuType<ResearchCraftingTableMenu>> RESEARCH_CRAFTING_TABLE_MENU =
+            registerMenuType("research_crafting_table_menu", ResearchCraftingTableMenu::new);
+
+
+
+
 }

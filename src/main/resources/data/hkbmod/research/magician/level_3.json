@@ -1,7 +1,12 @@
 {
   "class": "magician",
   "level": 3,
-  "prerequisites": [{"class": "magician", "level": 2}],
+  "prerequisites": [
+    {
+      "class": "magician",
+      "level": 2
+    }
+  ],
   "displayName": "Level 3: Expert",
   "description": "Become an expert magician",
   "requirements": [
@@ -15,8 +20,8 @@
     }
   ],
   "unlocks": [],
-    "advancement": {
-        "title": "Magician: Expert",
-        "description": "Become an expert magician"
-    }
+  "advancement": {
+    "title": "Magician: Expert",
+    "description": "Become an expert magician"
+  }
 }

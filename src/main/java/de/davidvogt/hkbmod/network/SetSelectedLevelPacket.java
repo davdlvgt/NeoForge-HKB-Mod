@@ -25,15 +25,10 @@ public record SetSelectedLevelPacket(BlockPos pos, int levelIndex, String classT
             SetSelectedLevelPacket::new
     );
 
-    @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
-
     public static void handle(SetSelectedLevelPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             HKBMod.LOGGER.info("SERVER: Received set selected level packet: level {} class {} at {}",
-                packet.levelIndex(), packet.classType(), packet.pos());
+                    packet.levelIndex(), packet.classType(), packet.pos());
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 var level = serverPlayer.level();
                 if (level.getBlockEntity(packet.pos()) instanceof ResearchTableBlockEntity blockEntity) {
@@ -42,5 +37,10 @@ public record SetSelectedLevelPacket(BlockPos pos, int levelIndex, String classT
                 }
             }
         });
+    }
+
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

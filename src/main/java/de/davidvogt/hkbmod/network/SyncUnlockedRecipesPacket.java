@@ -10,7 +10,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,11 +26,6 @@ public record SyncUnlockedRecipesPacket(List<ResourceLocation> unlockedRecipes) 
             SyncUnlockedRecipesPacket::unlockedRecipes,
             SyncUnlockedRecipesPacket::new
     );
-
-    @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
 
     /**
      * Creates a packet from a set of unlocked recipes
@@ -56,5 +50,10 @@ public record SyncUnlockedRecipesPacket(List<ResourceLocation> unlockedRecipes) 
                         packet.unlockedRecipes().size());
             }
         });
+    }
+
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

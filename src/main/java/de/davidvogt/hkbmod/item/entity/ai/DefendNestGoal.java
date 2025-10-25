@@ -33,17 +33,9 @@ public class DefendNestGoal extends Goal {
     private int fireballCooldown = 0;
     private int fireBreathCooldown = 0;
     private int checkTimer = 0;
-
-    // Aerial combat states
-    private enum CombatState {
-        APPROACHING,  // Flying towards player
-        ATTACKING,    // In attack range, shooting
-        RETREATING    // Too close, flying away
-    }
     private CombatState combatState = CombatState.APPROACHING;
     private Vec3 retreatTarget = null;
     private boolean decidedToLandAttack = false;
-
     public DefendNestGoal(DragonEntity dragon) {
         this.dragon = dragon;
         this.setFlags(EnumSet.of(Goal.Flag.TARGET, Goal.Flag.LOOK, Goal.Flag.MOVE));
@@ -91,20 +83,20 @@ public class DefendNestGoal extends Goal {
         // Find players near the nest
         AABB searchArea = new AABB(nestPos).inflate(detectionRadius);
         List<Player> nearbyPlayers = dragon.level().getEntitiesOfClass(
-            Player.class,
-            searchArea,
-            player -> !player.isSpectator() && !player.isCreative() && player.isAlive()
-                    && !dragon.isPlayerHoldingEnchantedGoldenApple(player) // Don't attack players holding enchanted golden apples
+                Player.class,
+                searchArea,
+                player -> !player.isSpectator() && !player.isCreative() && player.isAlive()
+                        && !dragon.isPlayerHoldingEnchantedGoldenApple(player) // Don't attack players holding enchanted golden apples
         );
 
         if (!nearbyPlayers.isEmpty()) {
             // Target the closest player to the nest
             target = nearbyPlayers.stream()
-                .min((p1, p2) -> Double.compare(
-                    p1.distanceToSqr(nestPos.getX(), nestPos.getY(), nestPos.getZ()),
-                    p2.distanceToSqr(nestPos.getX(), nestPos.getY(), nestPos.getZ())
-                ))
-                .orElse(null);
+                    .min((p1, p2) -> Double.compare(
+                            p1.distanceToSqr(nestPos.getX(), nestPos.getY(), nestPos.getZ()),
+                            p2.distanceToSqr(nestPos.getX(), nestPos.getY(), nestPos.getZ())
+                    ))
+                    .orElse(null);
             return target != null;
         }
 
@@ -207,7 +199,7 @@ public class DefendNestGoal extends Goal {
 
                     if (!dragon.level().isClientSide) {
                         LOGGER.debug("Dragon {} breathing fire from ground at close range ({} blocks)",
-                            dragon.getId(), String.format("%.1f", distanceToTarget));
+                                dragon.getId(), String.format("%.1f", distanceToTarget));
                     }
                 }
             }
@@ -221,7 +213,7 @@ public class DefendNestGoal extends Goal {
 
                     if (!dragon.level().isClientSide) {
                         LOGGER.debug("Dragon {} shooting fireball from ground at {}",
-                            dragon.getId(), target.getName().getString());
+                                dragon.getId(), target.getName().getString());
                     }
                 }
             }
@@ -242,7 +234,7 @@ public class DefendNestGoal extends Goal {
                 calculateRetreatTarget();
                 if (!dragon.level().isClientSide) {
                     LOGGER.debug("Dragon {} too close ({} blocks) - retreating",
-                        dragon.getId(), String.format("%.1f", distanceToTarget));
+                            dragon.getId(), String.format("%.1f", distanceToTarget));
                 }
             }
         } else if (distanceToTarget > MAX_ATTACK_DISTANCE) {
@@ -279,7 +271,7 @@ public class DefendNestGoal extends Goal {
 
                         if (!dragon.level().isClientSide) {
                             LOGGER.debug("Dragon {} breathing fire from air at {} ({} blocks away)",
-                                dragon.getId(), target.getName().getString(), String.format("%.1f", distanceToTarget));
+                                    dragon.getId(), target.getName().getString(), String.format("%.1f", distanceToTarget));
                         }
                     }
                 }
@@ -293,7 +285,7 @@ public class DefendNestGoal extends Goal {
 
                         if (!dragon.level().isClientSide) {
                             LOGGER.debug("Dragon {} shooting fireball from air at {} ({} blocks away)",
-                                dragon.getId(), target.getName().getString(), String.format("%.1f", distanceToTarget));
+                                    dragon.getId(), target.getName().getString(), String.format("%.1f", distanceToTarget));
                         }
                     }
                 }
@@ -398,9 +390,9 @@ public class DefendNestGoal extends Goal {
         double cos = Math.cos(randomAngle);
         double sin = Math.sin(randomAngle);
         Vec3 rotated = new Vec3(
-            awayFromTarget.x * cos - awayFromTarget.z * sin,
-            awayFromTarget.y,
-            awayFromTarget.x * sin + awayFromTarget.z * cos
+                awayFromTarget.x * cos - awayFromTarget.z * sin,
+                awayFromTarget.y,
+                awayFromTarget.x * sin + awayFromTarget.z * cos
         );
 
         // Retreat 50 blocks away
@@ -412,8 +404,8 @@ public class DefendNestGoal extends Goal {
 
         if (!dragon.level().isClientSide) {
             LOGGER.debug("Dragon {} retreat target set: {}, {}, {}",
-                dragon.getId(), String.format("%.1f", retreatTarget.x),
-                String.format("%.1f", retreatTarget.y), String.format("%.1f", retreatTarget.z));
+                    dragon.getId(), String.format("%.1f", retreatTarget.x),
+                    String.format("%.1f", retreatTarget.y), String.format("%.1f", retreatTarget.z));
         }
     }
 
@@ -435,14 +427,14 @@ public class DefendNestGoal extends Goal {
 
             double speed = 0.8D;
             dragon.setDeltaMovement(
-                direction.x * speed,
-                -0.3D, // Descend
-                direction.z * speed
+                    direction.x * speed,
+                    -0.3D, // Descend
+                    direction.z * speed
             );
 
             if (!dragon.level().isClientSide) {
                 LOGGER.debug("Dragon {} gliding to ground at {} to attack",
-                    dragon.getId(), groundPos.toShortString());
+                        dragon.getId(), groundPos.toShortString());
             }
         }
     }
@@ -451,14 +443,14 @@ public class DefendNestGoal extends Goal {
      * Find ground position near the target
      */
     private BlockPos findGroundNearTarget(Vec3 targetPos) {
-        int startY = (int)targetPos.y + 10;
-        int targetX = (int)targetPos.x;
-        int targetZ = (int)targetPos.z;
+        int startY = (int) targetPos.y + 10;
+        int targetX = (int) targetPos.x;
+        int targetZ = (int) targetPos.z;
 
         for (int y = startY; y > dragon.level().getMinY(); y--) {
             BlockPos checkPos = new BlockPos(targetX, y, targetZ);
             if (!dragon.level().getBlockState(checkPos).isAir() &&
-                dragon.level().getBlockState(checkPos).isSolid()) {
+                    dragon.level().getBlockState(checkPos).isSolid()) {
                 return checkPos.above();
             }
         }
@@ -469,5 +461,12 @@ public class DefendNestGoal extends Goal {
     @Override
     public boolean requiresUpdateEveryTick() {
         return true;
+    }
+
+    // Aerial combat states
+    private enum CombatState {
+        APPROACHING,  // Flying towards player
+        ATTACKING,    // In attack range, shooting
+        RETREATING    // Too close, flying away
     }
 }

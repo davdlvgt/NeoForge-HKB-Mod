@@ -16,7 +16,8 @@ public class PlayerResearchHelper {
 
     /**
      * Checks if a player has unlocked a specific recipe
-     * @param player The player to check
+     *
+     * @param player   The player to check
      * @param recipeId The recipe ID to check
      * @return true if the player has unlocked the recipe, false otherwise
      */
@@ -30,7 +31,8 @@ public class PlayerResearchHelper {
 
     /**
      * Unlocks a recipe for a player
-     * @param player The player to unlock the recipe for
+     *
+     * @param player   The player to unlock the recipe for
      * @param recipeId The recipe ID to unlock
      * @return true if the recipe was newly unlocked, false if already unlocked
      */
@@ -46,7 +48,8 @@ public class PlayerResearchHelper {
 
     /**
      * Locks a recipe for a player (removes from unlocked recipes)
-     * @param player The player to lock the recipe for
+     *
+     * @param player   The player to lock the recipe for
      * @param recipeId The recipe ID to lock
      * @return true if the recipe was unlocked and is now locked, false if it wasn't unlocked
      */
@@ -62,6 +65,7 @@ public class PlayerResearchHelper {
 
     /**
      * Gets all unlocked recipes for a player
+     *
      * @param player The player to get recipes for
      * @return An unmodifiable set of unlocked recipe IDs
      */
@@ -75,6 +79,7 @@ public class PlayerResearchHelper {
 
     /**
      * Clears all unlocked recipes for a player
+     *
      * @param player The player to clear recipes for
      */
     public static void clearUnlockedRecipes(Player player) {
@@ -88,6 +93,7 @@ public class PlayerResearchHelper {
 
     /**
      * Gets the count of unlocked recipes for a player
+     *
      * @param player The player to count recipes for
      * @return Number of unlocked recipes
      */
@@ -103,9 +109,10 @@ public class PlayerResearchHelper {
 
     /**
      * Checks if a player has completed a specific research level
-     * @param player The player to check
+     *
+     * @param player    The player to check
      * @param classType The class type (e.g., "archer", "knight")
-     * @param level The level to check
+     * @param level     The level to check
      * @return true if the level is completed, false otherwise
      */
     public static boolean isLevelCompleted(Player player, String classType, int level) {
@@ -118,7 +125,8 @@ public class PlayerResearchHelper {
 
     /**
      * Gets the highest completed level for a player in a specific class
-     * @param player The player to check
+     *
+     * @param player    The player to check
      * @param classType The class type (e.g., "archer", "knight")
      * @return The highest completed level, or -1 if none completed
      */
@@ -132,9 +140,10 @@ public class PlayerResearchHelper {
 
     /**
      * Completes a research level for a player
-     * @param player The player to complete the level for
+     *
+     * @param player    The player to complete the level for
      * @param classType The class type (e.g., "archer", "knight")
-     * @param level The level to complete
+     * @param level     The level to complete
      */
     public static void completeLevel(Player player, String classType, int level) {
         if (player == null || classType == null) {
@@ -147,10 +156,11 @@ public class PlayerResearchHelper {
 
     /**
      * Checks if a player can research a specific level
-     * @param player The player to check
+     *
+     * @param player    The player to check
      * @param classType The class type (e.g., "archer", "knight")
-     * @param level The level to check
-     * @param research The research object with prerequisites
+     * @param level     The level to check
+     * @param research  The research object with prerequisites
      * @return true if the player can research this level, false otherwise
      */
     public static boolean canResearch(Player player, String classType, int level, Research research) {

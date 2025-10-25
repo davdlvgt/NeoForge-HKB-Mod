@@ -29,7 +29,7 @@ public class ModEntities {
                     ));
 
     public static final DeferredHolder<EntityType<?>, EntityType<DeerEntity>> DEER =
-            ENTITY_TYPES.register("deer", () -> EntityType.Builder.<DeerEntity>of(
+            ENTITY_TYPES.register("deer", () -> EntityType.Builder.of(
                             DeerEntity::new, MobCategory.CREATURE)
                     .sized(0.9F, 1.4F)  // Width and height (slightly taller than cow: 0.9, 1.4 vs cow's 0.9, 1.3)
                     .clientTrackingRange(10)  // How far away clients can see this entity
@@ -40,7 +40,7 @@ public class ModEntities {
                     ));
 
     public static final DeferredHolder<EntityType<?>, EntityType<DragonEntity>> DRAGON =
-            ENTITY_TYPES.register("dragon", () -> EntityType.Builder.<DragonEntity>of(
+            ENTITY_TYPES.register("dragon", () -> EntityType.Builder.of(
                             DragonEntity::new, MobCategory.MONSTER)
                     .sized(2.5F, 1.5F)  // Width and height (scaled down from Ender Dragon's ~16x8)
                     .clientTrackingRange(10)  // How far away clients can see this entity

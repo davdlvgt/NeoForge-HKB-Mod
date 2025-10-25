@@ -1,6 +1,5 @@
 package de.davidvogt.hkbmod.attachment;
 
-import com.mojang.serialization.Codec;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.research.PlayerResearchData;
 import net.neoforged.bus.api.IEventBus;

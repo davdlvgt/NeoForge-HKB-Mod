@@ -17,14 +17,27 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class ResearchTableMenu extends AbstractContainerMenu {
+    // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
+    // must assign a slot number to each of the slots used by the GUI.
+    // For this container, we can see both the tile inventory's slots as well as the player inventory slots and the hotbar.
+    // Each time we add a Slot to the container, it automatically increases the slotIndex, which means
+    //  0 - 8 = TileInventory slots, which map to our TileEntity slot numbers 0 - 8)
+    //  9 - 17 = hotbar slots (which will map to the InventoryPlayer slot numbers 0 - 8)
+    //  18 - 44 = player inventory slots (which map to the InventoryPlayer slot numbers 9 - 35)
+    private static final int TE_INVENTORY_SLOT_COUNT = 9;
+    private static final int TE_INVENTORY_FIRST_SLOT_INDEX = 0;
+    private static final int HOTBAR_SLOT_COUNT = 9;
+    private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
+    private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
+    private static final int PLAYER_INVENTORY_SLOT_COUNT = PLAYER_INVENTORY_COLUMN_COUNT * PLAYER_INVENTORY_ROW_COUNT;
+    private static final int VANILLA_SLOT_COUNT = HOTBAR_SLOT_COUNT + PLAYER_INVENTORY_SLOT_COUNT;
+    private static final int VANILLA_FIRST_SLOT_INDEX = TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT;
     public final ResearchTableBlockEntity blockEntity;
     private final Level level;
     private final Player player;
-
     public ResearchTableMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
         this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
     }
-
     public ResearchTableMenu(int containerId, Inventory inv, BlockEntity blockEntity) {
         super(ModMenuTypes.RESEARCH_TABLE_MENU.get(), containerId);
         this.blockEntity = ((ResearchTableBlockEntity) blockEntity);
@@ -38,7 +51,7 @@ public class ResearchTableMenu extends AbstractContainerMenu {
         this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 3, 9, 35));
         this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 4, 27, 35));
         this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 5, 45, 35));
-        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 6, 9,  53));
+        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 6, 9, 53));
         this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 7, 27, 53));
         this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 8, 45, 53));
 
@@ -46,23 +59,6 @@ public class ResearchTableMenu extends AbstractContainerMenu {
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
     }
-
-    // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
-    // must assign a slot number to each of the slots used by the GUI.
-    // For this container, we can see both the tile inventory's slots as well as the player inventory slots and the hotbar.
-    // Each time we add a Slot to the container, it automatically increases the slotIndex, which means
-    //  0 - 8 = TileInventory slots, which map to our TileEntity slot numbers 0 - 8)
-    //  9 - 17 = hotbar slots (which will map to the InventoryPlayer slot numbers 0 - 8)
-    //  18 - 44 = player inventory slots (which map to the InventoryPlayer slot numbers 9 - 35)
-    private static final int TE_INVENTORY_SLOT_COUNT = 9;
-    private static final int TE_INVENTORY_FIRST_SLOT_INDEX = 0;
-
-    private static final int HOTBAR_SLOT_COUNT = 9;
-    private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
-    private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
-    private static final int PLAYER_INVENTORY_SLOT_COUNT = PLAYER_INVENTORY_COLUMN_COUNT * PLAYER_INVENTORY_ROW_COUNT;
-    private static final int VANILLA_SLOT_COUNT = HOTBAR_SLOT_COUNT + PLAYER_INVENTORY_SLOT_COUNT;
-    private static final int VANILLA_FIRST_SLOT_INDEX = TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT;
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int pIndex) {

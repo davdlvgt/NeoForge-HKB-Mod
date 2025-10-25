@@ -23,9 +23,9 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
         this.category = recipe.category();
         // Create empty 3x3 grid for getting result item
         java.util.List<ItemStack> emptyGrid = java.util.List.of(
-            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
-            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
-            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY
+                ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
+                ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
+                ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY
         );
         this.resultItem = recipe.assemble(CraftingInput.of(3, 3, emptyGrid), null);
     }
@@ -38,9 +38,9 @@ public class ResearchCraftingRecipe implements CraftingRecipe {
         this.category = category;
         // Create empty 3x3 grid for getting result item
         java.util.List<ItemStack> emptyGrid = java.util.List.of(
-            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
-            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
-            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY
+                ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
+                ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY,
+                ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY
         );
         this.resultItem = recipe.assemble(CraftingInput.of(3, 3, emptyGrid), null);
     }

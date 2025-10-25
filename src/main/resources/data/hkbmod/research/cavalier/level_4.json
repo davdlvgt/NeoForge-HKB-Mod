@@ -1,7 +1,12 @@
 {
   "class": "cavalier",
   "level": 4,
-  "prerequisites": [{"class": "cavalier", "level": 3}],
+  "prerequisites": [
+    {
+      "class": "cavalier",
+      "level": 3
+    }
+  ],
   "displayName": "Level 4: Master",
   "description": "Achieve cavalry mastery",
   "requirements": [
@@ -17,8 +22,8 @@
   "unlocks": [
     "dragon_material"
   ],
-    "advancement": {
-        "title": "Cavalier: Master",
-        "description": "Achieve cavalry mastery"
-    }
+  "advancement": {
+    "title": "Cavalier: Master",
+    "description": "Achieve cavalry mastery"
+  }
 }

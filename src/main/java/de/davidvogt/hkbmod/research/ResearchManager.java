@@ -26,7 +26,7 @@ public class ResearchManager {
         // or flat: data/hkbmod/research/<filename>.json
 
         Map<ResourceLocation, net.minecraft.server.packs.resources.Resource> allResources =
-            resourceManager.listResources("research", location -> location.getPath().endsWith(".json"));
+                resourceManager.listResources("research", location -> location.getPath().endsWith(".json"));
 
         for (Map.Entry<ResourceLocation, net.minecraft.server.packs.resources.Resource> entry : allResources.entrySet()) {
             ResourceLocation location = entry.getKey();

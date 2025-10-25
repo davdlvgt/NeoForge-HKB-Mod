@@ -14,22 +14,22 @@ import java.util.*;
 
 @EventBusSubscriber(modid = HKBMod.MODID)
 public class ModEvents {
-    private static final Set<BlockPos> HARVESTED_BLOCKS = new HashSet<>();
     public static final Map<UUID, Integer> PLAYER_DIG_SIZE = new HashMap<>();
+    private static final Set<BlockPos> HARVESTED_BLOCKS = new HashSet<>();
 
     @SubscribeEvent
     public static void onMagicPickaxeUsage(BlockEvent.BreakEvent event) {
         Player player = event.getPlayer();
         ItemStack mainHandItem = player.getMainHandItem();
 
-        if(mainHandItem.getItem() instanceof MagicPickaxeItem magicPickaxe && player instanceof ServerPlayer serverPlayer) {
+        if (mainHandItem.getItem() instanceof MagicPickaxeItem magicPickaxe && player instanceof ServerPlayer serverPlayer) {
             BlockPos initialBlockPos = event.getPos();
-            if(HARVESTED_BLOCKS.contains(initialBlockPos)) {
+            if (HARVESTED_BLOCKS.contains(initialBlockPos)) {
                 return;
             }
             int range = PLAYER_DIG_SIZE.getOrDefault(player.getUUID(), 1);
-            for(BlockPos pos : MagicPickaxeItem.getBlocksToBeDestroyed(range, initialBlockPos, serverPlayer)) {
-                if(pos == initialBlockPos || !magicPickaxe.isCorrectToolForDrops(mainHandItem, event.getLevel().getBlockState(pos))) {
+            for (BlockPos pos : MagicPickaxeItem.getBlocksToBeDestroyed(range, initialBlockPos, serverPlayer)) {
+                if (pos == initialBlockPos || !magicPickaxe.isCorrectToolForDrops(mainHandItem, event.getLevel().getBlockState(pos))) {
                     continue;
                 }
                 HARVESTED_BLOCKS.add(pos);

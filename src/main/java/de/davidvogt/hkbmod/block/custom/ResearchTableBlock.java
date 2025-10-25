@@ -2,7 +2,6 @@ package de.davidvogt.hkbmod.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import de.davidvogt.hkbmod.block.entity.ResearchTableBlockEntity;
-import de.davidvogt.hkbmod.screen.cutsom.ResearchTableMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -70,17 +69,17 @@ public class ResearchTableBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                           Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(level.getBlockEntity(pos) instanceof ResearchTableBlockEntity researchTableBlockEntity) {
-            if(!level.isClientSide()) {
-                ((ServerPlayer) player).openMenu(new SimpleMenuProvider(researchTableBlockEntity, Component.literal("Research Table")), pos);
+        if (level.getBlockEntity(pos) instanceof ResearchTableBlockEntity researchTableBlockEntity) {
+            if (!level.isClientSide()) {
+                player.openMenu(new SimpleMenuProvider(researchTableBlockEntity, Component.literal("Research Table")), pos);
                 return InteractionResult.SUCCESS;
             }
 
-            if(researchTableBlockEntity.inventory.getStackInSlot(0).isEmpty() && !stack.isEmpty()) {
+            if (researchTableBlockEntity.inventory.getStackInSlot(0).isEmpty() && !stack.isEmpty()) {
                 researchTableBlockEntity.inventory.insertItem(0, stack.copy(), false);
                 stack.shrink(1);
                 level.playSound(player, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
-            } else if(stack.isEmpty()) {
+            } else if (stack.isEmpty()) {
                 ItemStack stackOnResearchTable = researchTableBlockEntity.inventory.extractItem(0, 1, false);
                 player.setItemInHand(InteractionHand.MAIN_HAND, stackOnResearchTable);
                 researchTableBlockEntity.clearContents();

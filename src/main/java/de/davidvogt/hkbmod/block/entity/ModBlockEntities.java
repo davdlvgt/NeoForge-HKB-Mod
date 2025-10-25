@@ -13,7 +13,9 @@ public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, HKBMod.MODID);
 
-    public static final Supplier<BlockEntityType<ResearchTableBlockEntity>> RESEARCH_TABLE_BE =
+    public static void register(IEventBus eventBus) {
+        BLOCK_ENTITIES.register(eventBus);
+    }    public static final Supplier<BlockEntityType<ResearchTableBlockEntity>> RESEARCH_TABLE_BE =
             BLOCK_ENTITIES.register("research_table_be",
                     () -> new BlockEntityType<>(
                             ResearchTableBlockEntity::new,
@@ -37,7 +39,5 @@ public class ModBlockEntities {
                     )
             );
 
-    public static void register(IEventBus eventBus) {
-        BLOCK_ENTITIES.register(eventBus);
-    }
+
 }

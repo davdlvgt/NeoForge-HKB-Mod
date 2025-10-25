@@ -21,28 +21,11 @@ import java.util.List;
 public record SetGhostRecipePacket(List<GhostSlot> ghostSlots) implements CustomPacketPayload {
 
     public static final Type<SetGhostRecipePacket> TYPE =
-        new Type<>(ResourceLocation.fromNamespaceAndPath("hkbmod", "set_ghost_recipe"));
-
-    /**
-     * Represents a ghost item in a specific slot
-     */
-    public record GhostSlot(int slotIndex, ItemStack stack) {
-        public static final StreamCodec<RegistryFriendlyByteBuf, GhostSlot> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, GhostSlot::slotIndex,
-            ItemStack.STREAM_CODEC, GhostSlot::stack,
-            GhostSlot::new
-        );
-    }
-
+            new Type<>(ResourceLocation.fromNamespaceAndPath("hkbmod", "set_ghost_recipe"));
     public static final StreamCodec<RegistryFriendlyByteBuf, SetGhostRecipePacket> STREAM_CODEC = StreamCodec.composite(
-        GhostSlot.STREAM_CODEC.apply(ByteBufCodecs.list()), SetGhostRecipePacket::ghostSlots,
-        SetGhostRecipePacket::new
+            GhostSlot.STREAM_CODEC.apply(ByteBufCodecs.list()), SetGhostRecipePacket::ghostSlots,
+            SetGhostRecipePacket::new
     );
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
 
     /**
      * Handle the packet on the client side
@@ -66,5 +49,21 @@ public record SetGhostRecipePacket(List<GhostSlot> ghostSlots) implements Custom
                 screen.setGhostRecipe(ghostItems);
             }
         });
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
+    /**
+     * Represents a ghost item in a specific slot
+     */
+    public record GhostSlot(int slotIndex, ItemStack stack) {
+        public static final StreamCodec<RegistryFriendlyByteBuf, GhostSlot> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.INT, GhostSlot::slotIndex,
+                ItemStack.STREAM_CODEC, GhostSlot::stack,
+                GhostSlot::new
+        );
     }
 }

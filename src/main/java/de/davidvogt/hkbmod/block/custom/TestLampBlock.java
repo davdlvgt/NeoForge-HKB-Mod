@@ -20,7 +20,7 @@ public class TestLampBlock extends Block {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if(!level.isClientSide()) {
+        if (!level.isClientSide()) {
             boolean currentState = state.getValue(CLICKED);
             level.setBlockAndUpdate(pos, state.setValue(CLICKED, !currentState));
         }

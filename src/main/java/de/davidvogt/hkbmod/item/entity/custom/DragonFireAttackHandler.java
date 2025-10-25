@@ -51,11 +51,11 @@ public class DragonFireAttackHandler {
 
         // Create fireball
         ExplosiveFireballEntity fireball = new ExplosiveFireballEntity(
-            level,
-            dragon,
-            normalizedDir.x,
-            normalizedDir.y,
-            normalizedDir.z
+                level,
+                dragon,
+                normalizedDir.x,
+                normalizedDir.y,
+                normalizedDir.z
         );
 
         // Position in front of dragon's mouth
@@ -134,9 +134,9 @@ public class DragonFireAttackHandler {
         Vec3 lookVec = dragon.getViewVector(1.0F);
         double spawnDistance = 2.0;
         return new Vec3(
-            dragon.getX() + lookVec.x * spawnDistance,
-            dragon.getY(0.5) + 0.5,
-            dragon.getZ() + lookVec.z * spawnDistance
+                dragon.getX() + lookVec.x * spawnDistance,
+                dragon.getY(0.5) + 0.5,
+                dragon.getZ() + lookVec.z * spawnDistance
         );
     }
 
@@ -146,9 +146,9 @@ public class DragonFireAttackHandler {
     private Vec3 calculateConePosition(Vec3 direction, Vec3 startPos, double distance, double offset) {
         Vec3 perpendicular = new Vec3(-direction.z, 0, direction.x).normalize();
         return startPos.add(
-            direction.x * distance + perpendicular.x * offset * distance * 0.3,
-            direction.y * distance,
-            direction.z * distance + perpendicular.z * offset * distance * 0.3
+                direction.x * distance + perpendicular.x * offset * distance * 0.3,
+                direction.y * distance,
+                direction.z * distance + perpendicular.z * offset * distance * 0.3
         );
     }
 
@@ -162,41 +162,42 @@ public class DragonFireAttackHandler {
 
         // Flame particles
         serverLevel.sendParticles(
-            net.minecraft.core.particles.ParticleTypes.FLAME,
-            position.x, position.y, position.z,
-            5,
-            0.2, 0.2, 0.2,
-            0.03
+                net.minecraft.core.particles.ParticleTypes.FLAME,
+                position.x, position.y, position.z,
+                5,
+                0.2, 0.2, 0.2,
+                0.03
         );
 
         // Smoke particles (further out only)
         if (distance > 2.0 && dragon.getRandom().nextFloat() < 0.5F) {
             serverLevel.sendParticles(
-                net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
-                position.x, position.y, position.z,
-                3,
-                0.25, 0.25, 0.25,
-                0.02
+                    net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
+                    position.x, position.y, position.z,
+                    3,
+                    0.25, 0.25, 0.25,
+                    0.02
             );
         }
     }
 
     /**
      * Damages entities in a small area around a position
+     *
      * @return number of entities hit
      */
     private int damageEntitiesInArea(Vec3 position) {
         AABB damageBox = new AABB(
-            position.x - 0.6, position.y - 0.6, position.z - 0.6,
-            position.x + 0.6, position.y + 0.6, position.z + 0.6
+                position.x - 0.6, position.y - 0.6, position.z - 0.6,
+                position.x + 0.6, position.y + 0.6, position.z + 0.6
         );
 
         List<LivingEntity> entities = level.getEntitiesOfClass(
-            LivingEntity.class,
-            damageBox,
-            entity -> entity != dragon
-                && entity.isAlive()
-                && !entity.equals(dragon.getControllingPassenger())
+                LivingEntity.class,
+                damageBox,
+                entity -> entity != dragon
+                        && entity.isAlive()
+                        && !entity.equals(dragon.getControllingPassenger())
         );
 
         for (LivingEntity entity : entities) {

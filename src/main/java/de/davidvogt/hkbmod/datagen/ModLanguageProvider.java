@@ -51,10 +51,10 @@ public class ModLanguageProvider extends LanguageProvider {
 
         add(ModBlocks.ROBINIA_PLANKS.get(), "Robinia Planks");
         add(ModBlocks.ROBINIA_SAPLING.get(), "Robinia Sapling");
-        add(ModBlocks.ROBINIA_LEAVES.get(),  "Robinia Leaves");
+        add(ModBlocks.ROBINIA_LEAVES.get(), "Robinia Leaves");
 
-        add(ModBlocks.ROBINIA_STAIRS.get(),  "Robinia Stairs");
-        add(ModBlocks.ROBINIA_SLAB.get(),  "Robinia Slab");
+        add(ModBlocks.ROBINIA_STAIRS.get(), "Robinia Stairs");
+        add(ModBlocks.ROBINIA_SLAB.get(), "Robinia Slab");
         add(ModBlocks.ROBINIA_PRESSURE_PLATE.get(), "Robinia Pressure Plate");
         add(ModBlocks.ROBINIA_BUTTON.get(), "Robinia Button");
         add(ModBlocks.ROBINIA_FENCE.get(), "Robinia Fence");

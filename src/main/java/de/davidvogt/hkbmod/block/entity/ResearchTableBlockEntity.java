@@ -1,6 +1,5 @@
 package de.davidvogt.hkbmod.block.entity;
 
-import com.mojang.serialization.Codec;
 import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.attachment.ModAttachments;
 import de.davidvogt.hkbmod.network.SyncPlayerResearchPacket;
@@ -10,7 +9,6 @@ import de.davidvogt.hkbmod.research.PlayerResearchHelper;
 import de.davidvogt.hkbmod.research.Research;
 import de.davidvogt.hkbmod.research.ResearchManager;
 import de.davidvogt.hkbmod.screen.cutsom.ResearchTableMenu;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -20,20 +18,19 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import org.jetbrains.annotations.Debug;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -41,6 +38,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ResearchTableBlockEntity extends BlockEntity implements MenuProvider {
+    private static final long RESEARCH_DURATION_MS = 3000; // 10 seconds
+
     public final ItemStackHandler inventory = new ItemStackHandler(9) {
         @Override
         protected int getStackLimit(int slot, ItemStack stack) {
@@ -53,14 +52,14 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
             if (level != null && !level.isClientSide()) {
                 ItemStack stack = getStackInSlot(slot);
                 HKBMod.LOGGER.info("SERVER: Research Table inventory changed - slot {}, item: {}, count: {}, researching: {}",
-                    slot, stack.isEmpty() ? "EMPTY" : stack.getItem(), stack.getCount(), isResearching);
+                        slot, stack.isEmpty() ? "EMPTY" : stack.getItem(), stack.getCount(), isResearching);
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
                 // Check if research should be cancelled due to missing materials
                 checkResearchRequirements();
             } else if (level != null) {
                 ItemStack stack = getStackInSlot(slot);
                 HKBMod.LOGGER.info("CLIENT: Research Table inventory changed - slot {}, item: {}, count: {}",
-                    slot, stack.isEmpty() ? "EMPTY" : stack.getItem(), stack.getCount());
+                        slot, stack.isEmpty() ? "EMPTY" : stack.getItem(), stack.getCount());
             }
         }
     };
@@ -71,10 +70,34 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
     private String selectedClass = "";
     private long researchStartTime = 0;
     private UUID researchingPlayerUUID = null;
-    private static final long RESEARCH_DURATION_MS = 3000; // 10 seconds
-
     public ResearchTableBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.RESEARCH_TABLE_BE.get(), pos, blockState);
+    }
+
+    public static void tick(ResearchTableBlockEntity blockEntity) {
+        if (blockEntity.isResearching) {
+            float progress = blockEntity.getResearchProgress();
+
+            // Sync to client every 10 ticks
+            if (!blockEntity.level.isClientSide() && blockEntity.level.getGameTime() % 10 == 0) {
+                blockEntity.level.sendBlockUpdated(blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
+            }
+
+            // Log every 1 second (20 ticks)
+            if (blockEntity.level.getGameTime() % 20 == 0) {
+                String side = blockEntity.level.isClientSide() ? "CLIENT" : "SERVER";
+                HKBMod.LOGGER.info("{}: Research progress: {}% (level: {}, class: {})",
+                        side,
+                        String.format("%.1f", progress * 100),
+                        blockEntity.selectedLevelIndex,
+                        blockEntity.selectedClass);
+            }
+
+            if (progress >= 1.0f && !blockEntity.level.isClientSide()) {
+                HKBMod.LOGGER.info("SERVER: Research completed!");
+                blockEntity.finishResearch();
+            }
+        }
     }
 
     public void clearContents() {
@@ -145,7 +168,7 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
         tag.putString("SelectedClass", selectedClass);
         tag.putLong("ResearchStartTime", researchStartTime);
         HKBMod.LOGGER.info("SERVER: Creating update tag - isResearching: {}, level: {}, class: {}",
-            isResearching, selectedLevelIndex, selectedClass);
+                isResearching, selectedLevelIndex, selectedClass);
         return tag;
     }
 
@@ -153,7 +176,7 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
     public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
         loadAdditional(input);
         HKBMod.LOGGER.info("CLIENT: Received sync packet - isResearching: {}, level: {}, class: {}",
-            isResearching, selectedLevelIndex, selectedClass);
+                isResearching, selectedLevelIndex, selectedClass);
     }
 
     // Research getters and setters
@@ -190,7 +213,7 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
         Research research = ResearchManager.getResearch(selectedClass, levelIndex);
         if (!researchData.canResearch(selectedClass, levelIndex, research)) {
             HKBMod.LOGGER.warn("Player cannot research level {} for class {} - prerequisites not met or already completed",
-                levelIndex, selectedClass);
+                    levelIndex, selectedClass);
             return;
         }
 
@@ -234,13 +257,13 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
                     PlayerResearchData researchData = serverPlayer.getData(ModAttachments.PLAYER_RESEARCH);
                     researchData.completeLevel(selectedClass, selectedLevelIndex);
                     HKBMod.LOGGER.info("Player {} completed research level {} for class {}",
-                        serverPlayer.getName().getString(), selectedLevelIndex, selectedClass);
+                            serverPlayer.getName().getString(), selectedLevelIndex, selectedClass);
 
                     // Grant XP based on research level
                     int xpAmount = getXPForLevel(selectedLevelIndex);
                     serverPlayer.giveExperiencePoints(xpAmount);
                     HKBMod.LOGGER.info("Player {} received {} XP for completing level {} research",
-                        serverPlayer.getName().getString(), xpAmount, selectedLevelIndex);
+                            serverPlayer.getName().getString(), xpAmount, selectedLevelIndex);
 
                     // Grant advancement
                     grantResearchAdvancement(serverPlayer, selectedClass, selectedLevelIndex);
@@ -318,7 +341,7 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
         if (isResearching) {
             boolean hasMaterials = hasRequiredMaterials(selectedLevelIndex);
             HKBMod.LOGGER.info("Checking research requirements - has materials: {}, class: {}, level: {}",
-                hasMaterials, selectedClass, selectedLevelIndex);
+                    hasMaterials, selectedClass, selectedLevelIndex);
             if (!hasMaterials) {
                 HKBMod.LOGGER.info("Canceling research - requirements not met");
                 cancelResearch();
@@ -398,7 +421,8 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
 
     /**
      * Unlocks recipes defined in the research for the player
-     * @param player The player to unlock recipes for
+     *
+     * @param player   The player to unlock recipes for
      * @param research The research object containing the recipe IDs to unlock
      */
     private void unlockRecipesFromResearch(ServerPlayer player, Research research) {
@@ -424,29 +448,5 @@ public class ResearchTableBlockEntity extends BlockEntity implements MenuProvide
         }
     }
 
-    public static void tick(ResearchTableBlockEntity blockEntity) {
-        if (blockEntity.isResearching) {
-            float progress = blockEntity.getResearchProgress();
 
-            // Sync to client every 10 ticks
-            if (!blockEntity.level.isClientSide() && blockEntity.level.getGameTime() % 10 == 0) {
-                blockEntity.level.sendBlockUpdated(blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
-            }
-
-            // Log every 1 second (20 ticks)
-            if (blockEntity.level.getGameTime() % 20 == 0) {
-                String side = blockEntity.level.isClientSide() ? "CLIENT" : "SERVER";
-                HKBMod.LOGGER.info("{}: Research progress: {}% (level: {}, class: {})",
-                    side,
-                    String.format("%.1f", progress * 100),
-                    blockEntity.selectedLevelIndex,
-                    blockEntity.selectedClass);
-            }
-
-            if (progress >= 1.0f && !blockEntity.level.isClientSide()) {
-                HKBMod.LOGGER.info("SERVER: Research completed!");
-                blockEntity.finishResearch();
-            }
-        }
-    }
 }

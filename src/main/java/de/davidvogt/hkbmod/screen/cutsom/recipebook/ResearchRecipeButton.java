@@ -1,6 +1,5 @@
 package de.davidvogt.hkbmod.screen.cutsom.recipebook;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.davidvogt.hkbmod.recipe.ResearchCraftingRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,7 +17,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
  */
 public class ResearchRecipeButton extends AbstractWidget {
     private static final ResourceLocation RECIPE_BOOK_TEXTURE =
-        ResourceLocation.withDefaultNamespace("textures/gui/recipe_book.png");
+            ResourceLocation.withDefaultNamespace("textures/gui/recipe_book.png");
 
     private static final int BUTTON_WIDTH = 25;
     private static final int BUTTON_HEIGHT = 25;
@@ -31,6 +30,13 @@ public class ResearchRecipeButton extends AbstractWidget {
     }
 
     /**
+     * Gets the recipe this button represents
+     */
+    public RecipeHolder<ResearchCraftingRecipe> getRecipe() {
+        return recipe;
+    }
+
+    /**
      * Sets the recipe this button represents
      */
     public void setRecipe(RecipeHolder<ResearchCraftingRecipe> recipe) {
@@ -39,10 +45,10 @@ public class ResearchRecipeButton extends AbstractWidget {
     }
 
     /**
-     * Gets the recipe this button represents
+     * Checks if this button is selected
      */
-    public RecipeHolder<ResearchCraftingRecipe> getRecipe() {
-        return recipe;
+    public boolean isSelected() {
+        return selected;
     }
 
     /**
@@ -50,13 +56,6 @@ public class ResearchRecipeButton extends AbstractWidget {
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
-    }
-
-    /**
-     * Checks if this button is selected
-     */
-    public boolean isSelected() {
-        return selected;
     }
 
     @Override
@@ -78,7 +77,7 @@ public class ResearchRecipeButton extends AbstractWidget {
         }
 
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, RECIPE_BOOK_TEXTURE,
-            this.getX(), this.getY(), u, v, BUTTON_WIDTH, BUTTON_HEIGHT, 256, 256);
+                this.getX(), this.getY(), u, v, BUTTON_WIDTH, BUTTON_HEIGHT, 256, 256);
 
         // Render the result item
         ItemStack result = recipe.value().getResultItem();

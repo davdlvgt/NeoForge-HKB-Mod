@@ -21,7 +21,7 @@
   "prerequisites": [
     {
       "class": "archer",
-    "level": 3
+      "level": 3
     },
     {
       "class": "magician",

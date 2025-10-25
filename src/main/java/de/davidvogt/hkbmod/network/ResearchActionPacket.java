@@ -4,7 +4,6 @@ import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.block.entity.ResearchTableBlockEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -23,11 +22,6 @@ public record ResearchActionPacket(BlockPos pos, Action action) implements Custo
             ResearchActionPacket::new
     );
 
-    @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
-
     public static void handle(ResearchActionPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             HKBMod.LOGGER.info("SERVER: Received research action packet: {} at {}", packet.action(), packet.pos());
@@ -38,7 +32,7 @@ public record ResearchActionPacket(BlockPos pos, Action action) implements Custo
                     switch (packet.action()) {
                         case START -> {
                             HKBMod.LOGGER.info("SERVER: Starting research for level {} class {}",
-                                blockEntity.getSelectedLevelIndex(), blockEntity.getSelectedClass());
+                                    blockEntity.getSelectedLevelIndex(), blockEntity.getSelectedClass());
                             blockEntity.startResearch(blockEntity.getSelectedLevelIndex(), serverPlayer);
                         }
                         case CANCEL -> {
@@ -55,26 +49,30 @@ public record ResearchActionPacket(BlockPos pos, Action action) implements Custo
         });
     }
 
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
     public enum Action {
         START(0), CANCEL(1);
 
+        public static final StreamCodec<ByteBuf, Action> STREAM_CODEC = StreamCodec.of(
+                (buf, action) -> buf.writeByte(action.getId()),
+                buf -> Action.fromId(buf.readByte())
+        );
         private final int id;
 
         Action(int id) {
             this.id = id;
         }
 
-        public int getId() {
-            return id;
-        }
-
         public static Action fromId(int id) {
             return id == 0 ? START : CANCEL;
         }
 
-        public static final StreamCodec<ByteBuf, Action> STREAM_CODEC = StreamCodec.of(
-            (buf, action) -> buf.writeByte(action.getId()),
-            buf -> Action.fromId(buf.readByte())
-        );
+        public int getId() {
+            return id;
+        }
     }
 }

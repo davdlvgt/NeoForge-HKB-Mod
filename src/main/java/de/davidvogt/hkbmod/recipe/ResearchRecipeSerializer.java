@@ -1,11 +1,12 @@
 package de.davidvogt.hkbmod.recipe;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 
 /**
  * Serializer for ResearchCraftingRecipe.
@@ -27,16 +28,6 @@ public class ResearchRecipeSerializer implements RecipeSerializer<ResearchCrafti
                     ResearchRecipeSerializer::toNetwork,
                     ResearchRecipeSerializer::fromNetwork
             );
-
-    @Override
-    public MapCodec<ResearchCraftingRecipe> codec() {
-        return CODEC;
-    }
-
-    @Override
-    public StreamCodec<RegistryFriendlyByteBuf, ResearchCraftingRecipe> streamCodec() {
-        return STREAM_CODEC;
-    }
 
     /**
      * Writes the recipe to the network buffer (server -> client)
@@ -60,5 +51,15 @@ public class ResearchRecipeSerializer implements RecipeSerializer<ResearchCrafti
         ShapedRecipe shapedRecipe = ShapedRecipe.Serializer.SHAPED_RECIPE.streamCodec().decode(buffer);
 
         return new ResearchCraftingRecipe(category, shapedRecipe);
+    }
+
+    @Override
+    public MapCodec<ResearchCraftingRecipe> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, ResearchCraftingRecipe> streamCodec() {
+        return STREAM_CODEC;
     }
 }

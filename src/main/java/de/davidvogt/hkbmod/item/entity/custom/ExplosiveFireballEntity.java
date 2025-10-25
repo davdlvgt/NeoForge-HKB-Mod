@@ -42,12 +42,12 @@ public class ExplosiveFireballEntity extends AbstractHurtingProjectile {
         if (!this.level().isClientSide) {
             // Create explosion at impact point
             this.level().explode(
-                this,
-                this.getX(),
-                this.getY(),
-                this.getZ(),
-                DragonConstants.EXPLOSION_POWER,
-                Level.ExplosionInteraction.MOB
+                    this,
+                    this.getX(),
+                    this.getY(),
+                    this.getZ(),
+                    DragonConstants.EXPLOSION_POWER,
+                    Level.ExplosionInteraction.MOB
             );
 
             // Remove the fireball after explosion

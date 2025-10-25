@@ -5,7 +5,6 @@ import de.davidvogt.hkbmod.network.RequestRecipeSyncPacket;
 import de.davidvogt.hkbmod.network.ResearchRecipeSyncPacket;
 import de.davidvogt.hkbmod.recipe.ResearchCraftingRecipe;
 import de.davidvogt.hkbmod.screen.cutsom.recipebook.ResearchRecipeBookComponent;
-import de.davidvogt.hkbmod.util.RecipeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -19,11 +18,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.item.crafting.ShapedRecipePattern;
+import net.minecraft.world.item.crafting.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +30,12 @@ import java.util.List;
 public class ResearchCraftingTableScreen extends AbstractContainerScreen<ResearchCraftingTableMenu> {
     // Use vanilla crafting table texture as a base
     private static final ResourceLocation TEXTURE =
-        ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/container/crafting_table.png");
+            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/container/crafting_table.png");
 
     // Recipe book button sprites (reuse vanilla's)
     private static final WidgetSprites RECIPE_BUTTON_SPRITES = new WidgetSprites(
-        ResourceLocation.withDefaultNamespace("recipe_book/button"),
-        ResourceLocation.withDefaultNamespace("recipe_book/button_highlighted")
+            ResourceLocation.withDefaultNamespace("recipe_book/button"),
+            ResourceLocation.withDefaultNamespace("recipe_book/button_highlighted")
     );
 
     private final ResearchRecipeBookComponent recipeBook = new ResearchRecipeBookComponent();
@@ -69,13 +64,13 @@ public class ResearchCraftingTableScreen extends AbstractContainerScreen<Researc
 
         // Create and add recipe book button
         this.recipeBookButton = new ImageButton(
-            buttonX, buttonY,
-            20, 18,
-            RECIPE_BUTTON_SPRITES,
-            button -> {
-                this.recipeBook.toggleVisibility();
-                this.updateScreenPosition();
-            }
+                buttonX, buttonY,
+                20, 18,
+                RECIPE_BUTTON_SPRITES,
+                button -> {
+                    this.recipeBook.toggleVisibility();
+                    this.updateScreenPosition();
+                }
         );
         this.addRenderableWidget(this.recipeBookButton);
 
@@ -161,19 +156,19 @@ public class ResearchCraftingTableScreen extends AbstractContainerScreen<Researc
                 }
 
                 ShapedRecipePattern pattern = new ShapedRecipePattern(
-                    3,
-                    3,
-                    emptyIngredients,
-                    java.util.Optional.empty()
+                        3,
+                        3,
+                        emptyIngredients,
+                        java.util.Optional.empty()
                 );
 
                 // Create ShapedRecipe
                 ShapedRecipe shapedRecipe = new ShapedRecipe(
-                    "", // group
-                    data.category(),
-                    pattern,
-                    resultStack,
-                    false // show notification
+                        "", // group
+                        data.category(),
+                        pattern,
+                        resultStack,
+                        false // show notification
                 );
 
                 // Wrap in ResearchCraftingRecipe
@@ -181,8 +176,8 @@ public class ResearchCraftingTableScreen extends AbstractContainerScreen<Researc
 
                 // Create RecipeHolder
                 ResourceKey<Recipe<?>> recipeKey = ResourceKey.create(
-                    Registries.RECIPE,
-                    data.recipeId()
+                        Registries.RECIPE,
+                        data.recipeId()
                 );
                 RecipeHolder<ResearchCraftingRecipe> holder = new RecipeHolder<>(recipeKey, researchRecipe);
 

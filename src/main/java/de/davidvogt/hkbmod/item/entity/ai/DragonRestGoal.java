@@ -58,8 +58,8 @@ public class DragonRestGoal extends Goal {
         // Debug log every 10 seconds or when timer expired
         if ((timeSinceLastRest % 200 == 0 || landedTimerExpired) && !dragon.level().isClientSide) {
             LOGGER.debug("Dragon {} rest check - time since last: {:.1f}s, landed: {}, timer: {}, has target: {}",
-                dragon.getId(), timeSinceLastRest / 20.0, dragon.isLanded(),
-                dragon.getLandedTimer(), dragon.getTarget() != null);
+                    dragon.getId(), timeSinceLastRest / 20.0, dragon.isLanded(),
+                    dragon.getLandedTimer(), dragon.getTarget() != null);
         }
 
         // Can't rest if already resting
@@ -77,7 +77,7 @@ public class DragonRestGoal extends Goal {
         if (nestPos == null) {
             if (landedTimerExpired && !dragon.level().isClientSide) {
                 LOGGER.debug("Dragon {} - no nest found at {}, will take off instead",
-                    dragon.getId(), dragon.blockPosition());
+                        dragon.getId(), dragon.blockPosition());
             }
             return false;
         }
@@ -88,14 +88,14 @@ public class DragonRestGoal extends Goal {
             if (dragon.getRandom().nextFloat() < 0.5F) {
                 if (!dragon.level().isClientSide) {
                     LOGGER.info("Dragon {} decided to fly to nest and rest at {}",
-                        dragon.getId(), nestPos);
+                            dragon.getId(), nestPos);
                 }
                 targetNestPos = nestPos;
                 return true;
             } else {
                 if (!dragon.level().isClientSide) {
                     LOGGER.debug("Dragon {} skipped resting, will take off",
-                        dragon.getId());
+                            dragon.getId());
                 }
                 return false;
             }
@@ -117,7 +117,7 @@ public class DragonRestGoal extends Goal {
                     if (!dragon.level().isClientSide) {
                         double distance = Math.sqrt(dragon.blockPosition().distSqr(savedNestPos));
                         LOGGER.debug("Dragon {} using saved nest at {} (distance: {:.1f} blocks)",
-                            dragon.getId(), savedNestPos, distance);
+                                dragon.getId(), savedNestPos, distance);
                     }
                     return savedNestPos;
                 }
@@ -130,7 +130,7 @@ public class DragonRestGoal extends Goal {
 
         if (!dragon.level().isClientSide) {
             LOGGER.debug("Dragon {} searching for nest in {}x{}x10 area",
-                dragon.getId(), searchRadius * 2, searchRadius * 2);
+                    dragon.getId(), searchRadius * 2, searchRadius * 2);
         }
 
         // Check in configured area around the dragon
@@ -141,9 +141,9 @@ public class DragonRestGoal extends Goal {
                     BlockState state = dragon.level().getBlockState(checkPos);
                     if (state.is(ModBlocks.DRAGON_NEST.get())) {
                         if (!dragon.level().isClientSide) {
-                            double distance = Math.sqrt(x*x + y*y + z*z);
+                            double distance = Math.sqrt(x * x + y * y + z * z);
                             LOGGER.debug("Dragon {} found nest at {} (distance: {:.1f} blocks)",
-                                dragon.getId(), checkPos, distance);
+                                    dragon.getId(), checkPos, distance);
                         }
                         return checkPos;
                     }
@@ -193,14 +193,14 @@ public class DragonRestGoal extends Goal {
 
         if (!dragon.level().isClientSide) {
             double distanceToNest = dragon.position().distanceTo(
-                new Vec3(
-                    targetNestPos.getX() + 0.5,
-                    targetNestPos.getY() + 1.0,
-                    targetNestPos.getZ() + 0.5
-                )
+                    new Vec3(
+                            targetNestPos.getX() + 0.5,
+                            targetNestPos.getY() + 1.0,
+                            targetNestPos.getZ() + 0.5
+                    )
             );
             LOGGER.debug("Dragon {} flying to nest at {} (distance: {:.2f} blocks)",
-                dragon.getId(), targetNestPos, distanceToNest);
+                    dragon.getId(), targetNestPos, distanceToNest);
         }
     }
 
@@ -214,7 +214,7 @@ public class DragonRestGoal extends Goal {
 
         if (!dragon.level().isClientSide) {
             LOGGER.info("Dragon {} started resting on nest for {:.1f} seconds",
-                dragon.getId(), DragonConstants.REST_DURATION_TICKS / 20.0);
+                    dragon.getId(), DragonConstants.REST_DURATION_TICKS / 20.0);
         }
     }
 
@@ -248,15 +248,15 @@ public class DragonRestGoal extends Goal {
             // Log progress every 2 seconds
             if (dragon.tickCount % 40 == 0 && !dragon.level().isClientSide) {
                 LOGGER.debug("Dragon {} flying to nest, distance: {:.1f} blocks",
-                    dragon.getId(), distanceToNest);
+                        dragon.getId(), distanceToNest);
             }
 
             if (distanceToNest <= DragonConstants.NEST_POSITION_THRESHOLD) {
                 // Reached the nest, position dragon directly on it
                 Vec3 targetVec = new Vec3(
-                    targetNestPos.getX() + 0.5,
-                    targetNestPos.getY() + 0.5,
-                    targetNestPos.getZ() + 0.5
+                        targetNestPos.getX() + 0.5,
+                        targetNestPos.getY() + 0.5,
+                        targetNestPos.getZ() + 0.5
                 );
                 dragon.setPos(targetVec.x, targetVec.y, targetVec.z);
                 dragon.setDeltaMovement(Vec3.ZERO);
@@ -302,9 +302,9 @@ public class DragonRestGoal extends Goal {
             // Keep dragon positioned on nest
             if (targetNestPos != null) {
                 Vec3 nestCenter = new Vec3(
-                    targetNestPos.getX() + 0.5,
-                    targetNestPos.getY() + 0.5,
-                    targetNestPos.getZ() + 0.5
+                        targetNestPos.getX() + 0.5,
+                        targetNestPos.getY() + 0.5,
+                        targetNestPos.getZ() + 0.5
                 );
 
                 // Gently pull dragon towards nest center if it drifts
@@ -316,7 +316,7 @@ public class DragonRestGoal extends Goal {
             // Debug output every 2 seconds
             if (!dragon.level().isClientSide && restTimeLeft % 40 == 0) {
                 LOGGER.debug("Dragon {} resting... {:.1f} seconds remaining",
-                    dragon.getId(), restTimeLeft / 20.0);
+                        dragon.getId(), restTimeLeft / 20.0);
             }
         }
     }

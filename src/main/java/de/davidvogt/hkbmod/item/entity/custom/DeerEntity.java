@@ -13,7 +13,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -26,6 +25,17 @@ public class DeerEntity extends Animal {
 
     public DeerEntity(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
+    }
+
+    /**
+     * Define the attributes for the deer entity (health, movement speed, etc.)
+     */
+    public static AttributeSupplier.Builder createAttributes() {
+        return Animal.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 12.0D)      // 6 hearts (slightly more than cow's 10)
+                .add(Attributes.MOVEMENT_SPEED, 0.25D)   // Faster than cow (0.2D)
+                .add(Attributes.FOLLOW_RANGE, 16.0D)    // How far they notice players
+                .add(Attributes.TEMPT_RANGE, 10.0D);    // Range for tempting with food
     }
 
     @Override
@@ -59,17 +69,6 @@ public class DeerEntity extends Animal {
 
         // Priority 8: Look around randomly when idle
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
-    }
-
-    /**
-     * Define the attributes for the deer entity (health, movement speed, etc.)
-     */
-    public static AttributeSupplier.Builder createAttributes() {
-        return Animal.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 12.0D)      // 6 hearts (slightly more than cow's 10)
-                .add(Attributes.MOVEMENT_SPEED, 0.25D)   // Faster than cow (0.2D)
-                .add(Attributes.FOLLOW_RANGE, 16.0D)    // How far they notice players
-                .add(Attributes.TEMPT_RANGE, 10.0D);    // Range for tempting with food
     }
 
     /**

@@ -1,7 +1,12 @@
 {
   "class": "cavalier",
   "level": 5,
-  "prerequisites": [{"class": "cavalier", "level": 4}],
+  "prerequisites": [
+    {
+      "class": "cavalier",
+      "level": 4
+    }
+  ],
   "displayName": "Level 5: Legendary",
   "description": "Become a legendary cavalier",
   "requirements": [
@@ -17,8 +22,8 @@
   "unlocks": [
     "dragon_saddle"
   ],
-    "advancement": {
-        "title": "Cavalier: Legendary",
-        "description": "Become a legendary cavalier"
-    }
+  "advancement": {
+    "title": "Cavalier: Legendary",
+    "description": "Become a legendary cavalier"
+  }
 }

@@ -19,69 +19,69 @@ public class NetworkHandler {
         PayloadRegistrar registrar = event.registrar(HKBMod.MODID).versioned("1.0");
 
         registrar.playToServer(
-            ResearchActionPacket.TYPE,
-            ResearchActionPacket.STREAM_CODEC,
-            ResearchActionPacket::handle
+                ResearchActionPacket.TYPE,
+                ResearchActionPacket.STREAM_CODEC,
+                ResearchActionPacket::handle
         );
 
         registrar.playToServer(
-            SetSelectedLevelPacket.TYPE,
-            SetSelectedLevelPacket.STREAM_CODEC,
-            SetSelectedLevelPacket::handle
+                SetSelectedLevelPacket.TYPE,
+                SetSelectedLevelPacket.STREAM_CODEC,
+                SetSelectedLevelPacket::handle
         );
 
         registrar.playToServer(
-            SetDigSizePacket.TYPE,
-            SetDigSizePacket.STREAM_CODEC,
-            SetDigSizePacket::handle
+                SetDigSizePacket.TYPE,
+                SetDigSizePacket.STREAM_CODEC,
+                SetDigSizePacket::handle
         );
 
         registrar.playToServer(
-            RequestRecipeSyncPacket.TYPE,
-            RequestRecipeSyncPacket.STREAM_CODEC,
-            RequestRecipeSyncPacket::handle
+                RequestRecipeSyncPacket.TYPE,
+                RequestRecipeSyncPacket.STREAM_CODEC,
+                RequestRecipeSyncPacket::handle
         );
 
         registrar.playToServer(
-            PlaceRecipePacket.TYPE,
-            PlaceRecipePacket.STREAM_CODEC,
-            PlaceRecipePacket::handle
+                PlaceRecipePacket.TYPE,
+                PlaceRecipePacket.STREAM_CODEC,
+                PlaceRecipePacket::handle
         );
 
         registrar.playToServer(
-            DragonBreathFirePacket.TYPE,
-            DragonBreathFirePacket.STREAM_CODEC,
-            DragonBreathFirePacket::handle
+                DragonBreathFirePacket.TYPE,
+                DragonBreathFirePacket.STREAM_CODEC,
+                DragonBreathFirePacket::handle
         );
 
         registrar.playToClient(
-            SyncPlayerResearchPacket.TYPE,
-            SyncPlayerResearchPacket.STREAM_CODEC,
-            SyncPlayerResearchPacket::handle
+                SyncPlayerResearchPacket.TYPE,
+                SyncPlayerResearchPacket.STREAM_CODEC,
+                SyncPlayerResearchPacket::handle
         );
 
         registrar.playToClient(
-            SyncResearchDataPacket.TYPE,
-            SyncResearchDataPacket.STREAM_CODEC,
-            SyncResearchDataPacket::handle
+                SyncResearchDataPacket.TYPE,
+                SyncResearchDataPacket.STREAM_CODEC,
+                SyncResearchDataPacket::handle
         );
 
         registrar.playToClient(
-            SyncUnlockedRecipesPacket.TYPE,
-            SyncUnlockedRecipesPacket.STREAM_CODEC,
-            SyncUnlockedRecipesPacket::handle
+                SyncUnlockedRecipesPacket.TYPE,
+                SyncUnlockedRecipesPacket.STREAM_CODEC,
+                SyncUnlockedRecipesPacket::handle
         );
 
         registrar.playToClient(
-            ResearchRecipeSyncPacket.TYPE,
-            ResearchRecipeSyncPacket.STREAM_CODEC,
-            ResearchRecipeSyncPacket::handle
+                ResearchRecipeSyncPacket.TYPE,
+                ResearchRecipeSyncPacket.STREAM_CODEC,
+                ResearchRecipeSyncPacket::handle
         );
 
         registrar.playToClient(
-            SetGhostRecipePacket.TYPE,
-            SetGhostRecipePacket.STREAM_CODEC,
-            SetGhostRecipePacket::handle
+                SetGhostRecipePacket.TYPE,
+                SetGhostRecipePacket.STREAM_CODEC,
+                SetGhostRecipePacket::handle
         );
 
         HKBMod.LOGGER.info("Registered network packets");

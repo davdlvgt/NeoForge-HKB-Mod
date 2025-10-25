@@ -4,23 +4,23 @@ import de.davidvogt.hkbmod.HKBMod;
 import de.davidvogt.hkbmod.item.entity.ModEntities;
 import de.davidvogt.hkbmod.item.entity.custom.DragonEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Dragon Nest Block Entity - Manages dragon spawning and nest behavior.
- *
+ * <p>
  * Features:
  * - Spawns 1-2 dragons when first created
  * - Tracks linked dragons by UUID
@@ -121,8 +121,8 @@ public class DragonNestBlockEntity extends BlockEntity {
 
             // Check if position is safe (not inside blocks, has air space)
             if (level.getBlockState(testPos).isAir() &&
-                level.getBlockState(testPos.above()).isAir() &&
-                level.getBlockState(testPos.above(2)).isAir()) {
+                    level.getBlockState(testPos.above()).isAir() &&
+                    level.getBlockState(testPos.above(2)).isAir()) {
                 return testPos;
             }
         }

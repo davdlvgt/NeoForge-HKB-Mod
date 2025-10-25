@@ -1,9 +1,8 @@
 package de.davidvogt.hkbmod.item.entity.ai;
 
-import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.Mob;
 
 /**
  * Custom move control for the dragon that doesn't interfere with rotation.
@@ -43,11 +42,11 @@ public class DragonMoveControl extends MoveControl {
 
             // Set velocity directly (we handle rotation separately in tick())
             this.mob.setDeltaMovement(
-                this.mob.getDeltaMovement().add(
-                    dx * speed * 0.1,
-                    dy * speed * 0.1,
-                    dz * speed * 0.1
-                )
+                    this.mob.getDeltaMovement().add(
+                            dx * speed * 0.1,
+                            dy * speed * 0.1,
+                            dz * speed * 0.1
+                    )
             );
 
             this.operation = MoveControl.Operation.WAIT;
