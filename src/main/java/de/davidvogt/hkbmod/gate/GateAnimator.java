@@ -190,21 +190,90 @@ public class GateAnimator {
     }
 
     /**
-     * Checks if a gate can move (no obstructions in the path)
+     * Checks if a gate can move (no obstructions in the path).
+     *
+     * When OPENING (moving up): Checks the path from current position to (current + maxTravel)
+     * When CLOSING (moving down): Checks the path from current position to (current - maxTravel)
+     *
+     * Gate blocks are allowed to pass through each other, but all other blocks are obstructions.
+     *
+     * @param level   The server level
+     * @param structure The gate structure with CLOSED positions
+     * @param opening True if opening (moving up), false if closing (moving down)
+     * @return true if the path is clear, false if obstructed
      */
     public static boolean canGateMove(ServerLevel level, GateStructure structure, boolean opening) {
-        for (BlockPos gatePos : structure.getGateBlocks()) {
-            // Check if path is clear
-            for (int y = 1; y <= structure.getMaxTravel(); y++) {
-                BlockPos checkPos = gatePos.above(y);
-                BlockState state = level.getBlockState(checkPos);
+        LOGGER.info("Checking if gate can move {} - scanning {} blocks over {} steps",
+                   opening ? "UP" : "DOWN", structure.getGateBlocks().size(), structure.getMaxTravel());
 
-                if (!state.isAir() && !(state.getBlock() instanceof GateBlock)) {
-                    return false;
+        for (BlockPos closedPos : structure.getGateBlocks()) {
+            if (opening) {
+                // When opening, check the path UPWARD from the closed position
+                for (int offset = 1; offset <= structure.getMaxTravel(); offset++) {
+                    BlockPos checkPos = closedPos.above(offset);
+                    BlockState state = level.getBlockState(checkPos);
+
+                    // Allow air and gate blocks (gate blocks can overlap during detection)
+                    if (!state.isAir() && !(state.getBlock() instanceof GateBlock)) {
+                        LOGGER.warn("Opening blocked at {} by {} (offset +{})",
+                                   checkPos, state.getBlock().getName().getString(), offset);
+                        return false;
+                    }
+                }
+            } else {
+                // When closing, check the path DOWNWARD to the closed position
+                // This is trickier because gate might currently be open (at closedPos + maxTravel)
+                // We need to check from the current position down to the closed position
+
+                // First, find where this block currently is
+                BlockPos currentPos = null;
+
+                // Check if block is at its closed position
+                if (level.getBlockState(closedPos).getBlock() instanceof GateBlock) {
+                    currentPos = closedPos;
+                }
+
+                // If not, check if it's at the open position
+                if (currentPos == null) {
+                    BlockPos openPos = closedPos.above(structure.getMaxTravel());
+                    if (level.getBlockState(openPos).getBlock() instanceof GateBlock) {
+                        currentPos = openPos;
+                    }
+                }
+
+                // If we still can't find it, search nearby
+                if (currentPos == null) {
+                    for (int searchOffset = 0; searchOffset <= structure.getMaxTravel(); searchOffset++) {
+                        BlockPos searchPos = closedPos.above(searchOffset);
+                        if (level.getBlockState(searchPos).getBlock() instanceof GateBlock) {
+                            currentPos = searchPos;
+                            break;
+                        }
+                    }
+                }
+
+                if (currentPos == null) {
+                    LOGGER.warn("Could not find gate block for closed position {} - skipping obstruction check", closedPos);
+                    continue;
+                }
+
+                // Now check the path from current position down to closed position
+                int currentOffset = currentPos.getY() - closedPos.getY();
+                for (int offset = currentOffset - 1; offset >= 0; offset--) {
+                    BlockPos checkPos = closedPos.above(offset);
+                    BlockState state = level.getBlockState(checkPos);
+
+                    // Allow air and gate blocks
+                    if (!state.isAir() && !(state.getBlock() instanceof GateBlock)) {
+                        LOGGER.warn("Closing blocked at {} by {} (offset +{})",
+                                   checkPos, state.getBlock().getName().getString(), offset);
+                        return false;
+                    }
                 }
             }
         }
 
+        LOGGER.info("Gate movement path is clear");
         return true;
     }
 }

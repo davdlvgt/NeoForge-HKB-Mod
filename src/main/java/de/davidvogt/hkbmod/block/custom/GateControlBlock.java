@@ -3,6 +3,7 @@ package de.davidvogt.hkbmod.block.custom;
 import com.mojang.serialization.MapCodec;
 import de.davidvogt.hkbmod.block.entity.GateControlBlockEntity;
 import de.davidvogt.hkbmod.block.entity.ModBlockEntities;
+import de.davidvogt.hkbmod.gate.GateAnimator;
 import de.davidvogt.hkbmod.gate.GateDetector;
 import de.davidvogt.hkbmod.gate.GateStructure;
 import net.minecraft.core.BlockPos;
@@ -253,25 +254,42 @@ public class GateControlBlock extends BaseEntityBlock {
 
         // Get current state
         boolean isOpen = controlBlockEntity.isOpen();
-        GateStructure structure = controlBlockEntity.getStructure();
+        GateStructure oldStructure = controlBlockEntity.getStructure();
 
-        // Only detect structure if not already cached (first use or after neighbor change cleared it)
+        // ALWAYS re-detect structure before toggling to catch player modifications
+        // The detector will normalize to closed positions, preventing the "disappearing blocks" bug
+        LOGGER.info("Re-detecting gate structure to catch any player modifications");
+        GateStructure structure = GateDetector.detectGateStructure(level, pos);
+
         if (structure == null) {
-            LOGGER.info("No cached structure - detecting gate structure from control block at {}", pos);
-            structure = GateDetector.detectGateStructure(level, pos);
-
-            if (structure == null) {
-                LOGGER.warn("No valid gate structure found at {}", pos);
-                if (player != null) {
-                    player.displayClientMessage(net.minecraft.network.chat.Component.literal("No valid gate structure found!"), true);
-                }
-                return;
+            LOGGER.warn("No valid gate structure found at {}", pos);
+            if (player != null) {
+                player.displayClientMessage(net.minecraft.network.chat.Component.literal("No valid gate structure found!"), true);
             }
+            return;
+        }
 
-            LOGGER.info("Gate structure detected: {} gate blocks, max travel: {}", structure.getGateBlocks().size(), structure.getMaxTravel());
-            controlBlockEntity.setStructure(structure);
-        } else {
-            LOGGER.info("Using cached structure: {} gate blocks, max travel: {}", structure.getGateBlocks().size(), structure.getMaxTravel());
+        // Log if structure changed (player added/removed blocks)
+        if (oldStructure != null && structure.getGateBlocks().size() != oldStructure.getGateBlocks().size()) {
+            LOGGER.info("Gate structure changed: {} blocks -> {} blocks",
+                    oldStructure.getGateBlocks().size(), structure.getGateBlocks().size());
+            if (player != null) {
+                player.displayClientMessage(net.minecraft.network.chat.Component.literal(
+                        String.format("Gate updated: %d blocks detected", structure.getGateBlocks().size())), true);
+            }
+        }
+
+        LOGGER.info("Gate structure: {} gate blocks, max travel: {}", structure.getGateBlocks().size(), structure.getMaxTravel());
+        controlBlockEntity.setStructure(structure);
+
+        // Check if the gate can move (no obstructions)
+        boolean canMove = GateAnimator.canGateMove(level, structure, !isOpen);
+        if (!canMove) {
+            LOGGER.warn("Gate movement blocked - path is obstructed");
+            if (player != null) {
+                player.displayClientMessage(net.minecraft.network.chat.Component.literal("Gate blocked - remove obstructions!"), true);
+            }
+            return;
         }
 
         // Toggle gate state
