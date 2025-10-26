@@ -37,7 +37,9 @@
       "Bash(findstr dragon_nest)",
       "WebFetch(domain:nekoyue.github.io)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:maven.fabricmc.net)"
+      "WebFetch(domain:maven.fabricmc.net)",
+      "Bash(findstr:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

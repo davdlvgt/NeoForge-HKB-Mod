@@ -1,0 +1,100 @@
+{
+  "variants": {
+    "facing=north,rotation=north": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 270
+    },
+    "facing=north,rotation=south": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 270
+    },
+    "facing=north,rotation=west": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 270
+    },
+    "facing=north,rotation=east": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 270
+    },
+    "facing=south,rotation=north": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 90
+    },
+    "facing=south,rotation=south": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 90
+    },
+    "facing=south,rotation=west": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 90
+    },
+    "facing=south,rotation=east": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 90
+    },
+    "facing=west,rotation=north": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 180
+    },
+    "facing=west,rotation=south": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 180
+    },
+    "facing=west,rotation=west": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 180
+    },
+    "facing=west,rotation=east": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 180
+    },
+    "facing=east,rotation=north": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 0
+    },
+    "facing=east,rotation=south": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 0
+    },
+    "facing=east,rotation=west": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 0
+    },
+    "facing=east,rotation=east": {
+      "model": "hkbmod:block/gate_slide_block",
+      "y": 0
+    },
+    "facing=up,rotation=north": {
+      "model": "hkbmod:block/gate_slide_bottom_block",
+      "y": 0
+    },
+    "facing=up,rotation=south": {
+      "model": "hkbmod:block/gate_slide_bottom_block",
+      "y": 180
+    },
+    "facing=up,rotation=west": {
+      "model": "hkbmod:block/gate_slide_bottom_block",
+      "y": 270
+    },
+    "facing=up,rotation=east": {
+      "model": "hkbmod:block/gate_slide_bottom_block",
+      "y": 90
+    },
+    "facing=down,rotation=north": {
+      "model": "hkbmod:block/gate_slide_upper_block",
+      "y": 0
+    },
+    "facing=down,rotation=south": {
+      "model": "hkbmod:block/gate_slide_upper_block",
+      "y": 180
+    },
+    "facing=down,rotation=west": {
+      "model": "hkbmod:block/gate_slide_upper_block",
+      "y": 270
+    },
+    "facing=down,rotation=east": {
+      "model": "hkbmod:block/gate_slide_upper_block",
+      "y": 90
+    }
+  }
+}

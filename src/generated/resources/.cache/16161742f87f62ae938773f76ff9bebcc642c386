@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-25T13:34:01.6934355	Model Definitions - hkbmod
+// 1.21.8	2025-10-26T13:09:28.1826404	Model Definitions - hkbmod
 098162d3c53084529de99da150feb937cc6f06d1 assets/hkbmod/blockstates/custom_test_block.json
 7e4d1ea28b91fa33ba009f67bf41e33b4561e0d3 assets/hkbmod/blockstates/dragon_nest.json
 36c5d1a71329972be809a6b6d81bd92a5cc14576 assets/hkbmod/blockstates/elastic_wood.json
@@ -38,6 +38,9 @@ dc745a78f41cd55c196213999cff6fc6a1456da4 assets/hkbmod/items/elastic_wood.json
 5f3bab4904cfe7ff7c7f5731cb57fdbcf4171445 assets/hkbmod/items/emerald_pickaxe.json
 c2fbb310c6b63cc2d8abccc43dfeda497aa94c08 assets/hkbmod/items/emerald_shovel.json
 e20217067c1ec81fbfe667a59993cc327118cd3d assets/hkbmod/items/emerald_sword.json
+6e802d0021869697d70c5eb1d71f291173271904 assets/hkbmod/items/gate_block.json
+536b94f05f100ff56dd763c4a22d6be12495fd91 assets/hkbmod/items/gate_control_block.json
+8bbfa85941f2305098c86bf78f13afc155ddd675 assets/hkbmod/items/gate_slide_block.json
 069226dde89f9e074240f09e53476d14fd937c6c assets/hkbmod/items/longbow.json
 1c5095ee90077dfca799aec6ab4bcb934c213a7e assets/hkbmod/items/longbow_arrow.json
 850c4e7abc177244159eadde1f116f211f888996 assets/hkbmod/items/longbow_stick.json

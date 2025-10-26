@@ -59,6 +59,11 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.DRAGON_NEST.get());
         this.add(ModBlocks.DRAGON_EGG.get(), block -> createSingleItemTableWithSilkTouch(ModBlocks.DRAGON_EGG.get(), ModBlocks.DRAGON_EGG.get()));
 
+        // Gate system blocks
+        this.dropSelf(ModBlocks.GATE_BLOCK.get());
+        this.dropSelf(ModBlocks.GATE_SLIDE_BLOCK.get());
+        this.dropSelf(ModBlocks.GATE_CONTROL_BLOCK.get());
+
         add(ModBlocks.ROBINIA_DOOR.get(),
                 block -> createDoorTable(ModBlocks.ROBINIA_DOOR.get()));
 

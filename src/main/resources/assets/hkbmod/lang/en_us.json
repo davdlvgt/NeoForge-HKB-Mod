@@ -15,6 +15,9 @@
   "entity.hkbmod.dragon.variant.shadow": "Shadow Dragon",
   "entity.hkbmod.dragon.variant.arcane": "Arcane Dragon",
   "item.hkbmod.dragon_skin": "Dragon Skin",
+  "block.hkbmod.gate_block": "Gate Block",
+  "block.hkbmod.gate_slide_block": "Gate Slide Block",
+  "block.hkbmod.gate_control_block": "Gate Control Block",
   "gui.hkbmod.recipe_book.ingredients": "Required Ingredients:",
   "advancements.hkbmod.root.title": "HKB Mod",
   "advancements.hkbmod.root.description": "Begin your journey with hero classes"

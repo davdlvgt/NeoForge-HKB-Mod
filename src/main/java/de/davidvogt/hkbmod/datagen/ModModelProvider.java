@@ -98,7 +98,11 @@ public class ModModelProvider extends ModelProvider {
         return ModBlocks.BLOCKS.getEntries().stream().filter(
                 x -> !x.is(ModBlocks.RESEARCH_TABLE)
                         && !x.is(ModBlocks.RESEARCH_CRAFTING_TABLE)
-                        && !x.is(ModBlocks.DRAGON_EGG));
+                        && !x.is(ModBlocks.DRAGON_EGG)
+                        && !x.is(ModBlocks.GATE_SLIDE_BLOCK)
+                        && !x.is(ModBlocks.GATE_BLOCK)
+                        && !x.is(ModBlocks.GATE_CONTROL_BLOCK)
+        );
     }
 
     @Override

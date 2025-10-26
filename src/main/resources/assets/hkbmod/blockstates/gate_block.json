@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,open=false": { "model": "hkbmod:block/gate_block", "y": 0 },
+    "facing=north,open=true": { "model": "hkbmod:block/gate_block", "y": 0 },
+    "facing=south,open=false": { "model": "hkbmod:block/gate_block", "y": 180 },
+    "facing=south,open=true": { "model": "hkbmod:block/gate_block", "y": 180 },
+    "facing=east,open=false": { "model": "hkbmod:block/gate_block", "y": 90 },
+    "facing=east,open=true": { "model": "hkbmod:block/gate_block", "y": 90 },
+    "facing=west,open=false": { "model": "hkbmod:block/gate_block", "y": 270 },
+    "facing=west,open=true": { "model": "hkbmod:block/gate_block", "y": 270 }
+  }
+}

@@ -39,5 +39,12 @@ public class ModBlockEntities {
                     )
             );
 
+    public static final Supplier<BlockEntityType<GateControlBlockEntity>> GATE_CONTROL_BE =
+            BLOCK_ENTITIES.register("gate_control_be",
+                    () -> new BlockEntityType<>(
+                            GateControlBlockEntity::new,
+                            ModBlocks.GATE_CONTROL_BLOCK.get()
+                    )
+            );
 
 }

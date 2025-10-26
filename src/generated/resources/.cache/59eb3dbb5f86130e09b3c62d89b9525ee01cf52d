@@ -1,7 +1,10 @@
-// 1.21.8	2025-10-14T11:35:00.8740717	Loot Tables
+// 1.21.8	2025-10-25T20:39:38.3369928	Loot Tables
 02347853c1827551a0f5e25fcbcdb5fb988ce5c9 data/hkbmod/loot_table/blocks/dragon_egg.json
 460e3174a3fcda5781b1c5853bfadebe3902d54d data/hkbmod/loot_table/blocks/dragon_nest.json
 9977d922b31c56740e38597ad0d4dbbe4c97d7fe data/hkbmod/loot_table/blocks/elastic_wood.json
+40c034e45a5f4143f29372fcf0be69888624cddd data/hkbmod/loot_table/blocks/gate_block.json
+293ed8582193cadcfb7e88a77058eebc5dbdf3f6 data/hkbmod/loot_table/blocks/gate_control_block.json
+cec9502e4f0bd223529cb093297dc2978846facf data/hkbmod/loot_table/blocks/gate_slide_block.json
 870ff03e227792ec709b6a389667910c57243241 data/hkbmod/loot_table/blocks/research_crafting_table.json
 c066bd23d91a63018548b5761007647891e483f0 data/hkbmod/loot_table/blocks/research_table.json
 439b4807be55d2eef37e233803e509996a5317ce data/hkbmod/loot_table/blocks/robinia_button.json

@@ -57,6 +57,25 @@ public class ModBlocks {
                     .noOcclusion()
                     .sound(SoundType.STONE)));
 
+    // GATE SYSTEM BLOCKS
+    public static final DeferredBlock<Block> GATE_BLOCK = registerBlock("gate_block",
+            (properties) -> new GateBlock(properties
+                    .strength(3.0f)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)));
+
+    public static final DeferredBlock<Block> GATE_SLIDE_BLOCK = registerBlock("gate_slide_block",
+            (properties) -> new GateSlideBlock(properties
+                    .strength(3.0f)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)));
+
+    public static final DeferredBlock<Block> GATE_CONTROL_BLOCK = registerBlock("gate_control_block",
+            (properties) -> new GateControlBlock(properties
+                    .strength(3.0f)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)));
+
     public static final DeferredBlock<Block> ELASTIC_WOOD = registerBlock(
             "elastic_wood",
             Block::new
