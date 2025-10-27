@@ -578,86 +578,128 @@ public class GateDetector {
 
     /**
      * Calculates the CLOSED (original) positions of gate blocks that are currently OPEN (raised).
-     * This works by finding the lowest Y coordinate among all gate blocks and assuming that's
-     * where the bottom of the gate should be when closed.
+     *
+     * IMPORTANT: This handles irregular gates where players added blocks at different heights.
+     * - Blocks with OPEN=false are already at closed position (keep as-is)
+     * - Blocks with OPEN=true need to be normalized down to closed position
      */
     private static Set<BlockPos> calculateClosedPositions(Level level, Set<BlockPos> openGateBlocks) {
         if (openGateBlocks.isEmpty()) {
             return openGateBlocks;
         }
 
-        // Find the minimum Y coordinate - this tells us how far the gate has moved up
-        int minY = openGateBlocks.stream()
-                .mapToInt(BlockPos::getY)
-                .min()
-                .orElse(0);
+        // Separate blocks by their OPEN state
+        Set<BlockPos> alreadyClosedBlocks = new HashSet<>();
+        Set<BlockPos> openBlocks = new HashSet<>();
 
-        LOGGER.info("Detected gate blocks range from Y={} (minimum)", minY);
-
-        // We need to determine how far down to move the blocks to get to their closed position
-        // Strategy: Look for slide blocks BELOW the current gate position to find the lower boundary
-        // The gate should sit just ABOVE the lower boundary when closed
-
-        // Find ANY gate block to use as reference
-        BlockPos referenceGatePos = openGateBlocks.iterator().next();
-        BlockState referenceState = level.getBlockState(referenceGatePos);
-        Direction gateFacing = referenceState.getValue(GateBlock.FACING);
-
-        LOGGER.info("Reference gate block at {} with facing {}", referenceGatePos, gateFacing);
-
-        // Look for slide blocks adjacent to the gate (perpendicular to gate facing)
-        // If gate faces NORTH/SOUTH, slides are EAST/WEST
-        // If gate faces EAST/WEST, slides are NORTH/SOUTH
-        Direction slideDir1, slideDir2;
-        if (gateFacing == Direction.NORTH || gateFacing == Direction.SOUTH) {
-            slideDir1 = Direction.EAST;
-            slideDir2 = Direction.WEST;
-        } else {
-            slideDir1 = Direction.NORTH;
-            slideDir2 = Direction.SOUTH;
-        }
-
-        // Find slide column by checking adjacent to reference gate block
-        BlockPos slideColumnPos = null;
-        for (Direction dir : new Direction[]{slideDir1, slideDir2}) {
-            BlockPos checkPos = referenceGatePos.relative(dir);
-            BlockState checkState = level.getBlockState(checkPos);
-            if (checkState.getBlock() instanceof GateSlideBlock || checkState.getBlock() instanceof GateControlBlock) {
-                slideColumnPos = checkPos;
-                LOGGER.info("Found slide column at {}", slideColumnPos);
-                break;
+        for (BlockPos pos : openGateBlocks) {
+            BlockState state = level.getBlockState(pos);
+            if (state.getBlock() instanceof GateBlock) {
+                if (state.getValue(GateBlock.OPEN)) {
+                    openBlocks.add(pos);
+                } else {
+                    alreadyClosedBlocks.add(pos);
+                }
             }
         }
 
-        if (slideColumnPos == null) {
-            LOGGER.warn("Could not find slide column to determine closed position - using current positions");
+        LOGGER.info("Block state analysis: {} blocks at closed position, {} blocks at open position",
+                   alreadyClosedBlocks.size(), openBlocks.size());
+
+        // If no blocks are open, all are already at closed position
+        if (openBlocks.isEmpty()) {
+            LOGGER.info("All blocks already at closed position");
             return openGateBlocks;
         }
 
-        // Scan DOWN from the slide column position to find the lower boundary
-        BlockPos lowerBoundary = findLowerBoundaryInColumn(level, slideColumnPos, minY);
-
-        if (lowerBoundary == null) {
-            LOGGER.warn("Could not find lower boundary - using current positions");
-            return openGateBlocks;
+        // If we have blocks already at closed position, use them to determine the closed Y level
+        Integer closedMinY = null;
+        if (!alreadyClosedBlocks.isEmpty()) {
+            closedMinY = alreadyClosedBlocks.stream()
+                    .mapToInt(BlockPos::getY)
+                    .min()
+                    .orElse(0);
+            LOGGER.info("Using already-closed blocks to determine closed level: Y={}", closedMinY);
         }
 
-        LOGGER.info("Found lower boundary at Y={}", lowerBoundary.getY());
+        // If we don't have closed blocks to reference, find the lower boundary
+        if (closedMinY == null) {
+            // Find minimum Y of open blocks
+            int openMinY = openBlocks.stream()
+                    .mapToInt(BlockPos::getY)
+                    .min()
+                    .orElse(0);
 
-        // The closed position should be just ABOVE the lower boundary
-        int closedMinY = lowerBoundary.getY() + 1;
-        int yOffset = minY - closedMinY;
+            LOGGER.info("No closed blocks found, searching for lower boundary (open blocks at Y >= {})", openMinY);
 
-        LOGGER.info("Gate blocks currently at Y >= {}, should be at Y >= {} when closed, offset = {}",
-                   minY, closedMinY, yOffset);
+            // Find ANY gate block to use as reference
+            BlockPos referenceGatePos = openBlocks.iterator().next();
+            BlockState referenceState = level.getBlockState(referenceGatePos);
+            Direction gateFacing = referenceState.getValue(GateBlock.FACING);
 
-        // Move all gate blocks down by yOffset to get their closed positions
+            // Look for slide blocks adjacent to the gate
+            Direction slideDir1, slideDir2;
+            if (gateFacing == Direction.NORTH || gateFacing == Direction.SOUTH) {
+                slideDir1 = Direction.EAST;
+                slideDir2 = Direction.WEST;
+            } else {
+                slideDir1 = Direction.NORTH;
+                slideDir2 = Direction.SOUTH;
+            }
+
+            // Find slide column
+            BlockPos slideColumnPos = null;
+            for (Direction dir : new Direction[]{slideDir1, slideDir2}) {
+                BlockPos checkPos = referenceGatePos.relative(dir);
+                BlockState checkState = level.getBlockState(checkPos);
+                if (checkState.getBlock() instanceof GateSlideBlock || checkState.getBlock() instanceof GateControlBlock) {
+                    slideColumnPos = checkPos;
+                    break;
+                }
+            }
+
+            if (slideColumnPos == null) {
+                LOGGER.warn("Could not find slide column to determine closed position - using current positions");
+                return openGateBlocks;
+            }
+
+            // Find lower boundary
+            BlockPos lowerBoundary = findLowerBoundaryInColumn(level, slideColumnPos, openMinY);
+            if (lowerBoundary == null) {
+                LOGGER.warn("Could not find lower boundary - using current positions");
+                return openGateBlocks;
+            }
+
+            closedMinY = lowerBoundary.getY() + 1;
+            LOGGER.info("Determined closed level from lower boundary: Y={}", closedMinY);
+        }
+
+        // Now normalize the OPEN blocks to closed positions
+        // Calculate offset based on the lowest open block
+        int openMinY = openBlocks.stream()
+                .mapToInt(BlockPos::getY)
+                .min()
+                .orElse(closedMinY);
+
+        int yOffset = openMinY - closedMinY;
+        LOGGER.info("Normalizing open blocks: currentMinY={}, closedMinY={}, offset={}",
+                   openMinY, closedMinY, yOffset);
+
+        // Build the final set of closed positions
         Set<BlockPos> closedPositions = new HashSet<>();
-        for (BlockPos openPos : openGateBlocks) {
+
+        // Keep already-closed blocks as-is
+        closedPositions.addAll(alreadyClosedBlocks);
+
+        // Normalize open blocks by moving them down by the offset
+        for (BlockPos openPos : openBlocks) {
             BlockPos closedPos = openPos.below(yOffset);
             closedPositions.add(closedPos);
-            LOGGER.debug("Normalizing {} -> {}", openPos, closedPos);
+            LOGGER.debug("Normalizing open block: {} -> {}", openPos, closedPos);
         }
+
+        LOGGER.info("Final result: {} closed positions ({} kept, {} normalized)",
+                   closedPositions.size(), alreadyClosedBlocks.size(), openBlocks.size());
 
         return closedPositions;
     }
