@@ -24,6 +24,14 @@ import java.util.*;
 public class GateDetector {
     private static final Logger LOGGER = LoggerFactory.getLogger(GateDetector.class);
 
+    // Konstanten für magische Zahlen
+    private static final int MAX_VERTICAL_SEARCH_OFFSET = 64;
+    private static final int MAX_GATE_BLOCKS = 1000; // Verhindert Speicherprobleme bei fehlerhaften Strukturen
+    private static final int SLIDE_COLUMN_SEARCH_RADIUS = 6;
+    // PROBLEM 5 FIX: Reduziere übermäßige Suchbereiche - wir suchen nur in der Slide-Säule
+    private static final int SLIDE_COLUMN_EXTENSION = 10; // Blocks über/unter dem Gate zu scannen
+    private static final int LOWER_BOUNDARY_SEARCH_RANGE = 32; // Reduziert von 64
+
     /**
      * Detects a gate structure starting from a control block position.
      *
@@ -32,6 +40,11 @@ public class GateDetector {
      * @return GateStructure if valid, null if invalid or not found
      */
     public static GateStructure detectGateStructure(Level level, BlockPos controlPos) {
+        if (level == null || controlPos == null) {
+            LOGGER.error("Cannot detect gate structure - invalid parameters");
+            return null;
+        }
+
         LOGGER.info("Starting gate detection from control block at {}", controlPos);
 
         // Get the control block's facing direction
@@ -70,6 +83,10 @@ public class GateDetector {
         if (gateCurrentlyOpen) {
             LOGGER.info("Gate is currently OPEN - calculating closed positions");
             closedGateBlocks = calculateClosedPositions(level, gateBlocks);
+            if (closedGateBlocks.isEmpty()) {
+                LOGGER.error("Failed to calculate closed positions for open gate");
+                return null;
+            }
             LOGGER.info("Normalized {} gate blocks to closed positions", closedGateBlocks.size());
         } else {
             LOGGER.info("Gate is currently CLOSED - using detected positions as-is");
@@ -80,6 +97,10 @@ public class GateDetector {
 
         // Step 3: Calculate gate bounds
         GateBounds bounds = calculateGateBounds(gateBlocks);
+        if (bounds == null) {
+            LOGGER.error("Failed to calculate gate bounds");
+            return null;
+        }
         LOGGER.info("Gate bounds: {} x {} (width x height)", bounds.width(), bounds.height());
 
         // Step 4: Determine gate orientation and find slide columns
@@ -105,39 +126,52 @@ public class GateDetector {
         LOGGER.info("Found slide blocks - Left: {}, Right: {}", leftSlides.size(), rightSlides.size());
 
         // Step 5: Find boundary markers
-        // Boundaries are horizontal blocks ABOVE and BELOW the gate, not in the side columns!
-        // Search for boundaries at the gate's Z positions, not at the slide column positions
-        BlockPos leftLowerBoundary = findHorizontalBoundaryMarker(level, bounds, true);
-        BlockPos leftUpperBoundary = findHorizontalBoundaryMarker(level, bounds, false);
+        // PROBLEM 1 & 3 FIX: Search for boundaries in BOTH locations:
+        // 1. In the slide columns themselves (FACING=UP/DOWN markers)
+        // 2. As horizontal blocks above/below the gate
+        // This makes boundary detection more robust and consistent
+        BlockPos leftLowerBoundary = findBoundaryMarker(level, leftSlides, true);
+        BlockPos leftUpperBoundary = findBoundaryMarker(level, leftSlides, false);
 
-        // Boundaries are OPTIONAL - if not found, calculate them from slide column positions
+        // If not found in slide columns, try horizontal search
         if (leftLowerBoundary == null || leftUpperBoundary == null) {
-            LOGGER.info("Boundary markers not found or incomplete - calculating from slide columns");
+            LOGGER.info("Boundaries not found in slide columns - trying horizontal search");
+            if (leftLowerBoundary == null) {
+                leftLowerBoundary = findHorizontalBoundaryMarker(level, bounds, true);
+            }
+            if (leftUpperBoundary == null) {
+                leftUpperBoundary = findHorizontalBoundaryMarker(level, bounds, false);
+            }
+        }
+
+        // PROBLEM 3 FIX: Consistent fallback - use min/max of slide columns as boundaries
+        if (leftLowerBoundary == null || leftUpperBoundary == null) {
+            LOGGER.info("No explicit boundary markers found - using slide column extents as boundaries");
 
             // Find the actual boundary positions (first and last slide in column)
-            BlockPos leftMin = leftSlides.stream()
-                .min(Comparator.comparingInt(BlockPos::getY))
-                .orElse(null);
-            BlockPos leftMax = leftSlides.stream()
-                .max(Comparator.comparingInt(BlockPos::getY))
-                .orElse(null);
-            BlockPos rightMin = rightSlides.stream()
-                .min(Comparator.comparingInt(BlockPos::getY))
-                .orElse(null);
-            BlockPos rightMax = rightSlides.stream()
-                .max(Comparator.comparingInt(BlockPos::getY))
-                .orElse(null);
+            Optional<BlockPos> leftMin = leftSlides.stream()
+                .min(Comparator.comparingInt(BlockPos::getY));
+            Optional<BlockPos> leftMax = leftSlides.stream()
+                .max(Comparator.comparingInt(BlockPos::getY));
+            Optional<BlockPos> rightMin = rightSlides.stream()
+                .min(Comparator.comparingInt(BlockPos::getY));
+            Optional<BlockPos> rightMax = rightSlides.stream()
+                .max(Comparator.comparingInt(BlockPos::getY));
 
-            if (leftMin == null || leftMax == null || rightMin == null || rightMax == null) {
-                LOGGER.warn("Could not determine slide boundaries");
+            if (leftMin.isEmpty() || leftMax.isEmpty() || rightMin.isEmpty() || rightMax.isEmpty()) {
+                LOGGER.warn("Could not determine slide boundaries from empty streams");
                 return null;
             }
 
-            // Use lowest and highest slides as boundaries
-            leftLowerBoundary = leftMin;
-            leftUpperBoundary = leftMax;
+            // Use the min/max of BOTH columns to ensure consistency
+            int minSlideY = Math.min(leftMin.get().getY(), rightMin.get().getY());
+            int maxSlideY = Math.max(leftMax.get().getY(), rightMax.get().getY());
 
-            LOGGER.info("Using slide positions as boundaries - Lower: Y={}, Upper: Y={}",
+            // Create boundary positions (use left column X/Z for consistency)
+            leftLowerBoundary = new BlockPos(leftMin.get().getX(), minSlideY, leftMin.get().getZ());
+            leftUpperBoundary = new BlockPos(leftMax.get().getX(), maxSlideY, leftMax.get().getZ());
+
+            LOGGER.info("Using slide extents as boundaries - Lower: Y={}, Upper: Y={}",
                        leftLowerBoundary.getY(), leftUpperBoundary.getY());
         } else {
             LOGGER.info("Found boundary markers - Lower: Y={}, Upper: Y={}",
@@ -182,27 +216,59 @@ public class GateDetector {
      * Searches horizontally and vertically upward if gate is moved.
      */
     private static BlockPos findFirstGateBlock(Level level, BlockPos controlPos, Direction facing) {
+        if (level == null || controlPos == null || facing == null) {
+            LOGGER.error("Invalid parameters: level={}, controlPos={}, facing={}", level, controlPos, facing);
+            return null;
+        }
+
         // First check in the facing direction at the same level
         BlockPos checkPos = controlPos.relative(facing);
         if (level.getBlockState(checkPos).getBlock() instanceof GateBlock) {
             return checkPos;
         }
 
-        // If no gate block found horizontally, search vertically upward
-        // This handles the case where the gate is open and blocks are above
-        for (int yOffset = 1; yOffset <= 64; yOffset++) {
-            checkPos = controlPos.relative(facing).above(yOffset);
-            if (level.getBlockState(checkPos).getBlock() instanceof GateBlock) {
-                LOGGER.info("Found gate block {} blocks above control block", yOffset);
-                return checkPos;
+        // If no gate block found horizontally, search vertically upward and downward
+        int minWorldY = level.getMinY();
+        int maxWorldY = level.getMaxY();
+
+        boolean continueUp = true;
+        boolean continueDown = true;
+
+        for (int yOffset = 1; yOffset <= MAX_VERTICAL_SEARCH_OFFSET && (continueUp || continueDown); yOffset++) {
+            if (continueUp) {
+                BlockPos upPos = controlPos.relative(facing).above(yOffset);
+                if (upPos.getY() <= maxWorldY && level.getBlockState(upPos).getBlock() instanceof GateBlock) {
+                    LOGGER.info("Found gate block {} blocks above control block", yOffset);
+                    return upPos;
+                }
+
+                BlockPos aboveControl = controlPos.above(yOffset);
+                if (aboveControl.getY() > maxWorldY) {
+                    continueUp = false;
+                } else {
+                    BlockState state = level.getBlockState(aboveControl);
+                    if (!(state.getBlock() instanceof GateSlideBlock || state.getBlock() instanceof GateControlBlock)) {
+                        continueUp = false;
+                    }
+                }
             }
 
-            // Stop searching if we hit a non-slide block in the column above control
-            BlockPos aboveControl = controlPos.above(yOffset);
-            BlockState state = level.getBlockState(aboveControl);
-            if (!(state.getBlock() instanceof GateSlideBlock || state.getBlock() instanceof GateControlBlock)) {
-                // We've left the slide column, stop searching
-                break;
+            if (continueDown) {
+                BlockPos downPos = controlPos.relative(facing).below(yOffset);
+                if (downPos.getY() >= minWorldY && level.getBlockState(downPos).getBlock() instanceof GateBlock) {
+                    LOGGER.info("Found gate block {} blocks below control block", yOffset);
+                    return downPos;
+                }
+
+                BlockPos belowControl = controlPos.below(yOffset);
+                if (belowControl.getY() < minWorldY) {
+                    continueDown = false;
+                } else {
+                    BlockState stateDown = level.getBlockState(belowControl);
+                    if (!(stateDown.getBlock() instanceof GateSlideBlock || stateDown.getBlock() instanceof GateControlBlock)) {
+                        continueDown = false;
+                    }
+                }
             }
         }
 
@@ -210,14 +276,25 @@ public class GateDetector {
     }
 
     /**
-     * Finds all connected gate blocks using flood fill
+     * Finds all connected gate blocks using flood fill with size limit for safety
      */
     private static Set<BlockPos> findAllGateBlocks(Level level, BlockPos start) {
+        if (level == null || start == null) {
+            LOGGER.error("Invalid parameters: level={}, start={}", level, start);
+            return Collections.emptySet();
+        }
+
         Set<BlockPos> found = new HashSet<>();
         Queue<BlockPos> toCheck = new LinkedList<>();
         toCheck.add(start);
 
         while (!toCheck.isEmpty()) {
+            // Sicherheitsprüfung: Verhindere zu große Strukturen
+            if (found.size() >= MAX_GATE_BLOCKS) {
+                LOGGER.warn("Gate structure exceeds maximum size of {} blocks - stopping flood fill", MAX_GATE_BLOCKS);
+                break;
+            }
+
             BlockPos current = toCheck.poll();
 
             if (found.contains(current)) {
@@ -246,6 +323,11 @@ public class GateDetector {
      * Calculates the bounding box of the gate
      */
     private static GateBounds calculateGateBounds(Set<BlockPos> gateBlocks) {
+        if (gateBlocks == null || gateBlocks.isEmpty()) {
+            LOGGER.error("Cannot calculate bounds for null or empty gate blocks");
+            return null;
+        }
+
         int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
         int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
         int minZ = Integer.MAX_VALUE, maxZ = Integer.MIN_VALUE;
@@ -273,151 +355,193 @@ public class GateDetector {
      * direction the slides are actually at. We check both perpendicular directions.
      */
     private static List<BlockPos> findSlideColumnAtBounds(Level level, GateBounds bounds, Direction sideDirection) {
+        if (level == null || bounds == null || sideDirection == null) {
+            LOGGER.error("Invalid parameters in findSlideColumnAtBounds");
+            return Collections.emptyList();
+        }
+
         List<BlockPos> slides = new ArrayList<>();
 
         LOGGER.info("Looking for slide column on {} side of gate (bounds: X={} to {}, Z={} to {})",
-                    sideDirection, bounds.minX(), bounds.maxX(), bounds.minZ(), bounds.maxZ());
+                sideDirection, bounds.minX(), bounds.maxX(), bounds.minZ(), bounds.maxZ());
 
-        // The gate extends in one direction, slides are perpendicular
         // Check if gate extends in X or Z direction
         boolean gateExtendsInX = (bounds.maxX() - bounds.minX()) > 0;
         boolean gateExtendsInZ = (bounds.maxZ() - bounds.minZ()) > 0;
 
         LOGGER.info("Gate extends: X={}, Z={}", gateExtendsInX, gateExtendsInZ);
 
-        // Case 1: Gate extends in Z direction (like your build)
-        // Slides should be at minZ-1 (NORTH) and maxZ+1 (SOUTH)
+        // Case 1: Gate extends in Z direction -> slides run along X, columns at Z = minZ-1 or maxZ+1
         if (gateExtendsInZ && !gateExtendsInX) {
-            LOGGER.info("Gate extends in Z direction - looking for slides NORTH/SOUTH");
+            LOGGER.info("Gate extends in Z direction - scanning X range for slide columns");
 
-            if (sideDirection == Direction.WEST || sideDirection == Direction.NORTH) {
-                // Left side = NORTH (minZ - 1)
-                int slideZ = bounds.minZ() - 1;
-                LOGGER.info("Searching for LEFT slides at Z={}, X={}", slideZ, bounds.minX());
-                findSlideBlocksInColumn(level, new BlockPos(bounds.minX(), bounds.maxY(), slideZ), slides);
-            } else if (sideDirection == Direction.EAST || sideDirection == Direction.SOUTH) {
-                // Right side = SOUTH (maxZ + 1)
-                int slideZ = bounds.maxZ() + 1;
-                LOGGER.info("Searching for RIGHT slides at Z={}, X={}", slideZ, bounds.minX());
-                findSlideBlocksInColumn(level, new BlockPos(bounds.minX(), bounds.maxY(), slideZ), slides);
-            }
-        }
-        // Case 2: Gate extends in X direction
-        // Slides should be at minX-1 (WEST) and maxX+1 (EAST)
-        else if (gateExtendsInX && !gateExtendsInZ) {
-            LOGGER.info("Gate extends in X direction - looking for slides WEST/EAST");
-
-            if (sideDirection == Direction.WEST) {
-                // Left side = WEST (minX - 1)
-                int slideX = bounds.minX() - 1;
-                LOGGER.info("Searching for LEFT slides at X={}, Z={}", slideX, bounds.minZ());
-                findSlideBlocksInColumn(level, new BlockPos(slideX, bounds.maxY(), bounds.minZ()), slides);
-            } else if (sideDirection == Direction.EAST) {
-                // Right side = EAST (maxX + 1)
-                int slideX = bounds.maxX() + 1;
-                LOGGER.info("Searching for RIGHT slides at X={}, Z={}", slideX, bounds.minZ());
-                findSlideBlocksInColumn(level, new BlockPos(slideX, bounds.maxY(), bounds.minZ()), slides);
-            } else if (sideDirection == Direction.NORTH) {
-                // North interpreted as left for X-extending gates
-                int slideX = bounds.minX() - 1;
-                LOGGER.info("Searching for LEFT (NORTH) slides at X={}, Z={}", slideX, bounds.minZ());
-                findSlideBlocksInColumn(level, new BlockPos(slideX, bounds.maxY(), bounds.minZ()), slides);
+            int slideZ;
+            // Prefer explicit NORTH/SOUTH, but accept WEST/EAST as aliases from caller (left/right)
+            if (sideDirection == Direction.NORTH) {
+                slideZ = bounds.minZ() - 1;
             } else if (sideDirection == Direction.SOUTH) {
-                // South interpreted as right for X-extending gates
-                int slideX = bounds.maxX() + 1;
-                LOGGER.info("Searching for RIGHT (SOUTH) slides at X={}, Z={}", slideX, bounds.minZ());
-                findSlideBlocksInColumn(level, new BlockPos(slideX, bounds.maxY(), bounds.minZ()), slides);
+                slideZ = bounds.maxZ() + 1;
+            } else {
+                // Fallback: decide by closeness to min/max Z (choose left/right semantics handled by caller)
+                slideZ = (Math.abs(sideDirection.getStepZ() - bounds.minZ()) <= Math.abs(sideDirection.getStepZ() - bounds.maxZ()))
+                        ? bounds.minZ() - 1
+                        : bounds.maxZ() + 1;
+            }
+
+            for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
+                findSlideBlocksInColumn(level, new BlockPos(x, bounds.maxY(), slideZ), slides);
             }
         }
-        // Case 3: Gate is single block or extends in both directions (3D gate)
+        // Case 2: Gate extends in X direction -> slides run along Z, columns at X = minX-1 or maxX+1
+        else if (gateExtendsInX && !gateExtendsInZ) {
+            LOGGER.info("Gate extends in X direction - scanning Z range for slide columns");
+
+            int slideX;
+            if (sideDirection == Direction.WEST) {
+                slideX = bounds.minX() - 1;
+            } else if (sideDirection == Direction.EAST) {
+                slideX = bounds.maxX() + 1;
+            } else {
+                // Fallback similar to above
+                slideX = (Math.abs(sideDirection.getStepX() - bounds.minX()) <= Math.abs(sideDirection.getStepX() - bounds.maxX()))
+                        ? bounds.minX() - 1
+                        : bounds.maxX() + 1;
+            }
+
+            for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
+                findSlideBlocksInColumn(level, new BlockPos(slideX, bounds.maxY(), z), slides);
+            }
+        }
+        // Case 3: Single block or 3D gate - scan a limited neighborhood around gate center
         else {
-            LOGGER.warn("Gate has unusual dimensions - trying all directions");
-            // Try all four directions
-            BlockPos testPos = null;
-            switch (sideDirection) {
-                case WEST:
-                    testPos = new BlockPos(bounds.minX() - 1, bounds.maxY(), bounds.minZ());
-                    break;
-                case EAST:
-                    testPos = new BlockPos(bounds.maxX() + 1, bounds.maxY(), bounds.minZ());
-                    break;
-                case NORTH:
-                    testPos = new BlockPos(bounds.minX(), bounds.maxY(), bounds.minZ() - 1);
-                    break;
-                case SOUTH:
-                    testPos = new BlockPos(bounds.minX(), bounds.maxY(), bounds.maxZ() + 1);
-                    break;
-            }
-            if (testPos != null) {
-                findSlideBlocksInColumn(level, testPos, slides);
+            LOGGER.warn("Gate has unusual dimensions - scanning neighborhood to locate slides");
+
+            int centerX = (bounds.minX() + bounds.maxX()) / 2;
+            int centerZ = (bounds.minZ() + bounds.maxZ()) / 2;
+
+            if (sideDirection == Direction.NORTH || sideDirection == Direction.SOUTH) {
+                int[] candidateZ = new int[]{bounds.minZ() - 1, bounds.maxZ() + 1, bounds.minZ(), bounds.maxZ()};
+                int startX = centerX - SLIDE_COLUMN_SEARCH_RADIUS;
+                int endX = centerX + SLIDE_COLUMN_SEARCH_RADIUS;
+                LOGGER.info("  Scanning X={}..{} at Z candidates {} for slide columns (side={})", startX, endX, Arrays.toString(candidateZ), sideDirection);
+
+                for (int z : candidateZ) {
+                    for (int x = startX; x <= endX; x++) {
+                        findSlideBlocksInColumn(level, new BlockPos(x, bounds.maxY(), z), slides);
+                    }
+                    // Frühes Abbrechen wenn Slides gefunden wurden
+                    if (!slides.isEmpty()) break;
+                }
+            } else {
+                int[] candidateX = new int[]{bounds.minX() - 1, bounds.maxX() + 1, bounds.minX(), bounds.maxX()};
+                int startZ = centerZ - SLIDE_COLUMN_SEARCH_RADIUS;
+                int endZ = centerZ + SLIDE_COLUMN_SEARCH_RADIUS;
+                LOGGER.info("  Scanning Z={}..{} at X candidates {} for slide columns (side={})", startZ, endZ, Arrays.toString(candidateX), sideDirection);
+
+                for (int x : candidateX) {
+                    for (int z = startZ; z <= endZ; z++) {
+                        findSlideBlocksInColumn(level, new BlockPos(x, bounds.maxY(), z), slides);
+                    }
+                    // Frühes Abbrechen wenn Slides gefunden wurden
+                    if (!slides.isEmpty()) break;
+                }
             }
         }
 
-        // Remove duplicates
-        Set<BlockPos> uniqueSlides = new LinkedHashSet<>(slides);
-        slides.clear();
-        slides.addAll(uniqueSlides);
-
-        LOGGER.info("Found {} slide blocks on {} side", slides.size(), sideDirection);
         return slides;
     }
 
     /**
      * Helper method to find all slide/control blocks in a vertical column at a given X/Z position.
-     * Scans downward to find bottom, then upward to collect all blocks.
+     * OPTIMIZED: Only scans until FACING=UP (lower boundary) or FACING=DOWN (upper boundary) markers are found.
      */
     private static void findSlideBlocksInColumn(Level level, BlockPos startPos, List<BlockPos> results) {
-        LOGGER.info("Scanning column at X={}, Z={}, starting Y={}", startPos.getX(), startPos.getZ(), startPos.getY());
-        
-        // Check what's at the start position
-        BlockState startState = level.getBlockState(startPos);
-        LOGGER.info("  Block at start position: {}", startState.getBlock().getClass().getSimpleName());
-        
-        // Scan down to find the bottom - extend search range to include boundaries below gate
-        BlockPos scanPos = startPos;
-        int minY = Math.max(level.getMinY(), startPos.getY() - 128); // Increased range to find lower boundaries
-
-        LOGGER.info("  Scanning DOWN from Y={} to Y={}", startPos.getY(), minY);
-        while (scanPos.getY() > minY) {
-            BlockPos below = scanPos.below();
-            BlockState belowState = level.getBlockState(below);
-            LOGGER.info("    Y={}: {}", below.getY(), belowState.getBlock().getClass().getSimpleName());
-
-            if (belowState.getBlock() instanceof GateSlideBlock || belowState.getBlock() instanceof GateControlBlock) {
-                scanPos = below;
-            } else {
-                LOGGER.info("    Found non-slide block, stopping downward scan");
-                break;
-            }
+        if (level == null || startPos == null || results == null) {
+            LOGGER.error("Invalid parameters in findSlideBlocksInColumn");
+            return;
         }
 
-        LOGGER.info("  Bottom found at Y={}", scanPos.getY());
+        int x = startPos.getX();
+        int z = startPos.getZ();
 
-        // Now scan upward from the bottom to collect ALL slide/control blocks
-        int maxY = Math.min(level.getMaxY(), scanPos.getY() + 256); // Scan higher to include upper boundaries
-        BlockPos currentPos = scanPos;
+        // Prüfe ob diese Spalte bereits gescannt wurde (Duplikatsvermeidung)
+        boolean alreadyScanned = results.stream()
+                .anyMatch(pos -> pos.getX() == x && pos.getZ() == z);
 
-        LOGGER.info("  Scanning UP from Y={} to Y={}", scanPos.getY(), maxY);
-        int foundCount = 0;
-        while (currentPos.getY() <= maxY) {
-            BlockState state = level.getBlockState(currentPos);
-            String blockName = state.getBlock().getClass().getSimpleName();
-            LOGGER.info("    Y={}: {}", currentPos.getY(), blockName);
+        if (alreadyScanned) {
+            LOGGER.debug("Column at X={}, Z={} already scanned - skipping", x, z);
+            return;
+        }
 
-            if (state.getBlock() instanceof GateSlideBlock || state.getBlock() instanceof GateControlBlock) {
-                if (!results.contains(currentPos)) {
-                    results.add(currentPos.immutable());
-                    foundCount++;
-                    LOGGER.info("      -> Added to results (total: {})", foundCount);
+        LOGGER.info("Scanning column at X={}, Z={}, starting Y={}", x, z, startPos.getY());
+
+        // PROBLEM 5 FIX: Scanne nur mit begrenztem Abstand vom Startpunkt
+        int minY = Math.max(level.getMinY(), startPos.getY() - SLIDE_COLUMN_EXTENSION);
+        int maxY = Math.min(level.getMaxY(), startPos.getY() + SLIDE_COLUMN_EXTENSION);
+
+        LOGGER.info("  Initial scan range: Y={} to Y={}", minY, maxY);
+
+        List<BlockPos> foundInColumn = new ArrayList<>();
+        BlockPos lowerBoundary = null;
+        BlockPos upperBoundary = null;
+
+        // Scan downward from start to find lower boundary and all blocks
+        for (int y = startPos.getY(); y >= minY; y--) {
+            BlockPos pos = new BlockPos(x, y, z);
+            BlockState state = level.getBlockState(pos);
+
+            if (state.getBlock() instanceof GateSlideBlock) {
+                foundInColumn.add(pos.immutable());
+
+                // Check if this is the lower boundary (FACING=UP)
+                if (GateSlideBlock.isLowerBoundary(state)) {
+                    lowerBoundary = pos;
+                    LOGGER.info("  Found LOWER boundary at Y={}", y);
+                    break; // Stop scanning down
                 }
-                currentPos = currentPos.above();
+            } else if (state.getBlock() instanceof GateControlBlock) {
+                foundInColumn.add(pos.immutable());
             } else {
-                LOGGER.info("      -> Not a slide/control block, stopping upward scan");
+                // Hit a non-slide/control block, stop scanning down
+                LOGGER.debug("  Hit non-slide block at Y={}, stopping downward scan", y);
                 break;
             }
         }
 
-        LOGGER.info("  Column scan complete: found {} slide/control blocks at X={}, Z={}", foundCount, startPos.getX(), startPos.getZ());
+        // Scan upward from start to find upper boundary and all blocks
+        for (int y = startPos.getY() + 1; y <= maxY; y++) {
+            BlockPos pos = new BlockPos(x, y, z);
+            BlockState state = level.getBlockState(pos);
+
+            if (state.getBlock() instanceof GateSlideBlock) {
+                foundInColumn.add(pos.immutable());
+
+                // Check if this is the upper boundary (FACING=DOWN)
+                if (GateSlideBlock.isUpperBoundary(state)) {
+                    upperBoundary = pos;
+                    LOGGER.info("  Found UPPER boundary at Y={}", y);
+                    break; // Stop scanning up
+                }
+            } else if (state.getBlock() instanceof GateControlBlock) {
+                foundInColumn.add(pos.immutable());
+            } else {
+                // Hit a non-slide/control block, stop scanning up
+                LOGGER.debug("  Hit non-slide block at Y={}, stopping upward scan", y);
+                break;
+            }
+        }
+
+        // Add all found blocks to results
+        for (BlockPos pos : foundInColumn) {
+            if (!results.contains(pos)) {
+                results.add(pos);
+            }
+        }
+
+        LOGGER.info("  Column scan complete: found {} slide/control blocks at X={}, Z={} (boundaries: lower={}, upper={})",
+                   foundInColumn.size(), x, z,
+                   lowerBoundary != null ? "Y=" + lowerBoundary.getY() : "none",
+                   upperBoundary != null ? "Y=" + upperBoundary.getY() : "none");
     }
 
     /**
@@ -556,6 +680,11 @@ public class GateDetector {
      * If most blocks have OPEN=true, the gate is considered open.
      */
     private static boolean isGateOpen(Level level, Set<BlockPos> gateBlocks) {
+        if (level == null || gateBlocks == null || gateBlocks.isEmpty()) {
+            LOGGER.warn("Cannot check gate open state - invalid parameters");
+            return false;
+        }
+
         int openCount = 0;
         int totalCount = 0;
 
@@ -569,6 +698,11 @@ public class GateDetector {
             }
         }
 
+        if (totalCount == 0) {
+            LOGGER.warn("No valid gate blocks found when checking open state");
+            return false;
+        }
+
         // Gate is considered open if more than half the blocks are marked as open
         boolean isOpen = openCount > totalCount / 2;
         LOGGER.info("Gate open check: {}/{} blocks are marked OPEN -> gate is {}",
@@ -579,13 +713,14 @@ public class GateDetector {
     /**
      * Calculates the CLOSED (original) positions of gate blocks that are currently OPEN (raised).
      *
-     * IMPORTANT: This handles irregular gates where players added blocks at different heights.
+     * PROBLEM 4 FIX: Simplified and more robust approach
      * - Blocks with OPEN=false are already at closed position (keep as-is)
      * - Blocks with OPEN=true need to be normalized down to closed position
+     * - Uses consistent Y-level calculation to avoid irregular gate issues
      */
     private static Set<BlockPos> calculateClosedPositions(Level level, Set<BlockPos> openGateBlocks) {
-        if (openGateBlocks.isEmpty()) {
-            return openGateBlocks;
+        if (openGateBlocks == null || openGateBlocks.isEmpty()) {
+            return openGateBlocks != null ? openGateBlocks : Collections.emptySet();
         }
 
         // Separate blocks by their OPEN state
@@ -612,8 +747,10 @@ public class GateDetector {
             return openGateBlocks;
         }
 
-        // If we have blocks already at closed position, use them to determine the closed Y level
+        // Determine the closed Y level
         Integer closedMinY = null;
+
+        // Strategy 1: Use already-closed blocks as reference
         if (!alreadyClosedBlocks.isEmpty()) {
             closedMinY = alreadyClosedBlocks.stream()
                     .mapToInt(BlockPos::getY)
@@ -622,80 +759,51 @@ public class GateDetector {
             LOGGER.info("Using already-closed blocks to determine closed level: Y={}", closedMinY);
         }
 
-        // If we don't have closed blocks to reference, find the lower boundary
+        // Strategy 2: Find lower boundary from slide column
         if (closedMinY == null) {
-            // Find minimum Y of open blocks
-            int openMinY = openBlocks.stream()
+            closedMinY = findClosedLevelFromSlideColumn(level, openBlocks);
+            if (closedMinY != null) {
+                LOGGER.info("Determined closed level from slide column boundary: Y={}", closedMinY);
+            }
+        }
+
+        // Strategy 3: Fallback - use minimum Y of open blocks as closed position
+        // This is a last resort when we can't find proper boundaries
+        if (closedMinY == null) {
+            LOGGER.warn("Could not determine closed position from boundaries - using minimum Y of open blocks");
+
+            closedMinY = openBlocks.stream()
                     .mapToInt(BlockPos::getY)
                     .min()
                     .orElse(0);
 
-            LOGGER.info("No closed blocks found, searching for lower boundary (open blocks at Y >= {})", openMinY);
-
-            // Find ANY gate block to use as reference
-            BlockPos referenceGatePos = openBlocks.iterator().next();
-            BlockState referenceState = level.getBlockState(referenceGatePos);
-            Direction gateFacing = referenceState.getValue(GateBlock.FACING);
-
-            // Look for slide blocks adjacent to the gate
-            Direction slideDir1, slideDir2;
-            if (gateFacing == Direction.NORTH || gateFacing == Direction.SOUTH) {
-                slideDir1 = Direction.EAST;
-                slideDir2 = Direction.WEST;
-            } else {
-                slideDir1 = Direction.NORTH;
-                slideDir2 = Direction.SOUTH;
-            }
-
-            // Find slide column
-            BlockPos slideColumnPos = null;
-            for (Direction dir : new Direction[]{slideDir1, slideDir2}) {
-                BlockPos checkPos = referenceGatePos.relative(dir);
-                BlockState checkState = level.getBlockState(checkPos);
-                if (checkState.getBlock() instanceof GateSlideBlock || checkState.getBlock() instanceof GateControlBlock) {
-                    slideColumnPos = checkPos;
-                    break;
-                }
-            }
-
-            if (slideColumnPos == null) {
-                LOGGER.warn("Could not find slide column to determine closed position - using current positions");
-                return openGateBlocks;
-            }
-
-            // Find lower boundary
-            BlockPos lowerBoundary = findLowerBoundaryInColumn(level, slideColumnPos, openMinY);
-            if (lowerBoundary == null) {
-                LOGGER.warn("Could not find lower boundary - using current positions");
-                return openGateBlocks;
-            }
-
-            closedMinY = lowerBoundary.getY() + 1;
-            LOGGER.info("Determined closed level from lower boundary: Y={}", closedMinY);
+            LOGGER.info("Using fallback closed level: Y={}", closedMinY);
         }
 
-        // Now normalize the OPEN blocks to closed positions
-        // Calculate offset based on the lowest open block
+        // Now normalize all open blocks to closed positions
         int openMinY = openBlocks.stream()
                 .mapToInt(BlockPos::getY)
                 .min()
                 .orElse(closedMinY);
 
         int yOffset = openMinY - closedMinY;
-        LOGGER.info("Normalizing open blocks: currentMinY={}, closedMinY={}, offset={}",
+        LOGGER.info("Normalizing open blocks: currentMinY={}, closedMinY={}, yOffset={}",
                    openMinY, closedMinY, yOffset);
 
-        // Build the final set of closed positions
-        Set<BlockPos> closedPositions = new HashSet<>();
+        // Sanity check: offset should be non-negative (blocks are moving down or staying)
+        if (yOffset < 0) {
+            LOGGER.error("Invalid offset calculated: {} (should be >= 0) - using current positions", yOffset);
+            return openGateBlocks;
+        }
 
-        // Keep already-closed blocks as-is
-        closedPositions.addAll(alreadyClosedBlocks);
+        // Build the final set of closed positions
+        Set<BlockPos> closedPositions = new HashSet<>(alreadyClosedBlocks);
 
         // Normalize open blocks by moving them down by the offset
         for (BlockPos openPos : openBlocks) {
             BlockPos closedPos = openPos.below(yOffset);
             closedPositions.add(closedPos);
-            LOGGER.debug("Normalizing open block: {} -> {}", openPos, closedPos);
+            LOGGER.debug("Normalizing open block: {} -> {} (offset={})", openPos, closedPos, yOffset);
         }
 
         LOGGER.info("Final result: {} closed positions ({} kept, {} normalized)",
@@ -705,11 +813,138 @@ public class GateDetector {
     }
 
     /**
+     * PROBLEM 4 FIX: Helper method to find the closed Y level from the slide column.
+     * Extracted for clarity and reusability.
+     */
+    private static Integer findClosedLevelFromSlideColumn(Level level, Set<BlockPos> openBlocks) {
+        if (openBlocks.isEmpty()) {
+            return null;
+        }
+
+        // Find ANY gate block to use as reference
+        BlockPos referenceGatePos = openBlocks.iterator().next();
+        BlockState referenceState = level.getBlockState(referenceGatePos);
+
+        if (!(referenceState.getBlock() instanceof GateBlock)) {
+            return null;
+        }
+
+        Direction gateFacing = referenceState.getValue(GateBlock.FACING);
+
+        // CRITICAL FIX: We need to search for the slide column based on the GATE BOUNDS,
+        // not just the reference block position. When the gate is open, the blocks
+        // are at a different Y level, so we need to look at all X/Z positions.
+
+        // Calculate bounds of open blocks to find slide column location
+        int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
+        int minZ = Integer.MAX_VALUE, maxZ = Integer.MIN_VALUE;
+
+        for (BlockPos pos : openBlocks) {
+            minX = Math.min(minX, pos.getX());
+            maxX = Math.max(maxX, pos.getX());
+            minZ = Math.min(minZ, pos.getZ());
+            maxZ = Math.max(maxZ, pos.getZ());
+        }
+
+        // Determine slide column locations based on gate extension direction
+        // The key insight: slides are perpendicular to the gate's WIDTH direction, not its FACING
+        boolean gateExtendsInX = (maxX - minX) > 0;
+        boolean gateExtendsInZ = (maxZ - minZ) > 0;
+
+        int slideCheckX, slideCheckZ;
+
+        if (gateExtendsInZ && !gateExtendsInX) {
+            // Gate extends in Z direction (e.g., Z=26 to Z=31 at X=-26)
+            // Slides are perpendicular to Z extension, so at Z=minZ-1 or Z=maxZ+1
+            slideCheckX = minX;
+            slideCheckZ = minZ - 1; // Try one side first
+
+            LOGGER.info("Gate extends in Z (minZ={}, maxZ={}), checking slide at X={}, Z={}",
+                       minZ, maxZ, slideCheckX, slideCheckZ);
+        } else if (gateExtendsInX && !gateExtendsInZ) {
+            // Gate extends in X direction
+            // Slides are perpendicular to X extension, so at X=minX-1 or X=maxX+1
+            slideCheckX = minX - 1; // Try one side first
+            slideCheckZ = minZ;
+
+            LOGGER.info("Gate extends in X (minX={}, maxX={}), checking slide at X={}, Z={}",
+                       minX, maxX, slideCheckX, slideCheckZ);
+        } else {
+            // Single block gate or unusual configuration - use facing as fallback
+            LOGGER.warn("Gate has unusual dimensions (X span: {}, Z span: {}), using facing-based logic",
+                       maxX - minX, maxZ - minZ);
+
+            if (gateFacing == Direction.NORTH || gateFacing == Direction.SOUTH) {
+                slideCheckX = minX;
+                slideCheckZ = minZ - 1;
+            } else {
+                slideCheckX = minX - 1;
+                slideCheckZ = minZ;
+            }
+        }
+
+        // Try to find slide column at the calculated position
+        BlockPos slideColumnPos = new BlockPos(slideCheckX, referenceGatePos.getY(), slideCheckZ);
+        BlockState checkState = level.getBlockState(slideColumnPos);
+
+        if (!(checkState.getBlock() instanceof GateSlideBlock || checkState.getBlock() instanceof GateControlBlock)) {
+            // Try the other side based on gate extension direction
+            if (gateExtendsInZ && !gateExtendsInX) {
+                slideCheckZ = maxZ + 1; // Try the opposite side
+                LOGGER.info("First side not found, trying opposite at X={}, Z={}", slideCheckX, slideCheckZ);
+            } else if (gateExtendsInX && !gateExtendsInZ) {
+                slideCheckX = maxX + 1; // Try the opposite side
+                LOGGER.info("First side not found, trying opposite at X={}, Z={}", slideCheckX, slideCheckZ);
+            } else {
+                // Unusual configuration fallback
+                if (gateFacing == Direction.NORTH || gateFacing == Direction.SOUTH) {
+                    slideCheckZ = maxZ + 1;
+                } else {
+                    slideCheckX = maxX + 1;
+                }
+            }
+
+            slideColumnPos = new BlockPos(slideCheckX, referenceGatePos.getY(), slideCheckZ);
+            checkState = level.getBlockState(slideColumnPos);
+
+            if (!(checkState.getBlock() instanceof GateSlideBlock || checkState.getBlock() instanceof GateControlBlock)) {
+                LOGGER.warn("Could not find slide column adjacent to gate at X={}, Z={}", slideCheckX, slideCheckZ);
+                return null;
+            }
+        }
+
+        LOGGER.info("Found slide column at {} for closed level detection", slideColumnPos);
+
+        // Find the lower boundary in the slide column
+        int openMinY = openBlocks.stream()
+                .mapToInt(BlockPos::getY)
+                .min()
+                .orElse(referenceGatePos.getY());
+
+        BlockPos lowerBoundary = findLowerBoundaryInColumn(level, slideColumnPos, openMinY);
+        if (lowerBoundary == null) {
+            LOGGER.warn("Could not find lower boundary in slide column");
+            return null;
+        }
+
+        // Closed position starts one block above the lower boundary
+        return lowerBoundary.getY() + 1;
+    }
+
+    /**
      * Finds the lower boundary marker in a slide column by scanning downward from a starting position.
+     * Used when normalizing open gate positions to closed positions.
      */
     private static BlockPos findLowerBoundaryInColumn(Level level, BlockPos startPos, int minY) {
+        if (level == null || startPos == null) {
+            LOGGER.error("Invalid parameters in findLowerBoundaryInColumn");
+            return null;
+        }
+
         // Scan down from startPos to find a lower boundary marker (FACING=UP)
-        for (int y = startPos.getY(); y >= Math.max(level.getMinY(), minY - 64); y--) {
+        int searchLimit = Math.max(level.getMinY(), minY - LOWER_BOUNDARY_SEARCH_RANGE);
+
+        for (int y = startPos.getY(); y >= searchLimit; y--) {
             BlockPos checkPos = new BlockPos(startPos.getX(), y, startPos.getZ());
             BlockState state = level.getBlockState(checkPos);
 
@@ -728,7 +963,8 @@ public class GateDetector {
             }
         }
 
-        LOGGER.warn("Could not find lower boundary in column at X={}, Z={}", startPos.getX(), startPos.getZ());
+        LOGGER.warn("Could not find lower boundary in column at X={}, Z={} after searching down to Y={}",
+                   startPos.getX(), startPos.getZ(), searchLimit);
         return null;
     }
 }
